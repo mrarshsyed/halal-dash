@@ -38,6 +38,9 @@ export const useAppStore = defineStore('app', {
     getTokens: (state) => {
       const storedTokens = JSON.parse(localStorage.getItem('tokens'))
       return state.tokens || (storedTokens ? storedTokens : null)
+    },
+    getUserName: (state) => {
+      return state.user?.data?.email ? state.user.data.email.split('@')[0] : ''
     }
   },
   actions: {

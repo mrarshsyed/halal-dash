@@ -75,7 +75,7 @@
 
     <v-main>
       <v-container style="max-width: 1000px">
-        <v-card class="pa-4">
+        <v-card class="pa-4 overflow-scroll">
           <slot />
         </v-card>
       </v-container>
