@@ -8,8 +8,14 @@
     <v-row>
       <v-col cols="12" :md="4" v-for="(m, index) in modules">
         <v-card :to="m.to">
+          <div class="text-center">
+            <v-icon
+              color="primary"
+              size="x-large"
+              :icon="'mdi-' + m.icon"
+            ></v-icon>
+          </div>
           <v-card-title>
-            <v-icon>mdi-{{ m.icon }}</v-icon>
             {{ m?.title }}
           </v-card-title>
           <v-card-text>
