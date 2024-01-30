@@ -1,0 +1,1 @@
+import{_ as e,o as c,c as o}from"./index-1c68082f.js";const t={},r={class:"text-center"};function s(n,a){return c(),o("h1",r,"Welcome To Halal Explore")}const l=e(t,[["render",s]]);export{l as default};
