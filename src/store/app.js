@@ -22,7 +22,8 @@ export const useAppStore = defineStore('app', {
       content: '',
       confirmText: '',
       cancelText: 'Close',
-      confirmFunction: () => {}
+      confirmFunction: () => {},
+      formComponents: []
     },
     user: JSON.parse(localStorage.getItem('user')) || null,
     tokens: JSON.parse(localStorage.getItem('tokens')) || null,
@@ -55,7 +56,14 @@ export const useAppStore = defineStore('app', {
       this.snackbar.message = message
       this.snackbar.variant = variant ?? 'success'
     },
-    showDialog({ title, content, confirmText, cancelText, confirmFunction }) {
+    showDialog({
+      title,
+      content,
+      confirmText,
+      cancelText,
+      confirmFunction,
+      formComponents
+    }) {
       this.dialog.show = true
       this.dialog.title = title ?? 'Welcome to Dev Script'
       this.dialog.content =
@@ -63,6 +71,19 @@ export const useAppStore = defineStore('app', {
       this.dialog.confirmText = confirmText ?? 'Save'
       this.dialog.cancelText = cancelText ?? 'Close'
       this.dialog.confirmFunction = confirmFunction
+      this.dialog.formComponents = formComponents
+    },
+    closeDialog() {
+      const dialog = {
+        show: false,
+        title: '',
+        content: '',
+        confirmText: '',
+        cancelText: 'Close',
+        confirmFunction: () => {},
+        formComponents: []
+      }
+      this.dialog = dialog
     },
     setUser(user) {
       this.user = user

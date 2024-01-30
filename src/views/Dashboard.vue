@@ -7,14 +7,12 @@
     <p class="my-4">Modules</p>
     <v-row>
       <v-col cols="12" :md="4" v-for="(m, index) in modules">
-        <v-card :to="m.to">
-          <div class="text-center">
-            <v-icon
-              color="primary"
-              size="x-large"
-              :icon="'mdi-' + m.icon"
-            ></v-icon>
-          </div>
+        <v-card class="text-center" :to="m.to">
+          <v-icon
+            color="primary"
+            size="x-large"
+            :icon="'mdi-' + m.icon"
+          ></v-icon>
           <v-card-title>
             {{ m?.title }}
           </v-card-title>

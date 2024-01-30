@@ -33,6 +33,10 @@ axios.interceptors.response.use(
     const store = useAppStore()
     store.stopLoading()
     if (error.response) {
+      if (error.response.status === 500) {
+        store.logout()
+        return
+      }
       store.showSnackbar(error.response.data.message, 'error')
     } else if (error.request) {
       console.error('Request error:', error.request)

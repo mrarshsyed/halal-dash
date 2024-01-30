@@ -30,8 +30,27 @@ export default createVuetify({
       density: 'compact',
       class: 'mb-2'
     },
+    VSelect: {
+      variant: 'outlined',
+      clearable: true,
+      density: 'compact',
+      class: 'mb-2'
+    },
+    VAutocomplete: {
+      variant: 'outlined',
+      clearable: true,
+      density: 'compact',
+      class: 'mb-2'
+    },
     VCard: {
       class: 'py-5'
+    },
+    VChip: {
+      label: true,
+      variant: 'outlined',
+      size: 'small',
+      color: 'primary',
+      class: 'text-capitalize'
     }
   }
 })
