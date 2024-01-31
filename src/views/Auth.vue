@@ -138,8 +138,10 @@ const handleLogin = async () => {
       password: password.value
     })
     .then(async (res) => {
-      await store.setUser(res.data)
-      router.push('/dashboard')
+      if (res) {
+        await store.setUser(res.data)
+        router.push('/dashboard')
+      }
     })
 }
 
@@ -154,6 +156,7 @@ const handlePasswordSave = async () => {
     .then((res) => {
       if (res?.status === 200 && res?.data?.isVerified) {
         store.showSnackbar('Password Saved')
+        router.push('/authentication?mode=Login')
       }
     })
 }
@@ -183,12 +186,16 @@ watch(
             `admin/users/verify-password-link?str=${query.str}&otp=${query?.otp}&user=${query?.user}`
           )
           .then((res) => {
+            if (!res?.data?.user) {
+              router.push('/authentication?mode=Login')
+            }
             if (res?.status === 200 && res?.data?.user?._id) {
               store.showSnackbar('Link Verified')
               showPasswordSaveForm.value = true
-            } else {
-              showActionButton.value = false
             }
+          })
+          .catch((err) => {
+            showActionButton.value = false
           })
       }
     }

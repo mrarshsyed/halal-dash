@@ -86,6 +86,8 @@
 import { useAppStore } from '@/store/app'
 import { watch, ref, computed } from 'vue'
 import { useTheme } from 'vuetify'
+import { navLinks } from '@/config/userRoutes'
+import { onMounted } from 'vue'
 
 const store = useAppStore()
 const theme = useTheme()
@@ -93,50 +95,7 @@ const theme = useTheme()
 const data = ref({
   drawer: false,
   group: null,
-  items: [
-    {
-      title: 'Dashboard',
-      value: 'dashboard',
-      icon: 'clock',
-      to: '/dashboard',
-      role: ['admin', 'staff', 'manager'],
-      children: []
-    },
-    {
-      title: 'Hotels',
-      value: 'hotels',
-      icon: 'home-city',
-      role: ['admin', 'staff', 'manager'],
-      children: [
-        {
-          icon: 'view-list',
-          title: 'List',
-          to: '/hotels/list',
-          value: 'hotels-list'
-        },
-        {
-          icon: 'star-box',
-          title: 'Ratings',
-          to: '/hotel/ratings',
-          value: 'hotels-ratings'
-        },
-        {
-          icon: 'file-document-multiple',
-          title: 'Orders',
-          to: '/hotel/orders',
-          value: 'hotels-orders'
-        }
-      ]
-    },
-    {
-      title: 'Users',
-      value: 'users',
-      icon: 'account-box',
-      to: '/users',
-      role: ['admin', 'staff'],
-      children: []
-    }
-  ],
+  items: navLinks,
   open: []
 })
 

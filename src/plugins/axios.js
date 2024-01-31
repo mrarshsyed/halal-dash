@@ -25,6 +25,7 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response) => {
+    // console.log(response)
     const store = useAppStore()
     store.stopLoading()
     return response
@@ -33,17 +34,16 @@ axios.interceptors.response.use(
     const store = useAppStore()
     store.stopLoading()
     if (error.response) {
-      if (error.response.status === 500) {
-        store.logout()
-        return
+      if (error?.response?.data?.message) {
+        store.showSnackbar(error?.response?.data?.message, 'error')
+      } else if (error?.response?.data) {
+        store.showSnackbar(error.response.data, 'error')
       }
-      store.showSnackbar(error.response.data.message, 'error')
-    } else if (error.request) {
-      console.error('Request error:', error.request)
-    } else {
-      console.error('Error:', error.message)
-    }
 
+      if (error.response.status === 500 || error.response.status === 401) {
+        store.logout()
+      }
+    }
     return Promise.reject(error)
   }
 )

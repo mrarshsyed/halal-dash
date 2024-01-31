@@ -97,7 +97,7 @@ export const useAppStore = defineStore('app', {
       localStorage.clear()
       this.user = null
       this.tokens = null
-      this.router.push('/')
+      this.router.push('/authentication?mode=Login')
     },
     setUserList(list) {
       this.userList = list
