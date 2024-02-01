@@ -1,6 +1,7 @@
 // Utilities
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
+import axios from '@/plugins/axios'
 
 export const useAppStore = defineStore('app', {
   setup() {
@@ -27,7 +28,9 @@ export const useAppStore = defineStore('app', {
     },
     user: JSON.parse(localStorage.getItem('user')) || null,
     tokens: JSON.parse(localStorage.getItem('tokens')) || null,
-    userList: []
+    userList: [],
+    hotel_details: {},
+    rating_details: {}
   }),
   getters: {
     isLoading: (state) => state.loading,
@@ -71,7 +74,9 @@ export const useAppStore = defineStore('app', {
       this.dialog.confirmText = confirmText ?? 'Save'
       this.dialog.cancelText = cancelText ?? 'Close'
       this.dialog.confirmFunction = confirmFunction
-      this.dialog.formComponents = formComponents
+      this.dialog.formComponents = formComponents?.fields?.length
+        ? formComponents
+        : {}
     },
     closeDialog() {
       const dialog = {
@@ -101,6 +106,19 @@ export const useAppStore = defineStore('app', {
     },
     setUserList(list) {
       this.userList = list
+    },
+    setRatingDetails(details) {
+      this.rating_details = details
+    },
+    setHotelDetails(detail) {
+      this.hotel_details = detail
+    },
+    async createUser(email, role) {
+      const payload = {
+        email: email,
+        role: role
+      }
+      return await axios.post('admin/users', payload)
     }
   }
 })

@@ -34,6 +34,12 @@ const modules = [
     icon: 'account-circle',
     description: 'Manage All Users',
     to: '/users'
+  },
+  {
+    title: 'Hotels List',
+    icon: 'home-city',
+    description: 'Manage All hotels',
+    to: '/hotels/list'
   }
 ]
 </script>

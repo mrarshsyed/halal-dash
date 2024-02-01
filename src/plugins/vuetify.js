@@ -28,19 +28,22 @@ export default createVuetify({
       variant: 'outlined',
       clearable: true,
       density: 'compact',
-      class: 'mb-2'
+      class: 'mb-2',
+      color: 'primary'
     },
     VSelect: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',
-      class: 'mb-2'
+      class: 'mb-2',
+      color: 'primary'
     },
     VAutocomplete: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',
-      class: 'mb-2'
+      class: 'mb-2',
+      color: 'primary'
     },
     VCard: {
       class: 'py-5'
@@ -50,7 +53,17 @@ export default createVuetify({
       variant: 'outlined',
       size: 'small',
       color: 'primary',
-      class: 'text-capitalize'
+      class: 'text-capitalize font-weight-bold'
+    },
+    VDialog: {
+      maxWidth: '600px',
+      persistent: true,
+      scrollable: true,
+      color: 'primary'
+    },
+    VCheckbox: {
+      hideDetails: 'auto',
+      color: 'primary'
     }
   }
 })

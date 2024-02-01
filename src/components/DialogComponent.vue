@@ -18,24 +18,12 @@
                 :type="component?.type"
                 v-if="
                   component?.type === 'email' ||
-                  component?.type === 'string' ||
+                  component?.type === 'text' ||
                   component?.type === 'number'
                 "
                 :label="component?.label"
                 :required="component?.isRequired"
-                :rules="
-                  component?.isRequired
-                    ? [
-                        (v) => !!v || `${component?.label} is required`,
-                        (v) =>
-                          !v ||
-                          /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
-                            v
-                          ) ||
-                          'E-mail must be valid'
-                      ]
-                    : []
-                "
+                :rules="getValidationRules(component)"
                 v-model="component.value"
               ></v-text-field>
               <v-autocomplete
@@ -64,7 +52,7 @@
           color="error"
           variant="outlined"
           class="px-4"
-          @click="dialog.show = false"
+          @click="store.closeDialog"
         >
           {{ dialog.cancelText }}
         </v-btn>
@@ -80,6 +68,24 @@ import { useAppStore } from '@/store/app'
 import { computed, ref } from 'vue'
 const store = useAppStore()
 const form = ref()
+
+const getValidationRules = (component) => {
+  const commonRules = component?.isRequired
+    ? [(v) => !!v || `${component?.label} is required`]
+    : []
+
+  if (component?.type === 'email') {
+    return [
+      ...commonRules,
+      (v) =>
+        (component?.type === 'email' && !v) ||
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
+        'E-mail must be valid'
+    ]
+  }
+
+  return commonRules
+}
 
 const dialog = computed(() => {
   return store.dialog

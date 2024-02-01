@@ -74,13 +74,13 @@ export const navLinks = [
       {
         icon: 'star-box',
         title: 'Ratings',
-        to: '/hotel/ratings',
+        to: '/hotels/ratings',
         value: 'hotels-ratings'
       },
       {
         icon: 'file-document-multiple',
         title: 'Orders',
-        to: '/hotel/orders',
+        to: '/hotels/orders',
         value: 'hotels-orders'
       }
     ]

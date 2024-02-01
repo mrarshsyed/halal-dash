@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row>
+    <v-row class="mb-4">
       <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
@@ -116,7 +116,7 @@ const sendVerificationEmail = async () => {
     email: store.dialog.formComponents?.fields[0]?.value,
     role: store.dialog.formComponents?.fields[1]?.value
   }
-  await axiosInstance.post('/admin/users', payload).then(async (res) => {
+  await store.createUser(payload.email, payload.role).then(async (res) => {
     if (res?.status === 200) {
       store.showSnackbar('Invitation Link sent Successfully')
       await loadItems({
@@ -131,11 +131,12 @@ const sendVerificationEmail = async () => {
 }
 
 const showDialog = () => {
+  resetForm()
   const dialogModal = {
     title: 'Add new user with role',
     content: '',
     confirmText: 'Send Email Verification Link',
-    formComponents: { ...userForm.value },
+    formComponents: userForm.value,
     confirmFunction: sendVerificationEmail
   }
   store.showDialog(dialogModal)
