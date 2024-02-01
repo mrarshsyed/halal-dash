@@ -3,14 +3,15 @@
     <v-card :title="dialog.title">
       <v-card-text>
         {{ dialog.content }}
-        <v-form v-if="dialog?.formComponents?.fields?.length" ref="form">
+        <v-form
+          v-model="formValue"
+          v-if="dialog?.formComponents?.fields?.length"
+          ref="form"
+        >
           <v-row>
             <v-col
               cols="12"
               md="6"
-              lg="4"
-              xl="3"
-              xxl="2"
               v-for="(component, index) in dialog.formComponents?.fields"
               :key="index"
             >
@@ -68,7 +69,7 @@ import { useAppStore } from '@/store/app'
 import { computed, ref } from 'vue'
 const store = useAppStore()
 const form = ref()
-
+const formValue = ref(false)
 const getValidationRules = (component) => {
   const commonRules = component?.isRequired
     ? [(v) => !!v || `${component?.label} is required`]

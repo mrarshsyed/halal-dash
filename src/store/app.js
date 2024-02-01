@@ -99,6 +99,7 @@ export const useAppStore = defineStore('app', {
       localStorage.setItem('tokens', JSON.stringify(tokens))
     },
     logout() {
+      // axios.get('admin/auth/logout')
       localStorage.clear()
       this.user = null
       this.tokens = null

@@ -25,7 +25,7 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response) => {
-    // console.log(response)
+    console.log(response, response.headers['X-NEW-ACCESS-TOKEN'])
     const store = useAppStore()
     store.stopLoading()
     return response
@@ -40,7 +40,7 @@ axios.interceptors.response.use(
         store.showSnackbar(error.response.data, 'error')
       }
 
-      if (error.response.status === 500 || error.response.status === 401) {
+      if (error?.response.data?.code === 13331) {
         store.logout()
       }
     }
