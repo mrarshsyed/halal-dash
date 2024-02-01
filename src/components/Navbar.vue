@@ -88,6 +88,7 @@ import { watch, ref, computed } from 'vue'
 import { useTheme } from 'vuetify'
 import { navLinks } from '@/config/userRoutes'
 import { onMounted } from 'vue'
+import axios from '@/plugins/axios'
 
 const store = useAppStore()
 const theme = useTheme()
@@ -115,4 +116,9 @@ watch(
     data.value.drawer = false
   }
 )
+
+onMounted(async () => {
+  const countries = await axios.get('/misc/countries')
+  store.setCountries(countries?.data)
+})
 </script>

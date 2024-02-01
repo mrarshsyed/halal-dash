@@ -1,17 +1,8 @@
 <template>
   <div>
-    <v-row class="mb-4">
-      <v-col cols="12" md="8">
-        <v-text-field
-          v-model="table_data.search"
-          placeholder="Enter search here ..."
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-btn @click="showDialog" block color="primary">+ Add New User</v-btn>
-      </v-col>
-    </v-row>
+    <FormComponent />
     <v-data-table-server
+      class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
       :headers="table_data.headers"
@@ -21,8 +12,7 @@
       :items-per-page-options="table_data.itemsPerPageOption"
       :page="table_data.page"
       @update:options="loadItems"
-      fixed-footer
-      fixed-header
+      :show-current-page="true"
     >
       <template v-slot:item.name="{ item }">{{ item?.name }}</template>
       <template v-slot:item.city="{ item }">{{ item?.region?.name }}</template>
@@ -47,6 +37,10 @@
             "
           ></v-icon>
           <v-icon
+            v-if="
+              store.user?.data?.role === 'admin' ||
+              store.user?.data?.role === 'employee'
+            "
             @click="handelAssignManagerIconClick(item)"
             icon="mdi-cog"
           ></v-icon>
@@ -149,17 +143,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
+import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import HotelDetails from './HotelDetails.vue'
 import axios from '@/plugins/axios'
+import FormComponent from '@/components/FormComponent.vue'
 
 const store = useAppStore()
+const formStore = userFormStore()
 
 const detailsDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
-const managers = ref([])
+const managers = computed(() => {
+  return store.managers
+})
 const ratings = ref([])
 const selectedManager = ref(null)
 const selectedRatings = ref([])
@@ -183,43 +182,111 @@ const table_data = ref({
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
-    { value: 10, title: '10' },
-    { value: 100, title: '20' },
-    { value: -1, title: 'All' }
+    { value: 20, title: '20' },
+    { value: 40, title: '40' }
   ]
 })
 
-const userForm = ref({
-  fields: [
-    { type: 'email', label: 'Email Address', isRequired: true, value: null },
-    {
-      type: 'select',
-      label: 'Role',
-      isRequired: true,
-      options: [
-        { id: 'admin', title: 'Admin' },
-        { id: 'employee', title: 'Employee' },
-        { id: 'manager', title: 'Manager' }
-      ],
-      value: null
-    }
-  ]
-})
-
-const resetForm = async () => {
-  userForm.value.fields = userForm.value.fields?.map((form) => {
-    return {
-      ...form,
-      value: null
-    }
+const onSearch = async () => {
+  await loadItems({
+    page: table_data.value.page,
+    itemsPerPage: table_data.value.itemsPerPage,
+    sortBy: 'ascending'
   })
 }
+const onReset = async () => {
+  await loadItems({
+    page: table_data.value.page,
+    itemsPerPage: table_data.value.itemsPerPage,
+    sortBy: 'ascending'
+  })
+}
+
+const filteredCities = computed(() => {
+  const country = store.countries.find(
+    (c) => c.country?.code === formStore.getFieldValue('country')
+  )
+  return country ? country.cities : []
+})
+const searchForm = ref({
+  fields: [
+    {
+      key: 'name',
+      type: 'text',
+      label: 'Hotel Name',
+      isRequired: false,
+      value: null
+    },
+    {
+      key: 'ratingProvided',
+      type: 'select',
+      label: 'Rating Provided',
+      isRequired: false,
+      options: [
+        { id: true, title: 'YES' },
+        { id: false, title: 'NO' }
+      ],
+      value: null,
+      itemTitle: 'title',
+      itemValue: 'id',
+      multiple: false
+    },
+    {
+      key: 'manager',
+      type: 'select',
+      label: 'Assigned Manager',
+      isRequired: false,
+      options: managers.value,
+      value: null,
+      itemTitle: 'email',
+      itemValue: '_id',
+      multiple: false
+    },
+    {
+      key: 'country',
+      type: 'select',
+      label: 'Country',
+      isRequired: false,
+      options: store.countries,
+      value: null,
+      itemTitle: 'country.name',
+      itemValue: 'country.code',
+      multiple: false
+    },
+    {
+      key: 'city',
+      type: 'select',
+      label: 'City',
+      isRequired: false,
+      options: filteredCities,
+      value: null,
+      itemTitle: 'name',
+      itemValue: 'id',
+      multiple: false
+    }
+  ],
+  confirmFunction: onSearch,
+  reset: onReset,
+  confirmText: 'Search Hotels',
+  isSearched: true
+})
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+  formStore.setFormComponents(searchForm.value)
+  let filteredSearchFields = {}
+  if (formStore.formComponents.isSearched) {
+    formStore?.formComponents?.fields.forEach((field) => {
+      if (field.value !== null) {
+        filteredSearchFields[field.key] = field.value
+      }
+    })
+  }
   await axiosInstance
-    .get('admin/hotels', {
-      page: page,
-      itemsPerPage: itemsPerPage,
-      sortBy: sortBy
+    .get(`admin/hotels`, {
+      params: {
+        page: page,
+        perPage: itemsPerPage,
+        ...filteredSearchFields
+      }
     })
     .then((res) => {
       // store.setUserList(res?.data?.data)
@@ -229,7 +296,8 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axiosInstance.get('admin/users').then((res) => {
     if (res?.data?.length) {
       const managerList = res?.data?.filter((x) => x?.role === 'manager')
-      managers.value = managerList
+      store.setManager(managerList)
+      searchForm.value.fields[2].options = managerList
     }
   })
   await axiosInstance.get('admin/halal-ratings').then((res) => {
@@ -237,34 +305,6 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       ratings.value = res?.data
     }
   })
-}
-const sendVerificationEmail = async () => {
-  const payload = {
-    email: store.dialog.formComponents?.fields[0]?.value,
-    role: store.dialog.formComponents?.fields[1]?.value
-  }
-  await axiosInstance.post('/admin/users', payload).then(async (res) => {
-    if (res?.status === 200) {
-      store.showSnackbar('Invitation Link sent Successfully')
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
-      store.closeDialog()
-      resetForm()
-    }
-  })
-}
-const showDialog = () => {
-  const dialogModal = {
-    title: 'Add new user with role',
-    content: '',
-    confirmText: 'Send Email Verification Link',
-    formComponents: { ...userForm.value },
-    confirmFunction: sendVerificationEmail
-  }
-  store.showDialog(dialogModal)
 }
 const handelAssignManagerIconClick = (item) => {
   store.setHotelDetails(item)

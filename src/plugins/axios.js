@@ -26,7 +26,6 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response) => {
-    console.log(response, response.headers['X-NEW-ACCESS-TOKEN'])
     const store = useAppStore()
     store.stopLoading()
     return response

@@ -30,7 +30,25 @@ export const useAppStore = defineStore('app', {
     tokens: JSON.parse(localStorage.getItem('tokens')) || null,
     userList: [],
     hotel_details: {},
-    rating_details: {}
+    rating_details: {},
+    formComponents: {
+      // type:['email','text','number']
+      fields: [
+        { type: '', label: '', is_required: true, value: null },
+        {
+          type: '',
+          label: '',
+          is_required: true,
+          value: null,
+          options: [],
+          itemTitle: 'name',
+          itemValue: 'id',
+          multiple: false
+        }
+      ]
+    },
+    managers: [],
+    countries: []
   }),
   getters: {
     isLoading: (state) => state.loading,
@@ -114,12 +132,18 @@ export const useAppStore = defineStore('app', {
     setHotelDetails(detail) {
       this.hotel_details = detail
     },
+    setManager(list) {
+      this.managers = list
+    },
     async createUser(email, role) {
       const payload = {
         email: email,
         role: role
       }
       return await axios.post('admin/users', payload)
+    },
+    setCountries(list) {
+      this.countries = list
     }
   }
 })

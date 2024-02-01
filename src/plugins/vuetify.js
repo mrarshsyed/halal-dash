@@ -29,21 +29,24 @@ export default createVuetify({
       clearable: true,
       density: 'compact',
       class: 'mb-2',
-      color: 'primary'
+      color: 'primary',
+      hideDetails: 'auto'
     },
     VSelect: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',
       class: 'mb-2',
-      color: 'primary'
+      color: 'primary',
+      hideDetails: 'auto'
     },
     VAutocomplete: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',
       class: 'mb-2',
-      color: 'primary'
+      color: 'primary',
+      hideDetails: 'auto'
     },
     VCard: {
       class: 'py-5'
