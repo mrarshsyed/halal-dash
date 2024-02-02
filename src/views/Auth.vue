@@ -106,8 +106,8 @@ const store = useAppStore()
 const signupQuery = 'Sign Up'
 const mode = ref(signupQuery)
 
-const email = ref('admin@gmail.com')
-const password = ref('password')
+const email = ref('')
+const password = ref('')
 const name = ref('')
 const confirmPassword = ref('')
 
