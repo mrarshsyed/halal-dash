@@ -60,6 +60,14 @@ export const navLinks = [
     children: []
   },
   {
+    title: 'Users',
+    value: 'users',
+    icon: 'account-box',
+    to: '/users',
+    role: ['admin', 'employee'],
+    children: []
+  },
+  {
     title: 'Hotels',
     value: 'hotels',
     icon: 'home-city',
@@ -84,13 +92,5 @@ export const navLinks = [
         value: 'hotels-orders'
       }
     ]
-  },
-  {
-    title: 'Users',
-    value: 'users',
-    icon: 'account-box',
-    to: '/users',
-    role: ['admin', 'employee'],
-    children: []
   }
 ]
