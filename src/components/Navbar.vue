@@ -101,9 +101,18 @@ const data = ref({
 })
 
 const filteredItems = computed(() => {
-  return data.value.items.filter((i) =>
-    i?.role?.includes(store.getUser?.data?.role)
-  )
+  return data.value.items.filter((item) => {
+    const hasMainRouteRole = item?.role?.includes(store.getUser?.data?.role)
+    // i?.role?.includes(store.getUser?.data?.role)
+    // Check if the item has children and filter them based on role
+    if (item.children && item.children.length > 0) {
+      // Filter out child routes that the user doesn't have the required role for
+      item.children = item.children.filter((child) =>
+        child?.role?.includes(store.getUser?.data?.role)
+      )
+    }
+    return hasMainRouteRole || (item.children && item.children.length > 0)
+  })
 })
 
 const toggleTheme = () => {

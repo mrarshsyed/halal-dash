@@ -8,7 +8,7 @@
       Your Role is <v-chip>{{ store?.user?.data?.role }}</v-chip>
     </p>
     <p class="mt-4">Welcome To Dashboard</p>
-    <p class="mb-10">Modules</p>
+    <!-- <p class="mb-10">Modules</p>
     <v-row class="ga-4">
       <v-col cols="12" v-for="(m, index) in navLinks" :key="index">
         <v-card>
@@ -27,7 +27,7 @@
           </v-col>
         </v-row>
       </v-col>
-    </v-row>
+    </v-row> -->
   </div>
 </template>
 

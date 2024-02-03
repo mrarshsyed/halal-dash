@@ -34,11 +34,13 @@ export const routes = [
       },
       {
         path: 'ratings',
-        component: () => import('@/views/hotels/Ratings.vue')
+        component: () => import('@/views/hotels/Ratings.vue'),
+        meta: { requiresAuth: true, role: ['admin', 'employee'] }
       },
       {
         path: 'orders',
-        component: () => import('@/views/hotels/Orders.vue')
+        component: () => import('@/views/hotels/Orders.vue'),
+        meta: { requiresAuth: true, role: ['admin', 'employee'] }
       }
     ]
   },
@@ -77,19 +79,22 @@ export const navLinks = [
         icon: 'view-list',
         title: 'List',
         to: '/hotels/list',
-        value: 'hotels-list'
+        value: 'hotels-list',
+        role: ['admin', 'employee', 'manager']
       },
       {
         icon: 'star-box',
         title: 'Ratings',
         to: '/hotels/ratings',
-        value: 'hotels-ratings'
+        value: 'hotels-ratings',
+        role: ['admin', 'employee']
       },
       {
         icon: 'file-document-multiple',
         title: 'Orders',
         to: '/hotels/orders',
-        value: 'hotels-orders'
+        value: 'hotels-orders',
+        role: ['admin', 'employee']
       }
     ]
   }
