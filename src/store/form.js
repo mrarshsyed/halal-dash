@@ -30,7 +30,8 @@ export const userFormStore = defineStore('form', {
       confirmFunction: () => {},
       reset: () => {},
       confirmText: 'Save',
-      isSearched: false
+      isSearched: false,
+      selectedExportOption: null
     }
   }),
   actions: {
@@ -68,6 +69,12 @@ export const userFormStore = defineStore('form', {
           filteredFields[field.key] = field.value
           return filteredFields
         }, {})
+    },
+    hasValue() {
+      const hasNonNullValue = Object.values(
+        this.getFilteredSearchFields()
+      ).some((value) => value !== null && value !== undefined)
+      return hasNonNullValue
     }
   }
 })

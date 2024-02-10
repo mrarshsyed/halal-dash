@@ -187,9 +187,11 @@ const table_data = ref({
   ]
 })
 
-const filteredSearchFields = ref({})
-
 const onSearch = async () => {
+  const hasNonNullValue = Object.values(
+    formStore.getFilteredSearchFields()
+  ).some((value) => value !== null && value !== undefined)
+  if (!hasNonNullValue) return
   formStore.formComponents.isSearched = true
   await loadItems({
     page: table_data.value.page,
@@ -198,11 +200,43 @@ const onSearch = async () => {
   })
 }
 const onReset = async () => {
+  formStore.formComponents.selectedExportOption = null
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,
     sortBy: 'ascending'
   })
+}
+const current_page = computed(() => {
+  return table_data.value.page
+})
+const onExport = async () => {
+  const payload = {
+    page: current_page.value,
+    perPage: table_data.value.itemsPerPage,
+    export_type: formStore.formComponents.selectedExportOption,
+    ...formStore.getFilteredSearchFields()
+  }
+  await axios
+    .get('admin/hotels/generate-excel-report', {
+      params: { ...payload },
+      responseType: 'blob'
+    })
+    .then((response) => {
+      console.log(response)
+      if (response.data) {
+        const blob = new Blob([response.data], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = 'hotel_data.xlsx'
+        document.body.appendChild(link)
+        link.click()
+        // Remove the link from the document
+        document.body.removeChild(link)
+      }
+    })
 }
 
 const filteredCities = computed(() => {
@@ -271,9 +305,11 @@ const searchForm = ref({
   confirmFunction: onSearch,
   reset: onReset,
   confirmText: 'Search Hotels',
-  isSearched: true
+  isSearched: false,
+  exportFunction: onExport
 })
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+  table_data.value.page = page
   await axiosInstance
     .get(`admin/hotels`, {
       params: {
@@ -396,6 +432,14 @@ watch(
   () => formStore.getFieldValue('country'),
   () => {
     formStore.updateField('city', null)
+  }
+)
+watch(
+  () => formStore.formComponents.selectedExportOption,
+  (newValue, oldValue) => {
+    if (formStore.formComponents.selectedExportOption) {
+      onExport()
+    }
   }
 )
 </script>

@@ -43,8 +43,8 @@
         ></v-autocomplete>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col cols="12" md="6"
+    <v-row class="justify-end">
+      <v-col cols="12" md="4"
         ><v-btn
           block
           color="error"
@@ -54,7 +54,7 @@
           >Reset
         </v-btn></v-col
       >
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="4">
         <v-btn
           block
           @click="confirm"
@@ -64,6 +64,22 @@
         >
           {{ store.formComponents.confirmText ?? 'Save' }}
         </v-btn>
+      </v-col>
+      <v-col
+        cols="12"
+        md="4"
+        v-if="store.formComponents.isSearched && store.hasValue()"
+      >
+        <v-select
+          label="Export Data"
+          :items="[
+            { title: 'Current Page', value: 'current_page' },
+            { title: 'Current List', value: 'current_list' }
+          ]"
+          item-key="title"
+          item-value="value"
+          v-model="store.formComponents.selectedExportOption"
+        ></v-select>
       </v-col>
     </v-row>
   </v-form>
