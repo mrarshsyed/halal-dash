@@ -42,6 +42,32 @@ export const userFormStore = defineStore('form', {
         (field) => field?.key === key
       )
       return field ? field.value : null
+    },
+    updateField(key, value) {
+      const fieldIndex = this.formComponents.fields.findIndex(
+        (field) => field.key === key
+      )
+
+      if (fieldIndex !== -1) {
+        this.formComponents.fields[fieldIndex].value = value
+      }
+    },
+    updateOptions(key, value) {
+      const fieldIndex = this.formComponents.fields.findIndex(
+        (field) => field.key === key
+      )
+
+      if (fieldIndex !== -1) {
+        this.formComponents.fields[fieldIndex].options = value
+      }
+    },
+    getFilteredSearchFields() {
+      return this.formComponents.fields
+        .filter((field) => field.value !== null)
+        .reduce((filteredFields, field) => {
+          filteredFields[field.key] = field.value
+          return filteredFields
+        }, {})
     }
   }
 })

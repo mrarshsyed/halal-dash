@@ -126,8 +126,5 @@ watch(
   }
 )
 
-onMounted(async () => {
-  const countries = await axios.get('/misc/countries')
-  store.setCountries(countries?.data)
-})
+onMounted(async () => {})
 </script>

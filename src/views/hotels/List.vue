@@ -143,7 +143,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useAppStore } from '@/store/app'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
@@ -187,7 +187,10 @@ const table_data = ref({
   ]
 })
 
+const filteredSearchFields = ref({})
+
 const onSearch = async () => {
+  formStore.formComponents.isSearched = true
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,
@@ -271,21 +274,12 @@ const searchForm = ref({
   isSearched: true
 })
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
-  formStore.setFormComponents(searchForm.value)
-  let filteredSearchFields = {}
-  if (formStore.formComponents.isSearched) {
-    formStore?.formComponents?.fields.forEach((field) => {
-      if (field.value !== null) {
-        filteredSearchFields[field.key] = field.value
-      }
-    })
-  }
   await axiosInstance
     .get(`admin/hotels`, {
       params: {
         page: page,
         perPage: itemsPerPage,
-        ...filteredSearchFields
+        ...formStore.getFilteredSearchFields()
       }
     })
     .then((res) => {
@@ -293,18 +287,6 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.total
     })
-  await axiosInstance.get('admin/users').then((res) => {
-    if (res?.data?.length) {
-      const managerList = res?.data?.filter((x) => x?.role === 'manager')
-      store.setManager(managerList)
-      searchForm.value.fields[2].options = managerList
-    }
-  })
-  await axiosInstance.get('admin/halal-ratings').then((res) => {
-    if (res?.data?.length) {
-      ratings.value = res?.data
-    }
-  })
 }
 const handelAssignManagerIconClick = (item) => {
   store.setHotelDetails(item)
@@ -392,6 +374,30 @@ const onAssignRating = async () => {
       selectedRatings.value = []
     })
 }
+onMounted(async () => {
+  const countries = await axios.get('/misc/countries')
+  store.setCountries(countries?.data)
+  formStore.setFormComponents(searchForm.value)
+  formStore.updateOptions('country', countries?.data)
+  await axiosInstance.get('admin/users').then((res) => {
+    if (res?.data?.length) {
+      const managerList = res?.data?.filter((x) => x?.role === 'manager')
+      store.setManager(managerList)
+      searchForm.value.fields[2].options = managerList
+    }
+  })
+  await axiosInstance.get('admin/halal-ratings').then((res) => {
+    if (res?.data?.length) {
+      ratings.value = res?.data
+    }
+  })
+})
+watch(
+  () => formStore.getFieldValue('country'),
+  () => {
+    formStore.updateField('city', null)
+  }
+)
 </script>
 
 <style lang="scss" scoped></style>
