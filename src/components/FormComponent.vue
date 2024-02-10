@@ -43,7 +43,7 @@
         ></v-autocomplete>
       </v-col>
     </v-row>
-    <v-row class="justify-end">
+    <v-row class="justify-end" v-if="store.formComponents.fields.length">
       <v-col cols="12" md="4"
         ><v-btn
           block

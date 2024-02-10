@@ -14,18 +14,18 @@ export const userFormStore = defineStore('form', {
     formComponents: {
       // type:['email','text','number','select']
       fields: [
-        { key: 'name', type: '', label: '', is_required: true, value: null },
-        {
-          key: 'name',
-          type: '',
-          label: '',
-          is_required: true,
-          value: null,
-          options: [],
-          itemTitle: 'name',
-          itemValue: 'id',
-          multiple: false
-        }
+        // { key: 'name', type: '', label: '', is_required: true, value: null },
+        // {
+        //   key: 'name',
+        //   type: '',
+        //   label: '',
+        //   is_required: true,
+        //   value: null,
+        //   options: [],
+        //   itemTitle: 'name',
+        //   itemValue: 'id',
+        //   multiple: false
+        // }
       ],
       confirmFunction: () => {},
       reset: () => {},
