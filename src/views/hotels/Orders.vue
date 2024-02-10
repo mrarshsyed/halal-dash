@@ -17,6 +17,36 @@
       <template v-slot:item.hotel_name="{ item }">{{
         item?.hotelId?.name
       }}</template>
+      <template v-slot:item.status="{ item }">{{
+        item?.currentEmergingStatus
+      }}</template>
+      <template v-slot:item.room_name="{ item }">{{
+        item?.rateHash?.room_name
+      }}</template>
+      <template v-slot:item.emergingBookingDone="{ item }">
+        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">{{
+          item?.emergingBookingDone ? 'YES' : 'NO'
+        }}</v-chip>
+      </template>
+      <template v-slot:item.emergingBookingConfirmed="{ item }">
+        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">{{
+          item?.emergingBookingConfirmed ? 'YES' : 'NO'
+        }}</v-chip>
+      </template>
+      <template v-slot:item.supplier_info="{ item }">
+        <p>
+          {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.email }}
+        </p>
+        <p>
+          {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.phone }}
+        </p>
+      </template>
+      <template v-slot:item.room_info="{ item }">
+        <p>
+          {{ item?.emergingOrderBookingFormPayload?.checkin }} to
+          {{ item?.emergingOrderBookingFormPayload?.checkin }}
+        </p>
+      </template>
       <!-- <template v-slot:item.city="{ item }">{{ item?.region?.name }}</template>
       <template v-slot:item.country="{ item }">{{
         item?.region?.country_code
@@ -176,9 +206,26 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
-    { title: 'Hotel Name', key: 'hotel_name', align: 'start' }
-    // { title: 'City', key: 'city', align: 'start' },
-    // { title: 'Country', key: 'country', align: 'start' },
+    { title: 'Hotel Name', key: 'hotel_name', align: 'start' },
+    { title: 'Room Name', key: 'room_name', align: 'start' },
+    { title: 'Status', key: 'status', align: 'start' },
+    { title: 'Booking Done', key: 'emergingBookingDone', align: 'start' },
+    {
+      title: 'Booking Confirmed',
+      key: 'emergingBookingConfirmed',
+      align: 'start'
+    },
+    {
+      title: 'Supplier Info',
+      key: 'supplier_info',
+      align: 'start'
+    },
+    {
+      title: 'Room Info',
+      key: 'room_info',
+      align: 'start'
+    }
+
     // { title: 'Rating(%)', key: 'rating', align: 'start' },
     // { title: 'Manager', key: 'manager', align: 'start' },
     // { title: 'Action', key: 'action', align: 'center' }
