@@ -40,9 +40,9 @@ axios.interceptors.response.use(
         store.showSnackbar(error.response.data, 'error')
       }
 
-      if (error?.response.data?.code === 13331) {
-        store.logout()
-      }
+      // if (error?.response.data?.code === 13331) {
+      //   store.logout()
+      // }
     }
     return Promise.reject(error)
   }
