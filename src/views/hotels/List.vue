@@ -6,7 +6,7 @@
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
       :headers="table_data.headers"
-      :items-length="table_data.totalItems"
+      :items-length="200000"
       :items="table_data.serverItems"
       :search="table_data.search"
       :items-per-page-options="table_data.itemsPerPageOption"
@@ -24,6 +24,9 @@
       }}</template>
       <template v-slot:item.manager="{ item }">{{
         item?.manager?.email
+      }}</template>
+      <template v-slot:item.manager_name="{ item }">{{
+        store.getUserName(item?.manager)
       }}</template>
       <template v-slot:item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
@@ -179,6 +182,7 @@ const table_data = ref({
     { title: 'Country', key: 'country', align: 'start' },
     { title: 'Rating(%)', key: 'rating', align: 'start' },
     { title: 'Manager', key: 'manager', align: 'start' },
+    { title: 'Manager Name', key: 'manager_name', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
