@@ -31,7 +31,7 @@
     <v-navigation-drawer
       v-model="data.drawer"
       location="left"
-      v-if="store.getUser"
+      v-if="store.user?.data?._id"
       permanent
     >
       <v-list nav>

@@ -2,11 +2,11 @@
   <div>
     <FormComponent />
     <v-data-table-server
-      class="mt-4"
+      class="mt-4 hotels-data-table"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
+      :items-length="table_data.totalItems"
       :headers="table_data.headers"
-      :items-length="200000"
       :items="table_data.serverItems"
       :search="table_data.search"
       :items-per-page-options="table_data.itemsPerPageOption"
@@ -173,16 +173,16 @@ const table_data = ref({
   loading: true,
   search: '',
   itemsPerPage: 20,
-  totalItems: 0,
+  totalItems: 100,
   page: 1,
   serverItems: [],
   headers: [
-    { title: 'Name', key: 'name', align: 'start' },
+    { title: 'Hotel', key: 'name', align: 'start' },
     { title: 'City', key: 'city', align: 'start' },
     { title: 'Country', key: 'country', align: 'start' },
     { title: 'Rating(%)', key: 'rating', align: 'start' },
-    { title: 'Manager', key: 'manager', align: 'start' },
     { title: 'Manager Name', key: 'manager_name', align: 'start' },
+    { title: 'Manager', key: 'manager', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -325,7 +325,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
     .then((res) => {
       // store.setUserList(res?.data?.data)
       table_data.value.serverItems = res?.data?.data
-      table_data.value.totalItems = res?.data?.total
+      table_data.value.totalItems = res?.data?.data.length * res?.data?.to
     })
 }
 const handelAssignManagerIconClick = (item) => {

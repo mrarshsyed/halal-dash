@@ -8,9 +8,22 @@
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="4">
-        <v-btn @click="showDialog" block color="primary"
+        <v-btn
+          @click="showDialog"
+          :disabled="current_percentage >= 100"
+          block
+          color="primary"
           >+ Add New Rating</v-btn
         >
+      </v-col>
+      <v-col cols="12" class="d-flex justify-end">
+        <div class="d-flex flex-column ga-1">
+          <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
+          <p>
+            Current Percentage:
+            <span class="font-weight-bold">{{ current_percentage }}%</span>
+          </p>
+        </div>
       </v-col>
     </v-row>
     <v-data-table
@@ -50,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
 import axiosInstance from '@/plugins/axios'
 import axios from '@/plugins/axios'
@@ -115,7 +128,18 @@ const table_data = ref({
   ]
 })
 
+const maximum_percentage_reached = (rating) => {
+  const total = Number(current_percentage.value) + Number(rating)
+  return total > 100
+}
+
 const saveRating = async () => {
+  if (
+    maximum_percentage_reached(store.dialog.formComponents?.fields[1]?.value)
+  ) {
+    store.showSnackbar('maximum rating can be upto 100%', 'error')
+    return
+  }
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
     rating: store.dialog.formComponents?.fields[1]?.value
@@ -193,6 +217,13 @@ const onDelete = async (item) => {
   }
   store.showDialog(dialogModal)
 }
+
+const current_percentage = computed(() => {
+  return table_data.value.serverItems.reduce(
+    (sum, item) => sum + item?.rating,
+    0
+  )
+})
 
 onMounted(async () => {
   await loadItems({

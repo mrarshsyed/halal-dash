@@ -1,3 +1,8 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+.hotels-data-table .v-data-table-footer__info {
+  display: none !important;
+
+}
