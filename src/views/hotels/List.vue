@@ -25,9 +25,13 @@
       <template v-slot:item.manager="{ item }">{{
         item?.manager?.email
       }}</template>
-      <template v-slot:item.manager_name="{ item }">{{
-        store.getUserName(item?.manager)
-      }}</template>
+      <template v-slot:item.manager_name="{ item }">
+        {{
+          item?.manager?.name
+            ? item?.manager?.name
+            : store.getUserName(item?.manager?.email)
+        }}</template
+      >
       <template v-slot:item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
           <v-icon

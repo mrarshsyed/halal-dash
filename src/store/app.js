@@ -142,15 +142,9 @@ export const useAppStore = defineStore('app', {
     setCountries(list) {
       this.countries = list
     },
-    getUserName(item) {
-      const getName = (data) => {
-        return data?.name ?? data?.email.split('@')[0]
-      }
-      if (item) {
-        return getName(item)
-      } else {
-        return getName(this.user?.data)
-      }
+    getUserName(email) {
+      return email ? email.split('@')[0] : ''
+      // return email.split('@')[0]
     }
   }
 })

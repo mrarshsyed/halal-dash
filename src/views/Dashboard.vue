@@ -2,7 +2,11 @@
   <div>
     <h4>
       <v-icon icon="mdi-account-circle"> </v-icon> Hi,
-      {{ store.getUserName() }}
+      {{
+        store?.user?.data?.name
+          ? store?.user?.data?.name
+          : store.getUserName(store?.user?.data?.email)
+      }}
     </h4>
     <p>
       Your Role is <v-chip>{{ store?.user?.data?.role }}</v-chip>
@@ -54,14 +58,8 @@ const modules = [
   }
 ]
 
-const getUserName = (email) => {
-  const emailParts = email.split('@')
-  const userName = emailParts[0]
-  return userName
-}
 onMounted(async () => {
   routes.value = dashboardRoutes.value?.filter((x) => x?.children)
-  console.log(routes.value)
 })
 </script>
 
