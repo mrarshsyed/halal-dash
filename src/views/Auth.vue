@@ -4,9 +4,10 @@
       <v-row>
         <v-col cols="12" md="6" offset-md="3">
           <!-- <v-card> -->
-          <v-card-title class="text-center">
-            Welcome to Halal Explore
-          </v-card-title>
+          <div class="d-flex w-100 justify-center align-center">
+            <v-img src="@/assets/logo.png" height="56px" width="156px"></v-img>
+          </div>
+
           <v-card-text>
             <v-form ref="form" v-if="getMode === 'Login'">
               <v-text-field

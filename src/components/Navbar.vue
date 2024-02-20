@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-app-bar color="primary" density="comfortable">
+    <v-app-bar density="comfortable">
       <v-app-bar-nav-icon
         v-if="store.getUser"
         variant="text"
@@ -8,7 +8,7 @@
       />
 
       <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">
-        Halal Explore
+        <v-img src="@/assets/logo.png" height="56px" width="156px"></v-img>
       </v-app-bar-title>
 
       <v-spacer />
