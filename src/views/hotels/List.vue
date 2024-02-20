@@ -54,6 +54,23 @@
           <v-icon @click="onRatingIconClick(item)" icon="mdi-star"></v-icon>
         </div>
       </template>
+      <template v-slot:bottom>
+        <div class="d-flex justify-end align-center ga-4 pt-4">
+          <v-btn
+            size="x-small"
+            icon="mdi-chevron-left"
+            :disabled="table_data.page === 1"
+            @click="onPreviousPage"
+          ></v-btn>
+          <p>{{ table_data.page }}</p>
+          <v-btn
+            @click="onNextPage"
+            :disabled="!table_data.hasNextPage"
+            size="x-small"
+            icon="mdi-chevron-right"
+          ></v-btn>
+        </div>
+      </template>
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -192,7 +209,8 @@ const table_data = ref({
   itemsPerPageOption: [
     { value: 20, title: '20' },
     { value: 40, title: '40' }
-  ]
+  ],
+  hasNextPage: true
 })
 
 const onSearch = async () => {
@@ -330,6 +348,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       // store.setUserList(res?.data?.data)
       table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.data.length * res?.data?.to
+      table_data.value.hasNextPage = res?.data?.hasNextPage
     })
 }
 const handelAssignManagerIconClick = (item) => {
@@ -417,6 +436,12 @@ const onAssignRating = async () => {
       assignRatingDialogShow.value = false
       selectedRatings.value = []
     })
+}
+const onNextPage = async () => {
+  table_data.value.page = table_data.value.page + 1
+}
+const onPreviousPage = async () => {
+  table_data.value.page = table_data.value.page - 1
 }
 onMounted(async () => {
   const countries = await axios.get('/misc/countries')
