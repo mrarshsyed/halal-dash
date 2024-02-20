@@ -37,6 +37,15 @@
         ></v-icon>
         <v-icon v-else color="error" icon="mdi-close-circle"></v-icon>
       </template>
+      <template v-slot:item.action="{ item }">
+        <v-icon
+          @click="onDelete(item)"
+          v-if="canDelete(item)"
+          color="error"
+          class="cursor-pointer"
+          >mdi-delete</v-icon
+        >
+      </template>
     </v-data-table>
     <!-- @update:options="loadItems" -->
   </div>
@@ -46,6 +55,28 @@
 import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/store/app'
 import axiosInstance from '@/plugins/axios'
+const store = useAppStore()
+const user = ref(null)
+
+const getUserOption = () => {
+  const current_role = store.user?.data?.role
+  if (current_role === 'super-admin') {
+    return [
+      { id: 'admin', title: 'Admin' },
+      { id: 'employee', title: 'Employee' },
+      { id: 'manager', title: 'Manager' }
+    ]
+  } else if (current_role === 'admin') {
+    return [
+      { id: 'employee', title: 'Employee' },
+      { id: 'manager', title: 'Manager' }
+    ]
+  } else if (current_role === 'employee') {
+    return [{ id: 'manager', title: 'Manager' }]
+  } else {
+    return []
+  }
+}
 
 const userForm = ref({
   fields: [
@@ -54,11 +85,7 @@ const userForm = ref({
       type: 'select',
       label: 'Role',
       isRequired: true,
-      options: [
-        { id: 'admin', title: 'Admin' },
-        { id: 'employee', title: 'Employee' },
-        { id: 'manager', title: 'Manager' }
-      ],
+      options: getUserOption(),
       value: null
     }
   ]
@@ -72,8 +99,6 @@ const resetForm = async () => {
     }
   })
 }
-
-const store = useAppStore()
 
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axiosInstance
@@ -102,7 +127,8 @@ const table_data = ref({
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Email', key: 'email', align: 'start' },
     { title: 'Role', key: 'role', align: 'center' },
-    { title: 'Is Verified', key: 'isVerified', align: 'center' }
+    { title: 'Is Verified', key: 'isVerified', align: 'center' },
+    { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
     { value: 10, title: '10' },
@@ -149,6 +175,55 @@ onMounted(async () => {
     sortBy: 'ascending'
   })
 })
+
+const canDelete = (item) => {
+  const current_role = store.user?.data?.role
+  if (current_role === 'super-admin' && item?.role === 'super-admin') {
+    return false
+  }
+  if (current_role === 'admin' && item?.role === 'super-admin') {
+    return false
+  }
+  if (current_role === 'admin' && item?.role === 'admin') {
+    return false
+  }
+  if (current_role === 'employee' && item?.role === 'super-admin') {
+    return false
+  }
+  if (current_role === 'employee' && item?.role === 'admin') {
+    return false
+  }
+  if (current_role === 'employee' && item?.role === 'employee') {
+    return false
+  }
+  return true
+}
+
+const confirmDelete = async () => {
+  await axiosInstance
+    .delete(`admin/users/${user.value?._id}`)
+    .then(async (res) => {
+      store.showSnackbar('Successfully Deleted')
+      await loadItems({
+        page: table_data.value.page,
+        itemsPerPage: table_data.value.itemsPerPage,
+        sortBy: 'ascending'
+      })
+      store.closeDialog()
+    })
+}
+
+const onDelete = (item) => {
+  user.value = item
+  const dialogModal = {
+    title: 'Delete User',
+    content: `Are you sure to delete this user?`,
+    confirmText: 'Delete',
+    formComponents: { fields: [] },
+    confirmFunction: confirmDelete
+  }
+  store.showDialog(dialogModal)
+}
 </script>
 
 <style lang="scss" scoped></style>
