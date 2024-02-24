@@ -46,7 +46,8 @@
           <v-icon
             v-if="
               store.user?.data?.role === 'admin' ||
-              store.user?.data?.role === 'employee'
+              store.user?.data?.role === 'employee' ||
+              store.user?.data?.role === 'super-admin'
             "
             @click="handelAssignManagerIconClick(item)"
             icon="mdi-cog"
@@ -203,7 +204,7 @@ const table_data = ref({
     { title: 'Country', key: 'country', align: 'start' },
     { title: 'Rating(%)', key: 'rating', align: 'start' },
     { title: 'Manager Name', key: 'manager_name', align: 'start' },
-    { title: 'Manager', key: 'manager', align: 'start' },
+    { title: 'Manager Email', key: 'manager', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [

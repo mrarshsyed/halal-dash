@@ -94,7 +94,7 @@ export const navLinks = [
         title: 'Ratings',
         to: '/hotels/ratings',
         value: 'hotels-ratings',
-        role: ['super-admin', 'admin', 'employee']
+        role: ['super-admin']
       },
       {
         icon: 'file-document-multiple',
@@ -183,7 +183,7 @@ export const routesAndNavLinks = [
         title: 'Ratings',
         to: '/hotels/ratings',
         value: 'hotels-ratings',
-        role: ['super-admin', 'admin', 'employee']
+        role: ['super-admin']
       },
       {
         icon: 'description',
