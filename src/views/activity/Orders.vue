@@ -96,7 +96,7 @@
           ></v-icon>
         </div>
         <v-card-text>
-          <HotelDetails />
+          <!-- <HotelDetails /> -->
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -179,7 +179,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useAppStore } from '@/store/app'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
-import HotelDetails from './HotelDetails.vue'
+// import HotelDetails from './HotelDetails.vue'
 import axios from '@/plugins/axios'
 import FormComponent from '@/components/FormComponent.vue'
 
