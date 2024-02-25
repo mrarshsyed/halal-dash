@@ -27,6 +27,12 @@ export const routes = [
     }
   },
   {
+    path: '/users',
+    name: 'users',
+    component: () => import('@/views/Users.vue'),
+    meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+  },
+  {
     path: '/hotels',
     name: 'hotels',
     meta: {
@@ -52,10 +58,34 @@ export const routes = [
     ]
   },
   {
-    path: '/users',
-    name: 'users',
-    component: () => import('@/views/Users.vue'),
-    meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+    path: '/activity',
+    name: 'activity',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee', 'manager']
+    },
+    children: [
+      {
+        path: 'search-and-add',
+        component: () => import('@/views/activity/searchAndAdd.vue'),
+        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+      },
+      {
+        path: 'list',
+        component: () => import('@/views/activity/List.vue'),
+        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+      },
+      {
+        path: 'ratings',
+        component: () => import('@/views/activity/Ratings.vue'),
+        meta: { requiresAuth: true, role: ['super-admin', 'admin'] }
+      },
+      {
+        path: 'orders',
+        component: () => import('@/views/activity/Orders.vue'),
+        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+      }
+    ]
   }
 ]
 
@@ -104,92 +134,39 @@ export const navLinks = [
         role: ['super-admin', 'admin', 'employee']
       }
     ]
-  }
-]
-export const routesAndNavLinks = [
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'pageNotFound',
-    component: () => import('@/views/PageNotFound.vue'),
-    meta: { requiresAuth: false, role: [] },
-    title: 'Page Not Found', // Added for consistency
-    icon: 'warning', // Added for consistency
-    to: '/page-not-found', // Example URL (replace with actual URL)
-    children: [] // Empty array for consistency
   },
   {
-    path: '/',
-    name: 'Home',
-    component: () => import('@/views/Home.vue'),
-    meta: { requiresAuth: false, role: [] },
-    title: 'Home',
-    icon: 'home',
-    to: '/',
-    children: []
-  },
-  {
-    path: '/authentication',
-    name: 'authentication',
-    component: () => import('@/views/Auth.vue'),
-    meta: { requiresAuth: false, role: [] },
-    title: 'Authentication',
-    icon: 'verified_user',
-    to: '/authentication',
-    children: []
-  },
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('@/views/Dashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee', 'manager']
-    },
-    title: 'Dashboard',
-    icon: 'clock',
-    to: '/dashboard',
-    children: []
-  },
-  {
-    path: '/users',
-    name: 'users',
-    component: () => import('@/views/Users.vue'),
-    meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] },
-    title: 'Users',
-    icon: 'account_box',
-    to: '/users',
-    children: []
-  },
-  {
-    path: '/hotels',
-    name: 'hotels',
-    meta: {
-      requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee', 'manager']
-    },
-    title: 'Hotels',
-    icon: 'hotel',
-    to: '/hotels',
+    title: 'Activity',
+    value: 'activity',
+    icon: 'hydro-power',
+    role: ['super-admin', 'admin', 'employee', 'manager'],
     children: [
       {
-        icon: 'view_list',
-        title: 'List',
-        to: '/hotels/list',
-        value: 'hotels-list',
+        icon: 'text-box-search',
+        title: 'Search And Add',
+        to: '/activity/search-and-add',
+        value: 'activity-search-and-add',
         role: ['super-admin', 'admin', 'employee', 'manager']
       },
       {
-        icon: 'star',
+        icon: 'view-list',
+        title: 'List',
+        to: '/activity/list',
+        value: 'activity-list',
+        role: ['super-admin', 'admin', 'employee', 'manager']
+      },
+      {
+        icon: 'star-box',
         title: 'Ratings',
-        to: '/hotels/ratings',
-        value: 'hotels-ratings',
+        to: '/activity/ratings',
+        value: 'activity-ratings',
         role: ['super-admin']
       },
       {
-        icon: 'description',
+        icon: 'file-document-multiple',
         title: 'Orders',
-        to: '/hotels/orders',
-        value: 'hotels-orders',
+        to: '/activity/orders',
+        value: 'activity-orders',
         role: ['super-admin', 'admin', 'employee']
       }
     ]

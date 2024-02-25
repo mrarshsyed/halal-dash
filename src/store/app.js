@@ -48,7 +48,8 @@ export const useAppStore = defineStore('app', {
       ]
     },
     managers: [],
-    countries: []
+    countries: [],
+    details: {}
   }),
   getters: {
     isLoading: (state) => state.loading,
@@ -128,6 +129,9 @@ export const useAppStore = defineStore('app', {
     },
     setHotelDetails(detail) {
       this.hotel_details = detail
+    },
+    setDetails(detail) {
+      this.details = detail
     },
     setManager(list) {
       this.managers = list
