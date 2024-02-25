@@ -1,7 +1,6 @@
 // Utilities
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
-import axios from '@/plugins/axios'
 
 export const userFormStore = defineStore('form', {
   setup() {
