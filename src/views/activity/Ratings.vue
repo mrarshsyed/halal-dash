@@ -63,6 +63,7 @@
 </template>
 
 <script setup>
+const baseurl = 'admin/activity-halal-ratings'
 import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
 import axiosInstance from '@/plugins/axios'
@@ -95,7 +96,7 @@ const store = useAppStore()
 
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axiosInstance
-    .get('admin/halal-ratings', {
+    .get(baseurl, {
       page: page,
       itemsPerPage: itemsPerPage,
       sortBy: sortBy
@@ -145,8 +146,8 @@ const saveRating = async () => {
     rating: store.dialog.formComponents?.fields[1]?.value
   }
   const response = !ratingForm?.value?.id
-    ? await axios.post('admin/halal-ratings', payload)
-    : await axios.patch(`admin/halal-ratings/${ratingForm?.value?.id}`, payload)
+    ? await axios.post(baseurl, payload)
+    : await axios.patch(`${baseurl}/${ratingForm?.value?.id}`, payload)
   if (response?.status === 200) {
     store.showSnackbar('Rating saved successfully')
     await loadItems({
@@ -190,7 +191,7 @@ const onEdit = async (item) => {
 const deleteRating = async () => {
   if (store.rating_details?._id) {
     await axios
-      .delete(`admin/halal-ratings/${store.rating_details?._id}`)
+      .delete(`${baseurl}/${store.rating_details?._id}`)
       .then(async (res) => {
         if (res?.status === 204) {
           store.showSnackbar('Rating Deleted Successfully')
