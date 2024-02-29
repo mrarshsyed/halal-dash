@@ -259,7 +259,7 @@ const onExport = async () => {
         })
         const link = document.createElement('a')
         link.href = window.URL.createObjectURL(blob)
-        link.download = 'hotel_data.xlsx'
+        link.download = 'activities_data.xlsx'
         document.body.appendChild(link)
         link.click()
         // Remove the link from the document

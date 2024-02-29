@@ -14,26 +14,36 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
-      <template v-slot:item.hotel_name="{ item }">{{
-        item?.hotelId?.name
-      }}</template>
-      <template v-slot:item.status="{ item }">{{
-        item?.currentEmergingStatus
-      }}</template>
-      <template v-slot:item.room_name="{ item }">{{
-        item?.rateHash?.room_name
-      }}</template>
-      <template v-slot:item.emergingBookingDone="{ item }">
-        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">{{
-          item?.emergingBookingDone ? 'YES' : 'NO'
-        }}</v-chip>
+      <template #item.hotel_name="{ item }">
+        {{
+          item?.hotelId?.name
+        }}
       </template>
-      <template v-slot:item.emergingBookingConfirmed="{ item }">
-        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">{{
-          item?.emergingBookingConfirmed ? 'YES' : 'NO'
-        }}</v-chip>
+      <template #item.status="{ item }">
+        {{
+          item?.currentEmergingStatus
+        }}
       </template>
-      <template v-slot:item.supplier_info="{ item }">
+      <template #item.room_name="{ item }">
+        {{
+          item?.rateHash?.room_name
+        }}
+      </template>
+      <template #item.emergingBookingDone="{ item }">
+        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">
+          {{
+            item?.emergingBookingDone ? 'YES' : 'NO'
+          }}
+        </v-chip>
+      </template>
+      <template #item.emergingBookingConfirmed="{ item }">
+        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">
+          {{
+            item?.emergingBookingConfirmed ? 'YES' : 'NO'
+          }}
+        </v-chip>
+      </template>
+      <template #item.supplier_info="{ item }">
         <p>
           {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.email }}
         </p>
@@ -41,7 +51,7 @@
           {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.phone }}
         </p>
       </template>
-      <template v-slot:item.room_info="{ item }">
+      <template #item.room_info="{ item }">
         <p>
           {{ item?.emergingOrderBookingFormPayload?.checkin }} to
           {{ item?.emergingOrderBookingFormPayload?.checkin }}
@@ -93,7 +103,7 @@
             @click="detailsDialogShow = false"
             color="error"
             icon="mdi-close-circle"
-          ></v-icon>
+          />
         </div>
         <v-card-text>
           <!-- <HotelDetails /> -->
@@ -118,14 +128,13 @@
                   @keydown.enter="onManagerCreate"
                   required
                   :rules="[(v) => !!v || `Manager is required`]"
-                >
-                </v-autocomplete>
+                />
               </v-form>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -134,9 +143,15 @@
                 assignManagerDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignManager">Assign Manager</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignManager"
+          >
+            Assign Manager
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -146,17 +161,26 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
-                <template v-slot:label>
-                  {{ r?.name }} <v-chip class="ms-2">{{ r?.rating }}%</v-chip>
+            <v-col
+              cols="12"
+              v-for="(r, index) in ratings"
+              :key="index"
+            >
+              <v-checkbox
+                v-model="selectedRatings"
+                :value="r"
+              >
+                <template #label>
+                  {{ r?.name }} <v-chip class="ms-2">
+                    {{ r?.rating }}%
+                  </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -165,9 +189,15 @@
                 assignRatingDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignRating">Save</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignRating"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -181,7 +211,7 @@ import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 // import HotelDetails from './HotelDetails.vue'
 import axios from '@/plugins/axios'
-import FormComponent from '@/components/FormComponent.vue'
+
 
 const store = useAppStore()
 const formStore = userFormStore()
@@ -360,7 +390,7 @@ const searchForm = ref({
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance
-    .get(`admin/hotel-bookings`, {
+    .get(`admin/activity-bookings`, {
       params: {
         page: page,
         perPage: itemsPerPage,
