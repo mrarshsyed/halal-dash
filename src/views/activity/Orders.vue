@@ -14,33 +14,23 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
-      <template #item.hotel_name="{ item }">
-        {{
-          item?.hotelId?.name
-        }}
+      <template #item.activity_name="{ item }">
+        {{ item?.hotelId?.name }}
       </template>
       <template #item.status="{ item }">
-        {{
-          item?.currentEmergingStatus
-        }}
+        {{ item?.currentEmergingStatus }}
       </template>
       <template #item.room_name="{ item }">
-        {{
-          item?.rateHash?.room_name
-        }}
+        {{ item?.rateHash?.room_name }}
       </template>
       <template #item.emergingBookingDone="{ item }">
         <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">
-          {{
-            item?.emergingBookingDone ? 'YES' : 'NO'
-          }}
+          {{ item?.emergingBookingDone ? 'YES' : 'NO' }}
         </v-chip>
       </template>
       <template #item.emergingBookingConfirmed="{ item }">
         <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">
-          {{
-            item?.emergingBookingConfirmed ? 'YES' : 'NO'
-          }}
+          {{ item?.emergingBookingConfirmed ? 'YES' : 'NO' }}
         </v-chip>
       </template>
       <template #item.supplier_info="{ item }">
@@ -146,10 +136,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignManager"
-          >
+          <v-btn color="primary" @click="onAssignManager">
             Assign Manager
           </v-btn>
         </v-card-actions>
@@ -161,19 +148,10 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col
-              cols="12"
-              v-for="(r, index) in ratings"
-              :key="index"
-            >
-              <v-checkbox
-                v-model="selectedRatings"
-                :value="r"
-              >
+            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+              <v-checkbox v-model="selectedRatings" :value="r">
                 <template #label>
-                  {{ r?.name }} <v-chip class="ms-2">
-                    {{ r?.rating }}%
-                  </v-chip>
+                  {{ r?.name }} <v-chip class="ms-2"> {{ r?.rating }}% </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
@@ -192,12 +170,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignRating"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -211,7 +184,6 @@ import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 // import HotelDetails from './HotelDetails.vue'
 import axios from '@/plugins/axios'
-
 
 const store = useAppStore()
 const formStore = userFormStore()
@@ -236,7 +208,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
-    { title: 'Hotel Name', key: 'hotel_name', align: 'start' },
+    { title: 'Activity Name', key: 'activity_name', align: 'start' },
     { title: 'Room Name', key: 'room_name', align: 'start' },
     { title: 'Status', key: 'status', align: 'start' },
     { title: 'Booking Done', key: 'emergingBookingDone', align: 'start' },
