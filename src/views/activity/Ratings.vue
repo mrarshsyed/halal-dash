@@ -1,22 +1,32 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
-        ></v-text-field>
+        />
       </v-col>
-      <v-col cols="12" md="4">
+      <v-col
+        cols="12"
+        md="4"
+      >
         <v-btn
           @click="showDialog"
           :disabled="current_percentage >= 100"
           block
           color="primary"
-          >+ Add New Rating</v-btn
         >
+          + Add New Rating
+        </v-btn>
       </v-col>
-      <v-col cols="12" class="d-flex justify-end">
+      <v-col
+        cols="12"
+        class="d-flex justify-end"
+      >
         <div class="d-flex flex-column ga-1">
           <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
           <p>
@@ -37,24 +47,24 @@
       :items-per-page-options="table_data.itemsPerPageOption"
       :page="table_data.page"
     >
-      <template v-slot:item.name="{ item }">
+      <template #item.name="{ item }">
         {{ item?.name }}
       </template>
-      <template v-slot:item.rating="{ item }">
+      <template #item.rating="{ item }">
         {{ item?.rating }}
       </template>
-      <template v-slot:item.action="{ item }">
+      <template #item.action="{ item }">
         <div class="d-flex ga-3">
           <v-icon
             class="cursor-pointer"
             @click="onEdit(item)"
             icon="mdi-pencil-box"
-          ></v-icon>
+          />
           <v-icon
             class="cursor-pointer"
             @click="onDelete(item)"
             icon="mdi-delete"
-          ></v-icon>
+          />
         </div>
       </template>
     </v-data-table>

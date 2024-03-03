@@ -461,7 +461,7 @@ onMounted(async () => {
       searchForm.value.fields[2].options = managerList
     }
   })
-  await axiosInstance.get('admin/halal-ratings').then((res) => {
+  await axiosInstance.get('admin/activity-halal-ratings').then((res) => {
     if (res?.data?.length) {
       ratings.value = res?.data
     }
