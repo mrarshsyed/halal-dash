@@ -15,70 +15,23 @@
       :show-current-page="true"
     >
       <template #item.activity_name="{ item }">
-        {{ item?.hotelId?.name }}
+        {{ item?.activity?.name }}
+      </template>
+      <template #item.user="{ item }">
+        {{ item?.user?.email }}
       </template>
       <template #item.status="{ item }">
-        {{ item?.currentEmergingStatus }}
+        {{ item?.status }}
       </template>
-      <template #item.room_name="{ item }">
-        {{ item?.rateHash?.room_name }}
+      <template #item.bookingId="{ item }">
+        {{ item?.bookingId }}
       </template>
-      <template #item.emergingBookingDone="{ item }">
-        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">
-          {{ item?.emergingBookingDone ? 'YES' : 'NO' }}
-        </v-chip>
+      <template #item.bookedOn="{ item }">
+        {{ item?.bookedOn?.substring(0, 10) }}
       </template>
-      <template #item.emergingBookingConfirmed="{ item }">
-        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">
-          {{ item?.emergingBookingConfirmed ? 'YES' : 'NO' }}
-        </v-chip>
+      <template #item.amount="{ item }">
+        AED {{ item?.hotelbedsBookingResponse?.totalNet }}
       </template>
-      <template #item.supplier_info="{ item }">
-        <p>
-          {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.email }}
-        </p>
-        <p>
-          {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.phone }}
-        </p>
-      </template>
-      <template #item.room_info="{ item }">
-        <p>
-          {{ item?.emergingOrderBookingFormPayload?.checkin }} to
-          {{ item?.emergingOrderBookingFormPayload?.checkin }}
-        </p>
-      </template>
-      <!-- <template v-slot:item.city="{ item }">{{ item?.region?.name }}</template>
-      <template v-slot:item.country="{ item }">{{
-        item?.region?.country_code
-      }}</template>
-      <template v-slot:item.rating="{ item }">{{
-        item?.halal_ratings_percentage
-      }}</template>
-      <template v-slot:item.manager="{ item }">{{
-        item?.manager?.email
-      }}</template> -->
-      <!-- <template v-slot:item.action="{ item }">
-        <div class="d-flex ga-2 cursor-pointer">
-          <v-icon
-            icon="mdi-eye"
-            @click="
-              () => {
-                store.setHotelDetails(item)
-                detailsDialogShow = true
-              }
-            "
-          ></v-icon>
-          <v-icon
-            v-if="
-              store.user?.data?.role === 'admin' ||
-              store.user?.data?.role === 'employee'
-            "
-            @click="handelAssignManagerIconClick(item)"
-            icon="mdi-cog"
-          ></v-icon>
-          <v-icon @click="onRatingIconClick(item)" icon="mdi-star"></v-icon>
-        </div>
-      </template> -->
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -209,28 +162,11 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Activity Name', key: 'activity_name', align: 'start' },
-    { title: 'Room Name', key: 'room_name', align: 'start' },
+    { title: 'User', key: 'user', align: 'start' },
     { title: 'Status', key: 'status', align: 'start' },
-    { title: 'Booking Done', key: 'emergingBookingDone', align: 'start' },
-    {
-      title: 'Booking Confirmed',
-      key: 'emergingBookingConfirmed',
-      align: 'start'
-    },
-    {
-      title: 'Supplier Info',
-      key: 'supplier_info',
-      align: 'start'
-    },
-    {
-      title: 'Room Info',
-      key: 'room_info',
-      align: 'start'
-    }
-
-    // { title: 'Rating(%)', key: 'rating', align: 'start' },
-    // { title: 'Manager', key: 'manager', align: 'start' },
-    // { title: 'Action', key: 'action', align: 'center' }
+    { title: 'Booking Id', key: 'bookingId', align: 'start' },
+    { title: 'Booked On', key: 'bookedOn', align: 'start' },
+    { title: 'Amount', key: 'amount', align: 'start' }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },
