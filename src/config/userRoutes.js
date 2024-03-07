@@ -43,7 +43,10 @@ export const routes = [
       {
         path: 'list',
         component: () => import('@/views/hotels/List.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager']
+        }
       },
       {
         path: 'ratings',
@@ -73,7 +76,10 @@ export const routes = [
       {
         path: 'list',
         component: () => import('@/views/activity/List.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager']
+        }
       },
       {
         path: 'ratings',
@@ -146,7 +152,7 @@ export const navLinks = [
         title: 'Search And Add',
         to: '/activity/search-and-add',
         value: 'activity-search-and-add',
-        role: ['super-admin', 'admin', 'employee', 'manager']
+        role: ['super-admin', 'admin', 'employee']
       },
       {
         icon: 'view-list',
