@@ -14,26 +14,26 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
-      <template v-slot:item.hotel_name="{ item }">{{
-        item?.hotelId?.name
-      }}</template>
-      <template v-slot:item.status="{ item }">{{
-        item?.currentEmergingStatus
-      }}</template>
-      <template v-slot:item.room_name="{ item }">{{
-        item?.rateHash?.room_name
-      }}</template>
-      <template v-slot:item.emergingBookingDone="{ item }">
-        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">{{
-          item?.emergingBookingDone ? 'YES' : 'NO'
-        }}</v-chip>
+      <template #item.hotel_name="{ item }">
+        {{ item?.hotelId?.name }}
       </template>
-      <template v-slot:item.emergingBookingConfirmed="{ item }">
-        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">{{
-          item?.emergingBookingConfirmed ? 'YES' : 'NO'
-        }}</v-chip>
+      <template #item.status="{ item }">
+        {{ item?.currentEmergingStatus }}
       </template>
-      <template v-slot:item.supplier_info="{ item }">
+      <template #item.room_name="{ item }">
+        {{ item?.rateHash?.room_name }}
+      </template>
+      <template #item.emergingBookingDone="{ item }">
+        <v-chip :color="item?.emergingBookingDone ? 'success' : 'error'">
+          {{ item?.emergingBookingDone ? 'YES' : 'NO' }}
+        </v-chip>
+      </template>
+      <template #item.emergingBookingConfirmed="{ item }">
+        <v-chip :color="item?.emergingBookingConfirmed ? 'success' : 'error'">
+          {{ item?.emergingBookingConfirmed ? 'YES' : 'NO' }}
+        </v-chip>
+      </template>
+      <template #item.supplier_info="{ item }">
         <p>
           {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.email }}
         </p>
@@ -41,44 +41,12 @@
           {{ item?.emergingOrderBookingFinishPayload?.supplier_data?.phone }}
         </p>
       </template>
-      <template v-slot:item.room_info="{ item }">
+      <template #item.room_info="{ item }">
         <p>
           {{ item?.emergingOrderBookingFormPayload?.checkin }} to
           {{ item?.emergingOrderBookingFormPayload?.checkin }}
         </p>
       </template>
-      <!-- <template v-slot:item.city="{ item }">{{ item?.region?.name }}</template>
-      <template v-slot:item.country="{ item }">{{
-        item?.region?.country_code
-      }}</template>
-      <template v-slot:item.rating="{ item }">{{
-        item?.halal_ratings_percentage
-      }}</template>
-      <template v-slot:item.manager="{ item }">{{
-        item?.manager?.email
-      }}</template> -->
-      <!-- <template v-slot:item.action="{ item }">
-        <div class="d-flex ga-2 cursor-pointer">
-          <v-icon
-            icon="mdi-eye"
-            @click="
-              () => {
-                store.setHotelDetails(item)
-                detailsDialogShow = true
-              }
-            "
-          ></v-icon>
-          <v-icon
-            v-if="
-              store.user?.data?.role === 'admin' ||
-              store.user?.data?.role === 'employee'
-            "
-            @click="handelAssignManagerIconClick(item)"
-            icon="mdi-cog"
-          ></v-icon>
-          <v-icon @click="onRatingIconClick(item)" icon="mdi-star"></v-icon>
-        </div>
-      </template> -->
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -93,7 +61,7 @@
             @click="detailsDialogShow = false"
             color="error"
             icon="mdi-close-circle"
-          ></v-icon>
+          />
         </div>
         <v-card-text>
           <HotelDetails />
@@ -118,14 +86,13 @@
                   @keydown.enter="onManagerCreate"
                   required
                   :rules="[(v) => !!v || `Manager is required`]"
-                >
-                </v-autocomplete>
+                />
               </v-form>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -134,9 +101,15 @@
                 assignManagerDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignManager">Assign Manager</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignManager"
+          >
+            Assign Manager
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -146,17 +119,26 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
-                <template v-slot:label>
-                  {{ r?.name }} <v-chip class="ms-2">{{ r?.rating }}%</v-chip>
+            <v-col
+              cols="12"
+              v-for="(r, index) in ratings"
+              :key="index"
+            >
+              <v-checkbox
+                v-model="selectedRatings"
+                :value="r"
+              >
+                <template #label>
+                  {{ r?.name }} <v-chip class="ms-2">
+                    {{ r?.rating }}%
+                  </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -165,9 +147,15 @@
                 assignRatingDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignRating">Save</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignRating"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -181,7 +169,6 @@ import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import HotelDetails from './HotelDetails.vue'
 import axios from '@/plugins/axios'
-import FormComponent from '@/components/FormComponent.vue'
 
 const store = useAppStore()
 const formStore = userFormStore()
@@ -225,10 +212,6 @@ const table_data = ref({
       key: 'room_info',
       align: 'start'
     }
-
-    // { title: 'Rating(%)', key: 'rating', align: 'start' },
-    // { title: 'Manager', key: 'manager', align: 'start' },
-    // { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },
@@ -236,26 +219,6 @@ const table_data = ref({
   ]
 })
 
-const onSearch = async () => {
-  const hasNonNullValue = Object.values(
-    formStore.getFilteredSearchFields()
-  ).some((value) => value !== null && value !== undefined)
-  if (!hasNonNullValue) return
-  formStore.formComponents.isSearched = true
-  await loadItems({
-    page: table_data.value.page,
-    itemsPerPage: table_data.value.itemsPerPage,
-    sortBy: 'ascending'
-  })
-}
-const onReset = async () => {
-  formStore.formComponents.selectedExportOption = null
-  await loadItems({
-    page: table_data.value.page,
-    itemsPerPage: table_data.value.itemsPerPage,
-    sortBy: 'ascending'
-  })
-}
 const current_page = computed(() => {
   return table_data.value.page
 })
@@ -288,76 +251,7 @@ const onExport = async () => {
     })
 }
 
-const filteredCities = computed(() => {
-  const country = store.countries.find(
-    (c) => c.country?.code === formStore.getFieldValue('country')
-  )
-  return country ? country.cities : []
-})
-const searchForm = ref({
-  fields: [
-    {
-      key: 'name',
-      type: 'text',
-      label: 'Hotel Name',
-      isRequired: false,
-      value: null
-    },
-    {
-      key: 'ratingProvided',
-      type: 'select',
-      label: 'Rating Provided',
-      isRequired: false,
-      options: [
-        { id: true, title: 'YES' },
-        { id: false, title: 'NO' }
-      ],
-      value: null,
-      itemTitle: 'title',
-      itemValue: 'id',
-      multiple: false
-    },
-    {
-      key: 'manager',
-      type: 'select',
-      label: 'Assigned Manager',
-      isRequired: false,
-      options: managers.value,
-      value: null,
-      itemTitle: 'email',
-      itemValue: '_id',
-      multiple: false
-    },
-    {
-      key: 'country',
-      type: 'select',
-      label: 'Country',
-      isRequired: false,
-      options: store.countries,
-      value: null,
-      itemTitle: 'country.name',
-      itemValue: 'country.code',
-      multiple: false
-    },
-    {
-      key: 'city',
-      type: 'select',
-      label: 'City',
-      isRequired: false,
-      options: filteredCities,
-      value: null,
-      itemTitle: 'name',
-      itemValue: 'id',
-      multiple: false
-    }
-  ],
-  confirmFunction: onSearch,
-  reset: onReset,
-  confirmText: 'Search Hotels',
-  isSearched: false,
-  exportFunction: onExport
-})
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page
   await axiosInstance
     .get(`admin/hotel-bookings`, {
@@ -373,13 +267,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       table_data.value.totalItems = res?.data?.total
     })
 }
-const handelAssignManagerIconClick = (item) => {
-  store.setHotelDetails(item)
-  if (item?.manager?._id) {
-    selectedManager.value = item?.manager
-  }
-  assignManagerDialogShow.value = true
-}
+
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return re.test(email)
@@ -432,13 +320,7 @@ const onAssignManager = async () => {
       }
     })
 }
-const onRatingIconClick = async (item) => {
-  store.setHotelDetails(item)
-  if (item?.halal_ratings?.length) {
-    selectedRatings.value = item?.halal_ratings
-  }
-  assignRatingDialogShow.value = true
-}
+
 const onAssignRating = async () => {
   const ids = selectedRatings.value?.map((x) => {
     return x._id
@@ -447,7 +329,7 @@ const onAssignRating = async () => {
     .patch(`admin/hotels/${store.hotel_details?._id}/update-halal-ratings`, {
       ratingIds: ids
     })
-    .then(async (res) => {
+    .then(async () => {
       store.showSnackbar('Ratings updated successfully')
       store.setHotelDetails({})
       await loadItems({
@@ -459,24 +341,7 @@ const onAssignRating = async () => {
       selectedRatings.value = []
     })
 }
-onMounted(async () => {
-  // const countries = await axios.get('/misc/countries')
-  // store.setCountries(countries?.data)
-  // formStore.setFormComponents(searchForm.value)
-  // formStore.updateOptions('country', countries?.data)
-  // await axiosInstance.get('admin/users').then((res) => {
-  //   if (res?.data?.length) {
-  //     const managerList = res?.data?.filter((x) => x?.role === 'manager')
-  //     store.setManager(managerList)
-  //     searchForm.value.fields[2].options = managerList
-  //   }
-  // })
-  // await axiosInstance.get('admin/halal-ratings').then((res) => {
-  //   if (res?.data?.length) {
-  //     ratings.value = res?.data
-  //   }
-  // })
-})
+onMounted(async () => {})
 watch(
   () => formStore.getFieldValue('country'),
   () => {
@@ -485,7 +350,7 @@ watch(
 )
 watch(
   () => formStore.formComponents.selectedExportOption,
-  (newValue, oldValue) => {
+  () => {
     if (formStore.formComponents.selectedExportOption) {
       onExport()
     }

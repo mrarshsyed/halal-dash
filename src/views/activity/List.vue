@@ -14,64 +14,94 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
-      <template v-slot:item.name="{ item }">{{ item?.name }}</template>
-      <template v-slot:item.city="{ item }">{{
-        item?.destinationName
-      }}</template>
-      <template v-slot:item.country="{ item }">{{
-        item?.countryName
-      }}</template>
-      <template v-slot:item.rating="{ item }">{{
-        item?.halal_ratings_percentage
-      }}</template>
-      <template v-slot:item.manager="{ item }">{{
-        item?.manager?.email
-      }}</template>
-      <template v-slot:item.manager_name="{ item }">
+      <template #item.name="{ item }">
+        {{ item?.name }}
+      </template>
+      <template #item.city="{ item }">
+        {{ item?.destinationName }}
+      </template>
+      <template #item.country="{ item }">
+        {{ item?.countryName }}
+      </template>
+      <template #item.rating="{ item }">
+        {{ item?.halal_ratings_percentage }}
+      </template>
+      <template #item.manager="{ item }">
+        {{ item?.manager?.email }}
+      </template>
+      <template #item.manager_name="{ item }">
         {{
           item?.manager?.name
             ? item?.manager?.name
             : store.getUserName(item?.manager?.email)
-        }}</template
-      >
-      <template v-slot:item.action="{ item }">
+        }}
+      </template>
+      <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
-          <v-icon
-            icon="mdi-eye"
-            @click="
-              () => {
-                store.setDetails(item)
-                detailsDialogShow = true
-              }
-            "
-          ></v-icon>
-          <v-icon
-            v-if="
-              store.user?.data?.role === 'admin' ||
-              store.user?.data?.role === 'employee' ||
-              store.user?.data?.role === 'super-admin'
-            "
-            @click="handelAssignManagerIconClick(item)"
-            icon="mdi-cog"
-          ></v-icon>
-          <v-icon @click="onRatingIconClick(item)" icon="mdi-star"></v-icon>
+          <v-tooltip
+            text="Details"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                v-bind="props"
+                icon="mdi-eye"
+                @click="
+                  () => {
+                    store.setDetails(item)
+                    detailsDialogShow = true
+                  }
+                "
+              />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip
+            text="Assign Manager"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                v-bind="props"
+                v-if="
+                  store.user?.data?.role === 'admin' ||
+                    store.user?.data?.role === 'employee' ||
+                    store.user?.data?.role === 'super-admin'
+                "
+                @click="handelAssignManagerIconClick(item)"
+                icon="mdi-cog"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip
+            text="Ratings"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                v-bind="props"
+                @click="onRatingIconClick(item)"
+                icon="mdi-star"
+              />
+            </template>
+          </v-tooltip>
         </div>
       </template>
-      <template v-slot:bottom>
+      <template #bottom>
         <div class="d-flex justify-end align-center ga-4 pt-4">
           <v-btn
             size="x-small"
             icon="mdi-chevron-left"
             :disabled="table_data.page === 1"
             @click="onPreviousPage"
-          ></v-btn>
+          />
           <p>{{ table_data.page }}</p>
           <v-btn
             @click="onNextPage"
             :disabled="!table_data.hasNextPage"
             size="x-small"
             icon="mdi-chevron-right"
-          ></v-btn>
+          />
         </div>
       </template>
     </v-data-table-server>
@@ -88,7 +118,7 @@
             @click="detailsDialogShow = false"
             color="error"
             icon="mdi-close-circle"
-          ></v-icon>
+          />
         </div>
         <v-card-text>
           <Details />
@@ -113,14 +143,13 @@
                   @keydown.enter="onManagerCreate"
                   required
                   :rules="[(v) => !!v || `Manager is required`]"
-                >
-                </v-autocomplete>
+                />
               </v-form>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -129,9 +158,15 @@
                 assignManagerDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignManager">Assign Manager</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignManager"
+          >
+            Assign Manager
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -141,17 +176,26 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
-                <template v-slot:label>
-                  {{ r?.name }} <v-chip class="ms-2">{{ r?.rating }}%</v-chip>
+            <v-col
+              cols="12"
+              v-for="(r, index) in ratings"
+              :key="index"
+            >
+              <v-checkbox
+                v-model="selectedRatings"
+                :value="r"
+              >
+                <template #label>
+                  {{ r?.name }} <v-chip class="ms-2">
+                    {{ r?.rating }}%
+                  </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             color="error"
             @click="
@@ -160,9 +204,15 @@
                 assignRatingDialogShow = false
               }
             "
-            >Close</v-btn
           >
-          <v-btn color="primary" @click="onAssignRating">Save</v-btn>
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignRating"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -337,7 +387,7 @@ const searchForm = ref({
   isSearched: false,
   exportFunction: onExport
 })
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async ({ page, itemsPerPage, }) => {
   table_data.value.page = page
   await axiosInstance
     .get(`admin/activities`, {

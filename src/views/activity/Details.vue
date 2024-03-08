@@ -4,11 +4,17 @@
     <p>country : {{ hotel?.countryName }}</p>
     <p>City : {{ hotel?.destinationName }}</p>
     <p class="mt-8 d-flex ga-4 align-center">
-      <v-icon size="x-large" icon="mdi-account-circle"></v-icon>
-      <span>{{ hotel?.manager?.name }} <br />{{ hotel?.manager?.email }}</span>
-      <v-chip variant="tonal" class="font-weight-bold"
-        >{{ hotel?.halal_ratings_percentage }} %</v-chip
+      <v-icon
+        size="x-large"
+        icon="mdi-account-circle"
+      />
+      <span>{{ hotel?.manager?.name }} <br>{{ hotel?.manager?.email }}</span>
+      <v-chip
+        variant="tonal"
+        class="font-weight-bold"
       >
+        {{ hotel?.halal_ratings_percentage }} %
+      </v-chip>
     </p>
     <div class="mt-8">
       <p>Modalities</p>
@@ -19,12 +25,13 @@
           md="4"
           lg="3"
           v-for="(item, index) in hotel?.modalities"
+          :key="index"
         >
           <v-card>
             <v-card-title>
               {{ item?.name }}
             </v-card-title>
-            <v-card-text> </v-card-text>
+            <v-card-text />
           </v-card>
         </v-col>
       </v-row>
@@ -55,7 +62,6 @@
 
 <script setup>
 import { useAppStore } from '@/store/app'
-import { watch } from 'vue'
 import { computed } from 'vue'
 
 const store = useAppStore()
