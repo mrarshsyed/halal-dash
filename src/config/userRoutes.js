@@ -92,6 +92,21 @@ export const routes = [
         meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
       }
     ]
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin']
+    },
+    children: [
+      {
+        path: 'profit',
+        component: () => import('@/views/settings/Profit.vue'),
+        meta: { requiresAuth: true, role: ['super-admin', 'admin'] }
+      }
+    ]
   }
 ]
 
@@ -174,6 +189,21 @@ export const navLinks = [
         to: '/activity/orders',
         value: 'activity-orders',
         role: ['super-admin', 'admin', 'employee']
+      }
+    ]
+  },
+  {
+    title: 'Settings',
+    value: 'settings',
+    icon: 'cog',
+    role: ['super-admin', 'admin'],
+    children: [
+      {
+        icon: 'cash',
+        title: 'Profit',
+        to: '/settings/profit',
+        value: 'settings-profit',
+        role: ['super-admin', 'admin']
       }
     ]
   }

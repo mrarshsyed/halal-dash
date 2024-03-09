@@ -1,14 +1,26 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
-        ></v-text-field>
+        />
       </v-col>
-      <v-col cols="12" md="4">
-        <v-btn @click="showDialog" block color="primary">+ Add New User</v-btn>
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-btn
+          @click="showDialog"
+          block
+          color="primary"
+        >
+          + Add New User
+        </v-btn>
       </v-col>
     </v-row>
     <v-data-table
@@ -22,29 +34,37 @@
       :items-per-page-options="table_data.itemsPerPageOption"
       :page="table_data.page"
     >
-      <template v-slot:item.role="{ item }">
+      <template #item.role="{ item }">
         <v-chip>
-          <div style="min-width: 50px" class="text-center">
+          <div
+            style="min-width: 50px"
+            class="text-center"
+          >
             {{ item?.role }}
           </div>
         </v-chip>
       </template>
-      <template v-slot:item.isVerified="{ item }">
+      <template #item.isVerified="{ item }">
         <v-icon
           v-if="item?.isVerified"
           color="success"
           icon="mdi-check-circle"
-        ></v-icon>
-        <v-icon v-else color="error" icon="mdi-close-circle"></v-icon>
+        />
+        <v-icon
+          v-else
+          color="error"
+          icon="mdi-close-circle"
+        />
       </template>
-      <template v-slot:item.action="{ item }">
+      <template #item.action="{ item }">
         <v-icon
           @click="onDelete(item)"
           v-if="canDelete(item)"
           color="error"
           class="cursor-pointer"
-          >mdi-delete</v-icon
         >
+          mdi-delete
+        </v-icon>
       </template>
     </v-data-table>
     <!-- @update:options="loadItems" -->
