@@ -74,6 +74,24 @@
             </template>
           </v-tooltip>
           <v-tooltip
+            text="Remove Manager"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                v-bind="props"
+                v-if="
+                  store.user?.data?.role === 'admin' ||
+                    store.user?.data?.role === 'employee' ||
+                    (store.user?.data?.role === 'super-admin' &&
+                      item?.manager?.email)
+                "
+                @click="handelRemoveManagerIconClick(item)"
+                icon="mdi-link-off"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip
             text="Ratings"
             location="top"
           >
@@ -405,7 +423,7 @@ const loadItems = async ({ page, itemsPerPage, }) => {
     })
 }
 const handelAssignManagerIconClick = (item) => {
-  store.setHotelDetails(item)
+  store.setDetails(item)
   if (item?.manager?._id) {
     selectedManager.value = item?.manager
   }
@@ -447,7 +465,7 @@ const onAssignManager = async () => {
   managerForm.value.validate()
   if (!managerForm?.value?.isValid) return
   axios
-    .patch(`admin/activities/${store.hotel_details?._id}/update-manager`, {
+    .patch(`admin/activities/${store.details?._id}/update-manager`, {
       managerId: selectedManager.value?._id
     })
     .then(async (res) => {
@@ -464,7 +482,7 @@ const onAssignManager = async () => {
     })
 }
 const onRatingIconClick = async (item) => {
-  store.setHotelDetails(item)
+  store.setDetails(item)
   if (item?.halal_ratings?.length) {
     selectedRatings.value = item?.halal_ratings
   }
@@ -476,14 +494,14 @@ const onAssignRating = async () => {
   })
   axios
     .patch(
-      `admin/activities/${store.hotel_details?._id}/update-halal-ratings`,
+      `admin/activities/${store.details?._id}/update-halal-ratings`,
       {
         ratingIds: ids
       }
     )
     .then(async (res) => {
       store.showSnackbar('Ratings updated successfully')
-      store.setHotelDetails({})
+      store.setDetails({})
       await loadItems({
         page: table_data.value.page,
         itemsPerPage: table_data.value.itemsPerPage,
@@ -499,6 +517,38 @@ const onNextPage = async () => {
 const onPreviousPage = async () => {
   table_data.value.page = table_data.value.page - 1
 }
+const removeManager = async () => {
+  await axios
+    .patch(`admin/activities/${store.details?._id}/update-manager`, {
+      managerId: null
+    })
+    .then(async (res) => {
+      if (res?.status === 200) {
+        store.showSnackbar('Manager removed successfully')
+        await loadItems({
+          page: table_data.value.page,
+          itemsPerPage: table_data.value.itemsPerPage,
+          sortBy: 'ascending'
+        })
+        store.closeDialog()
+      }
+    })
+}
+
+const handelRemoveManagerIconClick = (item) => {
+  store.setDetails(item)
+  const dialogModal = {
+    title: 'Remove Manager',
+    content: `Are you sure you want to remove ${
+      item?.manager?.name ?? item?.manager?.email
+    } from ${item?.name} ?`,
+    confirmText: 'Remove Manager',
+    formComponents: [],
+    confirmFunction: removeManager
+  }
+  store.showDialog(dialogModal)
+}
+
 onMounted(async () => {
   const countries = await axios.get('/admin/activities/get-countries')
   store.setCountries(countries?.data)

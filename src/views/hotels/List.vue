@@ -73,6 +73,24 @@
             </template>
           </v-tooltip>
           <v-tooltip
+            text="Remove Manager"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                v-bind="props"
+                v-if="
+                  store.user?.data?.role === 'admin' ||
+                    store.user?.data?.role === 'employee' ||
+                    (store.user?.data?.role === 'super-admin' &&
+                      item?.manager?.email)
+                "
+                @click="handelRemoveManagerIconClick(item)"
+                icon="mdi-link-off"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip
             text="Add Ratings"
             location="top"
           >
@@ -316,7 +334,6 @@ const onExport = async () => {
       }
     })
 }
-
 const filteredCities = computed(() => {
   const country = store.countries.find(
     (c) => c.country?.code === formStore.getFieldValue('country')
@@ -409,6 +426,36 @@ const handelAssignManagerIconClick = (item) => {
     selectedManager.value = item?.manager
   }
   assignManagerDialogShow.value = true
+}
+const removeManager = async () => {
+  await axios
+    .patch(`admin/hotels/${store.hotel_details?._id}/update-manager`, {
+      managerId: null
+    })
+    .then(async (res) => {
+      if (res?.status === 200) {
+        store.showSnackbar('Manager removed successfully')
+        await loadItems({
+          page: table_data.value.page,
+          itemsPerPage: table_data.value.itemsPerPage,
+          sortBy: 'ascending'
+        })
+        store.closeDialog()
+      }
+    })
+}
+const handelRemoveManagerIconClick = (item) => {
+  store.setHotelDetails(item)
+  const dialogModal = {
+    title: 'Remove Manager',
+    content: `Are you sure you want to remove ${
+      item?.manager?.name ?? item?.manager?.email
+    } from ${item?.name} ?`,
+    confirmText: 'Remove Manager',
+    formComponents: [],
+    confirmFunction: removeManager
+  }
+  store.showDialog(dialogModal)
 }
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

@@ -104,7 +104,7 @@ export const routes = [
       {
         path: 'profit',
         component: () => import('@/views/settings/Profit.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin'] }
+        meta: { requiresAuth: true, role: ['super-admin', ] }
       }
     ]
   }
@@ -203,7 +203,7 @@ export const navLinks = [
         title: 'Profit',
         to: '/settings/profit',
         value: 'settings-profit',
-        role: ['super-admin', 'admin']
+        role: ['super-admin', ]
       }
     ]
   }
