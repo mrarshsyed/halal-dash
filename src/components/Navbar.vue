@@ -8,7 +8,7 @@
       />
 
       <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">
-        <v-img src="@/assets/logo.png" height="56px" width="156px"></v-img>
+        <v-img src="@/assets/logo.png" height="56px" width="156px" />
       </v-app-bar-title>
 
       <v-spacer />
@@ -24,7 +24,7 @@
         v-if="store.getUser"
         variant="text"
         icon="mdi-logout"
-        @click="store.logout()"
+        @click="store.logout('call-api')"
       />
     </v-app-bar>
 
@@ -45,10 +45,9 @@
             :title="item?.title"
             exact
             link
-          >
-          </v-list-item>
+          />
           <v-list-group v-else :value="item?.value">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-list-item
                 color="primary"
                 v-bind="props"
@@ -57,7 +56,7 @@
                 :value="item?.value"
                 exact
                 link
-              ></v-list-item>
+              />
             </template>
             <v-list-item
               v-for="(child, childIndex) in item?.children"
@@ -67,7 +66,7 @@
               :value="child?.value"
               :to="child?.to"
               color="primary"
-            ></v-list-item>
+            />
           </v-list-group>
         </div>
       </v-list>
@@ -88,7 +87,6 @@ import { watch, ref, computed } from 'vue'
 import { useTheme } from 'vuetify'
 import { navLinks } from '@/config/userRoutes'
 import { onMounted } from 'vue'
-import axios from '@/plugins/axios'
 
 const store = useAppStore()
 const theme = useTheme()
@@ -125,6 +123,20 @@ watch(
     data.value.drawer = false
   }
 )
+watch(() => data.value.drawer, (newValue, oldValue) => {
+  if (
+    store?.user?.data?.permissions?.length &&
+    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
+  ) {
+    data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
+  }
+  if (
+    store?.user?.data?.permissions?.length &&
+    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
+  ) {
+    data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
+  }
 
-onMounted(async () => {})
+})
+
 </script>

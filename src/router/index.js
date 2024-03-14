@@ -17,15 +17,46 @@ router.beforeEach(async (to, from, next) => {
         query: { mode: 'Login' }
       })
     } else {
+      const user = await store.getUserInfo()
+      if (user?.data?._id) {
+        let data = store.user
+        data.data = user?.data
+        store.setUser(data)
+      }
       if (
         to.meta?.role?.length &&
         to.meta?.role.includes(store.getUser?.data?.role)
       ) {
+        console.log();
         next()
+
+        // if (
+        //   (store.getUser?.data?.role === 'admin' ||
+        //     store.getUser?.data?.role === 'employee') &&
+        //   to.matched[0]?.name === 'hotels' &&
+        //   !store.getUser?.data?.permissions?.includes('hotel-all')
+        // ) {
+        //   next({ name: 'dashboard' })
+        // } 
+        
+        // else {
+        //   if (
+        //     (store.getUser?.data?.role === 'admin' ||
+        //       store.getUser?.data?.role === 'employee') &&
+        //     to.matched[0]?.name === 'activity' &&
+        //     !store.getUser?.data?.permissions?.includes('activity-all')
+        //   ) {
+        //     next({ name: 'dashboard' })
+        //   }
+        //   else {
+        //     next()
+        //   }
+        // }
+
       } else {
         next({
-          name: 'pageNotFound',
-          params: { pathMatch: ['not', 'found'] }
+          name: 'authentication',
+          query: { mode: 'Login' }
         })
       }
     }

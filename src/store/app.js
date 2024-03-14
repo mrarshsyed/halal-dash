@@ -104,7 +104,7 @@ export const useAppStore = defineStore('app', {
         confirmFunction: () => {},
         formComponents: []
       }
-      this.dialog = dialog
+      this.dialog.show = false
     },
     setUser(user) {
       this.user = user
@@ -114,12 +114,14 @@ export const useAppStore = defineStore('app', {
       this.tokens = tokens
       localStorage.setItem('tokens', JSON.stringify(tokens))
     },
-    logout() {
-      axios.get('admin/auth/logout')
+    async logout(callApi) {
+      if (callApi) {
+        await axios.get('admin/auth/logout')
+      }
       localStorage.clear()
       this.user = null
       this.tokens = null
-      this.router.push('/authentication?mode=Login')
+      this.router.replace('/authentication?mode=Login')
     },
     setUserList(list) {
       this.userList = list
@@ -149,6 +151,22 @@ export const useAppStore = defineStore('app', {
     getUserName(email) {
       return email ? email.split('@')[0] : ''
       // return email.split('@')[0]
+    },
+    async getUserInfo(){
+      return await axios.get('admin/auth/user') 
+    },
+    getFieldValue(key) {
+      const field = this.dialog.formComponents.fields?.find(
+        (field) => field?.key === key
+      )
+      return field ? field.value : null
+    },
+    async updateUserRoleAndPermissions(id,role,permissions) {
+      const payload = {
+        role: role,
+        permissions: [...permissions,'hotel-booking-all','activity-booking-all']
+      }
+      return await axios.patch(`admin/users/${id}/update-role-permissions`, payload)
     }
   }
 })

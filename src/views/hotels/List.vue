@@ -79,12 +79,7 @@
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
-                v-if="
-                  store.user?.data?.role === 'admin' ||
-                    store.user?.data?.role === 'employee' ||
-                    (store.user?.data?.role === 'super-admin' &&
-                      item?.manager?.email)
-                "
+                v-if="item?.manager?.email && store.user?.data?.permissions?.includes('hotel-all') "
                 @click="handelRemoveManagerIconClick(item)"
                 icon="mdi-link-off"
               />

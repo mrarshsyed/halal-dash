@@ -1,24 +1,14 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="4"
-      >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
+      <v-col cols="12" md="4">
+        <v-btn @click="showDialog" block color="primary">
           + Add New User
         </v-btn>
       </v-col>
@@ -36,10 +26,7 @@
     >
       <template #item.role="{ item }">
         <v-chip>
-          <div
-            style="min-width: 50px"
-            class="text-center"
-          >
+          <div style="min-width: 50px" class="text-center">
             {{ item?.role }}
           </div>
         </v-chip>
@@ -50,13 +37,12 @@
           color="success"
           icon="mdi-check-circle"
         />
-        <v-icon
-          v-else
-          color="error"
-          icon="mdi-close-circle"
-        />
+        <v-icon v-else color="error" icon="mdi-close-circle" />
       </template>
       <template #item.action="{ item }">
+        <v-icon @click="onEdit(item)" color="primary" class="cursor-pointer">
+          mdi-pen
+        </v-icon>
         <v-icon
           @click="onDelete(item)"
           v-if="canDelete(item)"
@@ -72,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store/app'
 import axiosInstance from '@/plugins/axios'
 const store = useAppStore()
@@ -100,22 +86,80 @@ const getUserOption = () => {
 
 const userForm = ref({
   fields: [
-    { type: 'email', label: 'Email Address', isRequired: true, value: null },
+    {
+      type: 'email',
+      label: 'Email Address',
+      isRequired: true,
+      value: null,
+      key: 'email'
+    },
     {
       type: 'select',
       label: 'Role',
       isRequired: true,
       options: getUserOption(),
-      value: null
+      value: null,
+      key: 'role'
+    },
+    {
+      type: 'treeview',
+      isRequired: true,
+      value: [],
+      cols: '12',
+      md: '12',
+      show: false,
+      key: 'permission'
     }
   ]
 })
+
+const updateRoleAndPermission = async () => {
+  await store
+    .updateUserRoleAndPermissions(
+      user.value._id,
+      store.getFieldValue('role'),
+      store.getFieldValue('permission')
+    )
+    .then(async (res) => {
+      if (res?.data?._id) {
+        store.showSnackbar('successfully updated')
+        await loadItems({
+          page: table_data.value.page,
+          itemsPerPage: table_data.value.itemsPerPage,
+          sortBy: 'ascending'
+        })
+        user
+        store.dialog.show = false
+      }
+    })
+}
+
+const onEdit = (item) => {
+  user.value = item
+  userForm.value.fields[0].value = item?.email
+  userForm.value.fields[1].value = item?.role
+  userForm.value.fields[2].value = item?.permissions
+  if (item?.role === 'admin' || item?.role === 'manager') {
+    userForm.value.fields[2].show = true
+  }
+  else{
+    userForm.value.fields[2].show = false
+  }
+  const dialogModal = {
+    title: 'Update User',
+    content: '',
+    confirmText: 'Update',
+    formComponents: userForm.value,
+    confirmFunction: updateRoleAndPermission
+  }
+  store.showDialog(dialogModal)
+}
 
 const resetForm = async () => {
   userForm.value.fields = userForm.value.fields?.map((form) => {
     return {
       ...form,
-      value: null
+      value: form?.type === 'treeview' ? [] : null
     }
   })
 }
@@ -160,8 +204,10 @@ const table_data = ref({
 const sendVerificationEmail = async () => {
   const payload = {
     email: store.dialog.formComponents?.fields[0]?.value,
-    role: store.dialog.formComponents?.fields[1]?.value
+    role: store.dialog.formComponents?.fields[1]?.value,
+    permissions: store.dialog.formComponents?.fields[2].value
   }
+
   await store.createUser(payload.email, payload.role).then(async (res) => {
     if (res?.status === 200) {
       store.showSnackbar('Invitation Link sent Successfully')
@@ -170,6 +216,9 @@ const sendVerificationEmail = async () => {
         itemsPerPage: table_data.value.itemsPerPage,
         sortBy: 'ascending'
       })
+      user.value = res?.data
+      await updateRoleAndPermission()
+      user.value = null
       store.closeDialog()
       resetForm()
     }
@@ -188,12 +237,21 @@ const showDialog = () => {
   store.showDialog(dialogModal)
 }
 
+const permissions = ref([])
+
+const loadPermissions = async () => {
+  await axiosInstance.get('admin/settings/permissions').then((res) => {
+    permissions.value = res.data?.data
+  })
+}
+
 onMounted(async () => {
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,
     sortBy: 'ascending'
   })
+  await loadPermissions()
 })
 
 const canDelete = (item) => {
@@ -222,7 +280,7 @@ const canDelete = (item) => {
 const confirmDelete = async () => {
   await axiosInstance
     .delete(`admin/users/${user.value?._id}`)
-    .then(async (res) => {
+    .then(async () => {
       store.showSnackbar('Successfully Deleted')
       await loadItems({
         page: table_data.value.page,
@@ -244,6 +302,20 @@ const onDelete = (item) => {
   }
   store.showDialog(dialogModal)
 }
+watch(
+  () => store.getFieldValue('role'),
+  () => {    
+    if (
+      store.getFieldValue('role') === 'admin' ||
+      store.getFieldValue('role') === 'employee'
+    ) {
+      store.dialog.formComponents.fields[2].show = true
+
+    } else {
+      store.dialog.formComponents.fields[2].show = false
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped></style>

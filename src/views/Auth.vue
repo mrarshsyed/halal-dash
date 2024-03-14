@@ -2,14 +2,25 @@
   <v-form @submit.prevent="authHandle">
     <v-container>
       <v-row>
-        <v-col cols="12" md="6" offset-md="3">
+        <v-col
+          cols="12"
+          md="6"
+          offset-md="3"
+        >
           <!-- <v-card> -->
           <div class="d-flex w-100 justify-center align-center">
-            <v-img src="@/assets/logo.png" height="56px" width="156px"></v-img>
+            <v-img
+              src="@/assets/logo.png"
+              height="56px"
+              width="156px"
+            />
           </div>
 
           <v-card-text>
-            <v-form ref="form" v-if="getMode === 'Login'">
+            <v-form
+              ref="form"
+              v-if="getMode === 'Login'"
+            >
               <v-text-field
                 v-model="email"
                 label="Email"
@@ -30,7 +41,9 @@
               ref="form"
               v-else-if="getMode === 'password_save' && showPasswordSaveForm"
             >
-              <p class="text-center my-4">Save Your User Name And Password</p>
+              <p class="text-center my-4">
+                Save Your User Name And Password
+              </p>
               <v-text-field
                 v-model="name"
                 label="Your Name"
@@ -53,7 +66,6 @@
                 v-model="confirmPassword"
                 :type="showPassword ? 'text' : 'password'"
                 label="Confirm Password"
-                type="password"
                 prepend-inner-icon="mdi-lock"
                 :rules="[
                   ...passwordRules,
@@ -68,7 +80,9 @@
               ref="form"
               v-if="getMode === 'generate_password_reset_link'"
             >
-              <p class="text-center my-4">Reset Your Password</p>
+              <p class="text-center my-4">
+                Reset Your Password
+              </p>
               <v-text-field
                 v-model="email"
                 label="Email"
@@ -77,8 +91,13 @@
                 prepend-inner-icon="mdi-gmail"
               />
             </v-form>
-            <v-form ref="form" v-if="getMode === 'password_reset'">
-              <p class="text-center my-4">Set Your New Password</p>
+            <v-form
+              ref="form"
+              v-if="getMode === 'password_reset'"
+            >
+              <p class="text-center my-4">
+                Set Your New Password
+              </p>
               <v-text-field
                 v-model="password"
                 label="Password"
@@ -94,7 +113,6 @@
                 v-model="confirmPassword"
                 :type="showPassword ? 'text' : 'password'"
                 label="Confirm Password"
-                type="password"
                 prepend-inner-icon="mdi-lock"
                 :rules="[
                   ...passwordRules,
@@ -108,7 +126,10 @@
           </v-card-text>
           <v-card-actions>
             <v-row>
-              <v-col cols="12" v-if="showActionButton">
+              <v-col
+                cols="12"
+                v-if="showActionButton"
+              >
                 <v-btn
                   block
                   @click="authHandle"
@@ -119,7 +140,10 @@
                   {{ getMode?.replaceAll('_', ' ') }}
                 </v-btn>
               </v-col>
-              <v-col cols="12" v-if="getMode === 'Login'">
+              <v-col
+                cols="12"
+                v-if="getMode === 'Login'"
+              >
                 <p>
                   Forgot password?
                   <router-link
@@ -238,7 +262,7 @@ const handlePasswordResetLinkGenerate = async () => {
     })
 }
 
-const authHandle = async (mode) => {
+const authHandle = async () => {
   const { valid } = await form.value.validate()
   if (!valid) {
     return
@@ -275,7 +299,7 @@ watch(
               showPasswordSaveForm.value = true
             }
           })
-          .catch((err) => {
+          .catch(() => {
             showActionButton.value = false
           })
       }
@@ -296,7 +320,7 @@ watch(
             router.push('/authentication?mode=Login')
           }
         })
-        .catch((err) => {
+        .catch(() => {
           showActionButton.value = false
         })
     }

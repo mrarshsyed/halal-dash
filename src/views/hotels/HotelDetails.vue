@@ -6,11 +6,17 @@
       {{ hotel?.region?.country_code }}
     </p>
     <p class="mt-8 d-flex ga-4 align-center">
-      <v-icon size="x-large" icon="mdi-account-circle"></v-icon>
-      <span>{{ hotel?.manager?.name }} <br />{{ hotel?.manager?.email }}</span>
-      <v-chip variant="tonal" class="font-weight-bold"
-        >{{ hotel?.halal_ratings_percentage }} %</v-chip
+      <v-icon
+        size="x-large"
+        icon="mdi-account-circle"
+      />
+      <span>{{ hotel?.manager?.name }} <br>{{ hotel?.manager?.email }}</span>
+      <v-chip
+        variant="tonal"
+        class="font-weight-bold"
       >
+        {{ hotel?.halal_ratings_percentage }} %
+      </v-chip>
     </p>
     <div class="mt-8">
       <p>Amenities</p>
@@ -21,6 +27,7 @@
           md="4"
           lg="3"
           v-for="(item, index) in hotel?.amenity_groups"
+          :key="index"
         >
           <v-card>
             <v-card-title>
@@ -43,7 +50,9 @@
     </div>
 
     <v-row class="mt-8">
-      <v-col cols="12"><p>Image Gallery</p></v-col>
+      <v-col cols="12">
+        <p>Image Gallery</p>
+      </v-col>
       <v-col
         cols="6"
         md="4"
@@ -58,8 +67,7 @@
           :src="img ? img?.replace('{size}', '1024x768') : ''"
           cover
           class="rounded"
-        >
-        </v-img>
+        />
       </v-col>
     </v-row>
   </div>

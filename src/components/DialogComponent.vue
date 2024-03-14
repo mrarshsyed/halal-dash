@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog.show" max-width="600" persistent scrollable>
+  <v-dialog
+    v-model="dialog.show"
+    max-width="800"
+    persistent
+    scrollable
+  >
     <v-card :title="dialog.title">
       <v-card-text>
         {{ dialog.content }}
@@ -10,8 +15,8 @@
         >
           <v-row>
             <v-col
-              cols="12"
-              md="6"
+              :cols="component?.cols ?? 12"
+              :md="component?.md ?? 6"
               v-for="(component, index) in dialog.formComponents?.fields"
               :key="index"
             >
@@ -19,14 +24,14 @@
                 :type="component?.type"
                 v-if="
                   component?.type === 'email' ||
-                  component?.type === 'text' ||
-                  component?.type === 'number'
+                    component?.type === 'text' ||
+                    component?.type === 'number'
                 "
                 :label="component?.label"
                 :required="component?.isRequired"
                 :rules="getValidationRules(component)"
                 v-model="component.value"
-              ></v-text-field>
+              />
               <v-autocomplete
                 clearable
                 v-if="component?.type === 'select'"
@@ -42,7 +47,11 @@
                     : []
                 "
                 v-model="component.value"
-              ></v-autocomplete>
+              />
+              {{  component?.show }}
+              <TreeView
+                v-if="component?.type === 'treeview' && component?.show"
+              />
             </v-col>
           </v-row>
         </v-form>
@@ -57,7 +66,12 @@
         >
           {{ dialog.cancelText }}
         </v-btn>
-        <v-btn @click="confirm" class="px-4" color="primary" variant="elevated">
+        <v-btn
+          @click="confirm"
+          class="px-4"
+          color="primary"
+          variant="elevated"
+        >
           {{ dialog.confirmText }}
         </v-btn>
       </v-card-actions>
@@ -67,9 +81,12 @@
 <script setup>
 import { useAppStore } from '@/store/app'
 import { computed, ref } from 'vue'
+import TreeView from './TreeView.vue'
+
 const store = useAppStore()
 const form = ref()
 const formValue = ref(false)
+
 const getValidationRules = (component) => {
   const commonRules = component?.isRequired
     ? [(v) => !!v || `${component?.label} is required`]
@@ -87,7 +104,6 @@ const getValidationRules = (component) => {
 
   return commonRules
 }
-
 const dialog = computed(() => {
   return store.dialog
 })
