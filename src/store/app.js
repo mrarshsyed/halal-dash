@@ -115,13 +115,22 @@ export const useAppStore = defineStore('app', {
       localStorage.setItem('tokens', JSON.stringify(tokens))
     },
     async logout(callApi) {
-      if (callApi) {
-        await axios.get('admin/auth/logout')
+      try {
+        if (callApi) {
+          await axios.get('admin/auth/logout')
+        }
+        localStorage.clear()
+        this.user = null
+        this.tokens = null
+        this.router.replace('/authentication?mode=Login')  
+      } catch (error) {
+        localStorage.clear()
+        this.user = null
+        this.tokens = null
+        this.router.replace('/authentication?mode=Login')
+        
       }
-      localStorage.clear()
-      this.user = null
-      this.tokens = null
-      this.router.replace('/authentication?mode=Login')
+      
     },
     setUserList(list) {
       this.userList = list
@@ -162,10 +171,13 @@ export const useAppStore = defineStore('app', {
       return field ? field.value : null
     },
     async updateUserRoleAndPermissions(id,role,permissions) {
-
+    
       let payload = {
         role: role,
         permissions: permissions
+      }
+      if (role === 'manager') {
+        payload.permissions = ['hotel-all','activity-all']
       }
     
       return await axios.patch(`admin/users/${id}/update-role-permissions`, payload)
