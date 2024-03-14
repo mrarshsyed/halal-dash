@@ -48,7 +48,6 @@
                 "
                 v-model="component.value"
               />
-              {{  component?.show }}
               <TreeView
                 v-if="component?.type === 'treeview' && component?.show"
               />

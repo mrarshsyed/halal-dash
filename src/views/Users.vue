@@ -107,7 +107,7 @@ const userForm = ref({
       value: [],
       cols: '12',
       md: '12',
-      show: false,
+      show: true,
       key: 'permission'
     }
   ]
