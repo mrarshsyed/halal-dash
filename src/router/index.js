@@ -9,60 +9,49 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta?.requiresAuth)) {
-    const store = useAppStore()
-    if (!store.getUser) {
-      next({
-        name: 'authentication',
-        query: { mode: 'Login' }
-      })
-    } else {
-      const user = await store.getUserInfo()
-      if (user?.data?._id) {
-        let data = store.user
-        data.data = user?.data
-        store.setUser(data)
+  const store = useAppStore()
+
+  // Check if the route requires authentication
+  if (to.meta?.requiresAuth) {
+    try {
+      // Ensure user is logged in
+      if (!store.getUser) {
+        throw new Error('User not logged in')
       }
+
+      // Fetch user information
+      const userInfo = await store.getUserInfo()
+
+      // Update user information in the store
+      if (userInfo?.data?._id) {
+        store.setUser({ data: userInfo.data })
+      }
+
+      // Check user roles for authorization
+      if (to.meta.role && !to.meta.role.includes(store.getUser.data.role)) {
+        throw new Error('Unauthorized access')
+      }
+      if (userInfo.data?.role === 'super-admin') {
+        return next()
+      }
+
       if (
-        to.meta?.role?.length &&
-        to.meta?.role.includes(store.getUser?.data?.role)
+        to.meta.permissions &&
+        !to.meta.permissions.some((permission) =>
+          (store.getUser.data.permissions || []).includes(permission)
+        )
       ) {
-        console.log();
-        next()
-
-        // if (
-        //   (store.getUser?.data?.role === 'admin' ||
-        //     store.getUser?.data?.role === 'employee') &&
-        //   to.matched[0]?.name === 'hotels' &&
-        //   !store.getUser?.data?.permissions?.includes('hotel-all')
-        // ) {
-        //   next({ name: 'dashboard' })
-        // } 
-        
-        // else {
-        //   if (
-        //     (store.getUser?.data?.role === 'admin' ||
-        //       store.getUser?.data?.role === 'employee') &&
-        //     to.matched[0]?.name === 'activity' &&
-        //     !store.getUser?.data?.permissions?.includes('activity-all')
-        //   ) {
-        //     next({ name: 'dashboard' })
-        //   }
-        //   else {
-        //     next()
-        //   }
-        // }
-
-      } else {
-        next({
-          name: 'authentication',
-          query: { mode: 'Login' }
-        })
+        console.log(to,userInfo);
+        throw new Error('Insufficient permissions')
       }
+    } catch (error) {
+      // Redirect to authentication page for login or handle unauthorized access
+      return next({ name: 'pageNotFound',})
     }
-  } else {
-    next() // make sure to always call next()!
   }
+
+  // Allow access to the route
+  next()
 })
 
 export default router

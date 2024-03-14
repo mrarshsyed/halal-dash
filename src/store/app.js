@@ -167,9 +167,7 @@ export const useAppStore = defineStore('app', {
         role: role,
         permissions: permissions
       }
-      if (role === 'employee' && !payload.permissions?.includes('user-all')) {
-        payload.permissions.push('user-all')
-      }
+    
       return await axios.patch(`admin/users/${id}/update-role-permissions`, payload)
     }
   }

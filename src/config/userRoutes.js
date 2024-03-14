@@ -3,41 +3,46 @@ export const routes = [
     path: '/:pathMatch(.*)*',
     name: 'pageNotFound',
     component: () => import('@/views/PageNotFound.vue'),
-    meta: { requiresAuth: false, role: [] }
+    meta: { requiresAuth: false, role: [], permissions: [] }
   },
   {
     path: '/',
     name: 'Home',
     component: () => import('@/views/Home.vue'),
-    meta: { requiresAuth: false, role: [] }
+    meta: { requiresAuth: false, role: [], permissions: [] }
   },
   {
     path: '/authentication',
     name: 'authentication',
     component: () => import('@/views/Auth.vue'),
-    meta: { requiresAuth: false, role: [] }
+    meta: { requiresAuth: false, role: [], permissions: [] }
   },
   {
     path: '/dashboard',
     name: 'dashboard',
     component: () => import('@/views/Dashboard.vue'),
     meta: {
-      requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee', 'manager']
+      requiresAuth: false,
+      role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
     }
   },
   {
     path: '/users',
     name: 'users',
     component: () => import('@/views/Users.vue'),
-    meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: ['user-all','user-list']
+    }
   },
   {
     path: '/hotels',
     name: 'hotels',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee', 'manager']
+      role: ['super-admin', 'admin', 'employee', 'manager'],
     },
     children: [
       {
@@ -45,18 +50,27 @@ export const routes = [
         component: () => import('@/views/hotels/List.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee', 'manager']
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: ['hotel-list','hotel-all']
         }
       },
       {
         path: 'ratings',
         component: () => import('@/views/hotels/Ratings.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin',],
+          permissions: []
+        }
       },
       {
         path: 'orders',
         component: () => import('@/views/hotels/Orders.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: ['hotel-booking-all']
+        }
       }
     ]
   },
@@ -65,31 +79,45 @@ export const routes = [
     name: 'activity',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee', 'manager']
+      role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
     },
     children: [
       {
         path: 'search-and-add',
         component: () => import('@/views/activity/searchAndAdd.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: ['activity-all','activity-add-to-system']
+        }
       },
       {
         path: 'list',
         component: () => import('@/views/activity/List.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee', 'manager']
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: ['activity-all','activity-list']
         }
       },
       {
         path: 'ratings',
         component: () => import('@/views/activity/Ratings.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin',],
+          permissions: []
+        }
       },
       {
         path: 'orders',
         component: () => import('@/views/activity/Orders.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', 'admin', 'employee'] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: ['activity-all','activity-booking-all']
+        }
       }
     ]
   },
@@ -98,13 +126,18 @@ export const routes = [
     name: 'settings',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin']
+      role: ['super-admin', 'admin'],
+      permissions: ['settings:view']
     },
     children: [
       {
         path: 'profit',
         component: () => import('@/views/settings/Profit.vue'),
-        meta: { requiresAuth: true, role: ['super-admin', ] }
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: ['settings:profit:view']
+        }
       }
     ]
   }
@@ -203,7 +236,7 @@ export const navLinks = [
         title: 'Profit',
         to: '/settings/profit',
         value: 'settings-profit',
-        role: ['super-admin', ]
+        role: ['super-admin']
       }
     ]
   }

@@ -3,9 +3,10 @@
     Assign Permission
   </p>
   <v-list
-    :opened="['hotel', 'activity']"
+  density="compact"
+    :opened="['user']"
     style="width: 100%; overflow: hidden"
-    class="border rounded"
+    class="border rounded px-4"
   >
     <v-row>
       <v-col
@@ -32,11 +33,13 @@
         <v-list-group
           v-else
           :value="item.value"
+          class="lp-3 shadow border"
         >
           <template #activator="{ props }">
             <v-list-item
               v-bind="props"
               :title="item?.title"
+              class=" rounded mt-1"
             />
           </template>
           <v-list-item
@@ -61,59 +64,85 @@
 
 <script setup>
 import { useAppStore } from '@/store/app'
-import { ref ,computed,} from 'vue'
+import { ref, computed } from 'vue'
 
 const store = useAppStore()
 
 const navLinks = [
+{
+    title: 'User',
+    value: 'user',
+    children: [
+      {
+        title: 'All',
+        value: 'user-all'
+      },
+      {
+        title: 'List',
+        value: 'user-list'
+      },
+      {
+        title: 'Create',
+        value: 'user-create'
+      },
+      { title: 'Update', value: 'user-role-permission-update' },
+      { title: 'Delete', value: 'user-delete' }
+    ]
+  },
   {
     title: 'Hotels',
-    value: 'hotel-all',
-    children: []
-    // {
-    //     title: 'List',
-    //     value: 'hotel-list'
-    //   },
-    //   {
-    //     title: 'Assign & Remove Manager',
-    //     value: 'hotel-update-manager'
-    //   },
-    //   { title: 'Add Rating', value: 'hotel-update-halal-ratings' },
-    //   { title: 'Order', value: 'hotel-booking-all' }
-    
+    value: 'hotel',
+    children: [
+      {
+        title: 'All',
+        value: 'hotel-all'
+      },
+      {
+        title: 'List',
+        value: 'hotel-list'
+      },
+      {
+        title: 'Assign & Remove Manager',
+        value: 'hotel-update-manager'
+      },
+      { title: 'Add Rating', value: 'hotel-update-halal-ratings' },
+      { title: 'Order', value: 'hotel-booking-all' }
+    ]
   },
   {
     title: 'Activities',
     value: 'activity-all',
-    children: []
-    
-    //   {
-    //     title: 'Search & Add',
-    //     value: 'activity-add-to-system'
-    //   },
-    //   {
-    //     title: 'List',
-    //     value: 'activity-list'
-    //   },
-    //   {
-    //     title: 'Assign & Remove Manager',
-    //     value: 'activity-update-manager'
-    //   },
-    //   { title: 'Add Rating', value: 'activity-update-halal-ratings' },
-    //   { title: 'Order', value: 'activity-booking-all' }
-    // 
-  },
+    children: [
+      {
+        title: 'All',
+        value: 'activity-all'
+      },
+      {
+        title: 'Search & Add',
+        value: 'activity-add-to-system'
+      },
+      {
+        title: 'List',
+        value: 'activity-list'
+      },
+      {
+        title: 'Assign & Remove Manager',
+        value: 'activity-update-manager'
+      },
+      { title: 'Add Rating', value: 'activity-update-halal-ratings' },
+      { title: 'Order', value: 'activity-booking-all' }
+    ]
+  }
 ]
 const selectedItems = computed({
   get: () => {
-    return store.dialog.formComponents?.fields[2]?.value;
+    return store.dialog.formComponents?.fields[2]?.value
   },
   set: (newValue) => {
     // Assuming fields[2] already exists, if not, you may need to initialize it
     if (store.dialog.formComponents?.fields[2]) {
-      store.dialog.formComponents.fields[2].value = newValue;
+      store.dialog.formComponents.fields[2].value = newValue
     }
-  },
-});
-
+  }
+})
 </script>

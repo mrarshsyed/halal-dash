@@ -6,3 +6,10 @@
   display: none !important;
 
 }
+
+.lp-3{
+ text-indent: 4px;
+}
+.v-list-group__items .v-list-item{
+  padding-inline-start: 4px;
+}

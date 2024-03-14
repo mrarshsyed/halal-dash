@@ -243,13 +243,13 @@ const showDialog = () => {
   store.showDialog(dialogModal)
 }
 
-// const permissions = ref([])
+const permissions = ref([])
 
-// const loadPermissions = async () => {
-//   await axiosInstance.get('admin/settings/permissions').then((res) => {
-//     permissions.value = res.data?.data
-//   })
-// }
+const loadPermissions = async () => {
+  await axiosInstance.get('admin/settings/permissions').then((res) => {
+    permissions.value = res.data?.data
+  })
+}
 
 onMounted(async () => {
   await loadItems({
