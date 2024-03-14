@@ -126,8 +126,8 @@ export const routes = [
     name: 'settings',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin'],
-      permissions: ['settings:view']
+      role: ['super-admin',],
+      permissions: []
     },
     children: [
       {
@@ -136,7 +136,7 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin'],
-          permissions: ['settings:profit:view']
+          permissions: ['']
         }
       }
     ]
@@ -229,7 +229,7 @@ export const navLinks = [
     title: 'Settings',
     value: 'settings',
     icon: 'cog',
-    role: ['super-admin', 'admin'],
+    role: ['super-admin', ],
     children: [
       {
         icon: 'cash',
