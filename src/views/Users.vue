@@ -107,7 +107,7 @@ const userForm = ref({
       value: [],
       cols: '12',
       md: '12',
-      show: true,
+      show: store.user.data?.role === 'employee' ? false : true,
       key: 'permission'
     }
   ]
@@ -139,12 +139,6 @@ const onEdit = (item) => {
   userForm.value.fields[0].value = item?.email
   userForm.value.fields[1].value = item?.role
   userForm.value.fields[2].value = item?.permissions
-  if (item?.role === 'admin' || item?.role === 'manager') {
-    userForm.value.fields[2].show = true
-  }
-  else{
-    userForm.value.fields[2].show = false
-  }
   const dialogModal = {
     title: 'Update User',
     content: '',
@@ -174,7 +168,19 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
     .then((res) => {
       if (res?.data?.length) {
         // store.setUserList(res?.data?.data)
-        table_data.value.serverItems = res?.data
+        if (store.user.data?.role === 'super-admin') {
+          table_data.value.serverItems = res?.data?.filter(
+            (x) => x?.role !== 'super-admin'
+          )
+        } else if (store.user.data?.role === 'admin') {
+          table_data.value.serverItems = res?.data?.filter(
+            (x) => x?.role !== 'admin' && x?.role !== 'super-admin'
+          )
+        } else if (store.user.data?.role === 'employee') {
+          table_data.value.serverItems = res?.data?.filter(
+            (x) => x?.role == 'manager'
+          )
+        }
         table_data.value.totalItems = res?.data?.length
       }
     })
@@ -237,13 +243,13 @@ const showDialog = () => {
   store.showDialog(dialogModal)
 }
 
-const permissions = ref([])
+// const permissions = ref([])
 
-const loadPermissions = async () => {
-  await axiosInstance.get('admin/settings/permissions').then((res) => {
-    permissions.value = res.data?.data
-  })
-}
+// const loadPermissions = async () => {
+//   await axiosInstance.get('admin/settings/permissions').then((res) => {
+//     permissions.value = res.data?.data
+//   })
+// }
 
 onMounted(async () => {
   await loadItems({
@@ -304,13 +310,13 @@ const onDelete = (item) => {
 }
 watch(
   () => store.getFieldValue('role'),
-  () => {    
+  () => {
+    console.log(store.getFieldValue('role'));
     if (
       store.getFieldValue('role') === 'admin' ||
       store.getFieldValue('role') === 'employee'
     ) {
       store.dialog.formComponents.fields[2].show = true
-
     } else {
       store.dialog.formComponents.fields[2].show = false
     }

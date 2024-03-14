@@ -162,9 +162,13 @@ export const useAppStore = defineStore('app', {
       return field ? field.value : null
     },
     async updateUserRoleAndPermissions(id,role,permissions) {
-      const payload = {
+
+      let payload = {
         role: role,
-        permissions: [...permissions,'hotel-booking-all','activity-booking-all']
+        permissions: permissions
+      }
+      if (role === 'employee' && !payload.permissions?.includes('user-all')) {
+        payload.permissions.push('user-all')
       }
       return await axios.patch(`admin/users/${id}/update-role-permissions`, payload)
     }
