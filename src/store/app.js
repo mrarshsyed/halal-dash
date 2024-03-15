@@ -171,7 +171,6 @@ export const useAppStore = defineStore('app', {
       return field ? field.value : null
     },
     async updateUserRoleAndPermissions(id,role,permissions) {
-    
       let payload = {
         role: role,
         permissions: permissions

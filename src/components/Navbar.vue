@@ -123,18 +123,18 @@ watch(
     data.value.drawer = false
   }
 )
-// watch(() => data.value.drawer, (newValue, oldValue) => {
-//   if (
-//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
-//   ) {
-//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
-//   }
-//   if (
-//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
-//   ) {
-//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
-//   }
+watch(() => data.value.drawer, (newValue, oldValue) => {
+  if (
+    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
+  ) {
+    data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
+  }
+  if (
+    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
+  ) {
+    data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
+  }
 
-// })
+})
 
 </script>
