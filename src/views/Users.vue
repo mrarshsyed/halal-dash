@@ -1,14 +1,24 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col cols="12" md="4">
-        <v-btn @click="showDialog" block color="primary">
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-btn
+          @click="showDialog"
+          block
+          color="primary"
+        >
           + Add New User
         </v-btn>
       </v-col>
@@ -26,10 +36,24 @@
     >
       <template #item.role="{ item }">
         <v-chip>
-          <div style="min-width: 50px" class="text-center">
+          <div
+            style="min-width: 50px"
+            class="text-center"
+          >
             {{ item?.role }}
           </div>
         </v-chip>
+      </template>
+      <template #item.permissions="{ item }">
+        <p v-if="!item?.permissions?.length" >-</p>
+        <v-chip-group v-else column>
+          <v-chip
+            v-for="(permission, index) in item?.permissions"
+            :key="index"
+          >
+            {{ permission }}
+          </v-chip>
+        </v-chip-group>
       </template>
       <template #item.isVerified="{ item }">
         <v-icon
@@ -37,10 +61,18 @@
           color="success"
           icon="mdi-check-circle"
         />
-        <v-icon v-else color="error" icon="mdi-close-circle" />
+        <v-icon
+          v-else
+          color="error"
+          icon="mdi-close-circle"
+        />
       </template>
       <template #item.action="{ item }">
-        <v-icon @click="onEdit(item)" color="primary" class="cursor-pointer">
+        <v-icon
+          @click="onEdit(item)"
+          color="primary"
+          class="cursor-pointer"
+        >
           mdi-pen
         </v-icon>
         <v-icon
@@ -197,6 +229,7 @@ const table_data = ref({
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Email', key: 'email', align: 'start' },
     { title: 'Role', key: 'role', align: 'center' },
+    { title: 'Permissions', key: 'permissions', align: 'center' },
     { title: 'Is Verified', key: 'isVerified', align: 'center' },
     { title: 'Action', key: 'action', align: 'center' }
   ],

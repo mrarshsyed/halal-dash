@@ -1,4 +1,4 @@
-const permissions = {
+export const permissions = {
   userAll: 'user-all',
   userList: 'user-list',
   userCreate: 'user-create',
@@ -16,7 +16,11 @@ const permissions = {
   activityUpdateManager: 'activity-update_manager',
   activityUpdateHalalRatings: 'activity-update_halal_ratings',
   activityBookingAll: 'activity_booking-all',
-  activityBookingList: 'activity_booking-list'
+  activityBookingList: 'activity_booking-list',
+  settingAll:'setting-all',
+  hotelHalalRating :'hotel-halal-rating',
+  activityHalalRating: 'activity-halal-rating',
+  profitSettings:'profit-settings',
 }
 
 export const routes = [
@@ -191,7 +195,8 @@ export const navLinks = [
     title: 'Hotels',
     value: 'hotels',
     icon: 'home-city',
-    role: ['super-admin', 'admin', 'employee', 'manager'],
+    role: ['super-admin', 'admin', 'employee', 'manager'],    
+    permissions: [permissions.hotelAll, permissions.hotelList, permissions.hotelBookingAll],
     children: [
       {
         icon: 'view-list',
@@ -199,7 +204,11 @@ export const navLinks = [
         to: '/hotels/list',
         value: 'hotels-list',
         role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [permissions.hotelAll, permissions.hotelList]
+        permissions: [
+          permissions.hotelAll,
+          permissions.hotelList,
+         
+        ]
       },
       {
         icon: 'star-box',
@@ -207,7 +216,7 @@ export const navLinks = [
         to: '/hotels/ratings',
         value: 'hotels-ratings',
         role: ['super-admin'],
-        permissions:[]
+        permissions: [permissions.hotelHalalRating]
       },
       {
         icon: 'file-document-multiple',
@@ -217,14 +226,19 @@ export const navLinks = [
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.hotelBookingAll]
       }
-    ]
+    ],
   },
   {
     title: 'Activity',
     value: 'activity',
     icon: 'hydro-power',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    permissions: [],
+    permissions: [
+      permissions.activityAll,
+      permissions.activityList,
+      permissions.activityBookingAll,
+      permissions.activityAddToSystem
+    ],
     children: [
       {
         icon: 'text-box-search',
@@ -232,10 +246,7 @@ export const navLinks = [
         to: '/activity/search-and-add',
         value: 'activity-search-and-add',
         role: ['super-admin', 'admin', 'employee'],
-        permissions: [
-          permissions.activityAll,
-          permissions.activityAddToSystem
-        ]
+        permissions: [permissions.activityAll, permissions.activityAddToSystem]
       },
       {
         icon: 'view-list',
@@ -251,7 +262,7 @@ export const navLinks = [
         to: '/activity/ratings',
         value: 'activity-ratings',
         role: ['super-admin'],
-        permissions: []
+        permissions: [permissions.hotelHalalRating]
       },
       {
         icon: 'file-document-multiple',
@@ -268,13 +279,15 @@ export const navLinks = [
     value: 'settings',
     icon: 'cog',
     role: ['super-admin'],
+    permissions: [permissions.settingAll],
     children: [
       {
         icon: 'cash',
         title: 'Profit',
         to: '/settings/profit',
         value: 'settings-profit',
-        role: ['super-admin']
+        role: ['super-admin'],
+        permissions: [permissions.profitSettings]
       }
     ]
   }

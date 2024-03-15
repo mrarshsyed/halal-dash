@@ -1,25 +1,40 @@
 <template>
   <v-layout>
     <v-app-bar density="comfortable">
-      <v-app-bar-nav-icon
-        v-if="store.getUser"
+      <!-- <v-app-bar-nav-icon
+        v-if="store?.user?.data._id"
         variant="text"
-        @click.stop="data.drawer = !data.drawer"
-      />
+        @click.stop="drawer != drawer"
+      /> -->
 
-      <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">
-        <v-img src="@/assets/logo.png" height="56px" width="156px" />
+      <v-app-bar-title
+        class="cursor-pointer"
+        @click="$router.push('/')"
+      >
+        <v-img
+          src="@/assets/logo.png"
+          height="56px"
+          width="156px"
+        />
       </v-app-bar-title>
 
       <v-spacer />
 
-      <v-btn variant="text" icon="mdi-theme-light-dark" @click="toggleTheme" />
+      <v-btn
+        variant="text"
+        icon="mdi-theme-light-dark"
+        @click="toggleTheme"
+      />
       <v-btn
         v-if="!store.getUser"
         text="Login"
         to="/authentication?mode=Login"
       />
-      <v-btn v-if="store.getUser" variant="text" icon="mdi-account-circle" />
+      <v-btn
+        v-if="store.getUser"
+        variant="text"
+        icon="mdi-account-circle"
+      />
       <v-btn
         v-if="store.getUser"
         variant="text"
@@ -29,13 +44,15 @@
     </v-app-bar>
 
     <v-navigation-drawer
-      v-model="data.drawer"
+      v-model="drawer"
       location="left"
-      v-if="store.user?.data?._id"
       permanent
     >
       <v-list nav>
-        <div v-for="(item, index) in filteredItems" :key="index">
+        <div
+          v-for="(item, index) in store.sideBarLinks"
+          :key="index"
+        >
           <v-list-item
             :value="item?.value"
             color="primary"
@@ -46,7 +63,10 @@
             exact
             link
           />
-          <v-list-group v-else :value="item?.value">
+          <v-list-group
+            v-else
+            :value="item?.value"
+          >
             <template #activator="{ props }">
               <v-list-item
                 color="primary"
@@ -86,55 +106,56 @@ import { useAppStore } from '@/store/app'
 import { watch, ref, computed } from 'vue'
 import { useTheme } from 'vuetify'
 import { navLinks } from '@/config/userRoutes'
-import { onMounted } from 'vue'
 
 const store = useAppStore()
 const theme = useTheme()
 
 const data = ref({
-  drawer: false,
+  drawer: true,
   group: null,
   items: navLinks,
   open: []
 })
 
-const filteredItems = computed(() => {
-  return data.value.items.filter((item) => {
-    const hasMainRouteRole = item?.role?.includes(store.getUser?.data?.role)
-    // i?.role?.includes(store.getUser?.data?.role)
-    // Check if the item has children and filter them based on role
-    if (item.children && item.children.length > 0) {
-      // Filter out child routes that the user doesn't have the required role for
-      item.children = item.children.filter((child) =>
-        child?.role?.includes(store.getUser?.data?.role)
-      )
-    }
-    return hasMainRouteRole || (item.children && item.children.length > 0)
-  })
-})
+// const filteredItems = computed(() => {
+//   return data.value.items.filter((item) => {
+//     const hasMainRouteRole = item?.role?.includes(store.getUser?.data?.role)
+//     if (item.children && item.children.length > 0) {
+//       item.children = item.children.filter((child) =>
+//         child?.role?.includes(store.getUser?.data?.role)
+//       )
+//     }
+//     return hasMainRouteRole || (item.children && item.children.length > 0)
+//   })
+// })
 
 const toggleTheme = () => {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
-watch(
-  () => data.value.group,
-  () => {
-    data.value.drawer = false
-  }
-)
-watch(() => data.value.drawer, (newValue, oldValue) => {
-  if (
-    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
-  ) {
-    data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
-  }
-  if (
-    (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
-  ) {
-    data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
-  }
 
+// watch(() => data.value.drawer, (newValue, oldValue) => {
+//   if (
+//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
+//   ) {
+//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
+//   }
+//   if (
+//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
+//   ) {
+//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
+//   }
+
+// })
+
+const drawer = computed({
+  get: () => {
+    return store.sideBarLinks?.length ? true: false
+  },
+  set: (newValue) => {
+    // Assuming fields[2] already exists, if not, you may need to initialize it
+    console.log(newValue);
+  }
 })
 
 </script>
