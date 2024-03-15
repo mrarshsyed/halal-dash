@@ -1,3 +1,24 @@
+const permissions = {
+  userAll: 'user-all',
+  userList: 'user-list',
+  userCreate: 'user-create',
+  userRolePermissionUpdate: 'user-role_permission_update',
+  userDelete: 'user-delete',
+  hotelAll: 'hotel-all',
+  hotelList: 'hotel-list',
+  hotelUpdateManager: 'hotel-update_manager',
+  hotelUpdateHalalRatings: 'hotel-update_halal_ratings',
+  hotelBookingAll: 'hotel_booking-all',
+  hotelBookingList: 'hotel_booking-list',
+  activityAll: 'activity-all',
+  activityAddToSystem: 'activity-add_to_system',
+  activityList: 'activity-list',
+  activityUpdateManager: 'activity-update_manager',
+  activityUpdateHalalRatings: 'activity-update_halal_ratings',
+  activityBookingAll: 'activity_booking-all',
+  activityBookingList: 'activity_booking-list'
+}
+
 export const routes = [
   {
     path: '/:pathMatch(.*)*',
@@ -34,7 +55,7 @@ export const routes = [
     meta: {
       requiresAuth: true,
       role: ['super-admin', 'admin', 'employee'],
-      permissions: ['user-all','user-list']
+      permissions: [permissions.userAll, permissions.userList]
     }
   },
   {
@@ -43,6 +64,7 @@ export const routes = [
     meta: {
       requiresAuth: true,
       role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
     },
     children: [
       {
@@ -51,7 +73,7 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: ['hotel-list','hotel-all']
+          permissions: [permissions.hotelAll, permissions.hotelList]
         }
       },
       {
@@ -59,7 +81,7 @@ export const routes = [
         component: () => import('@/views/hotels/Ratings.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin',],
+          role: ['super-admin'],
           permissions: []
         }
       },
@@ -69,7 +91,7 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee'],
-          permissions: ['hotel-booking-all']
+          permissions: [permissions.hotelBookingAll]
         }
       }
     ]
@@ -89,7 +111,10 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee'],
-          permissions: ['activity-all','activity-add-to-system']
+          permissions: [
+            permissions.activityAll,
+            permissions.activityAddToSystem
+          ]
         }
       },
       {
@@ -98,7 +123,7 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: ['activity-all','activity-list']
+          permissions: [permissions.activityAll, permissions.activityList]
         }
       },
       {
@@ -106,7 +131,7 @@ export const routes = [
         component: () => import('@/views/activity/Ratings.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin',],
+          role: ['super-admin'],
           permissions: []
         }
       },
@@ -116,7 +141,7 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee'],
-          permissions: ['activity-all','activity-booking-all']
+          permissions: [permissions.activityBookingAll]
         }
       }
     ]
@@ -126,7 +151,7 @@ export const routes = [
     name: 'settings',
     meta: {
       requiresAuth: true,
-      role: ['super-admin',],
+      role: ['super-admin'],
       permissions: []
     },
     children: [
@@ -150,7 +175,8 @@ export const navLinks = [
     icon: 'clock',
     to: '/dashboard',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    children: []
+    children: [],
+    permissions: []
   },
   {
     title: 'Users',
@@ -158,7 +184,8 @@ export const navLinks = [
     icon: 'account-box',
     to: '/users',
     role: ['super-admin', 'admin', 'employee'],
-    children: []
+    children: [],
+    permissions: [permissions.userAll, permissions.userList]
   },
   {
     title: 'Hotels',
@@ -171,21 +198,24 @@ export const navLinks = [
         title: 'List',
         to: '/hotels/list',
         value: 'hotels-list',
-        role: ['super-admin', 'admin', 'employee', 'manager']
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.hotelAll, permissions.hotelList]
       },
       {
         icon: 'star-box',
         title: 'Ratings',
         to: '/hotels/ratings',
         value: 'hotels-ratings',
-        role: ['super-admin']
+        role: ['super-admin'],
+        permissions:[]
       },
       {
         icon: 'file-document-multiple',
         title: 'Orders',
         to: '/hotels/orders',
         value: 'hotels-orders',
-        role: ['super-admin', 'admin', 'employee']
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.hotelBookingAll]
       }
     ]
   },
@@ -194,34 +224,42 @@ export const navLinks = [
     value: 'activity',
     icon: 'hydro-power',
     role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [],
     children: [
       {
         icon: 'text-box-search',
         title: 'Search And Add',
         to: '/activity/search-and-add',
         value: 'activity-search-and-add',
-        role: ['super-admin', 'admin', 'employee']
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [
+          permissions.activityAll,
+          permissions.activityAddToSystem
+        ]
       },
       {
         icon: 'view-list',
         title: 'List',
         to: '/activity/list',
         value: 'activity-list',
-        role: ['super-admin', 'admin', 'employee', 'manager']
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.activityAll, permissions.activityList]
       },
       {
         icon: 'star-box',
         title: 'Ratings',
         to: '/activity/ratings',
         value: 'activity-ratings',
-        role: ['super-admin']
+        role: ['super-admin'],
+        permissions: []
       },
       {
         icon: 'file-document-multiple',
         title: 'Orders',
         to: '/activity/orders',
         value: 'activity-orders',
-        role: ['super-admin', 'admin', 'employee']
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.activityBookingAll]
       }
     ]
   },
@@ -229,7 +267,7 @@ export const navLinks = [
     title: 'Settings',
     value: 'settings',
     icon: 'cog',
-    role: ['super-admin', ],
+    role: ['super-admin'],
     children: [
       {
         icon: 'cash',
