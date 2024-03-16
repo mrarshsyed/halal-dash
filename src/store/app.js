@@ -233,6 +233,15 @@ export const useAppStore = defineStore('app', {
         `admin/users/${id}/update-role-permissions`,
         payload
       )
+    },
+   hasPermission(permissionName) {
+      if (this.user.data?.role === 'super-admin') {
+        return true
+      } else if (this?.user?.data?.permissions?.includes(permissionName)) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 })
