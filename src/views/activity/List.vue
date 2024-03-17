@@ -53,36 +53,38 @@
             </template>
           </v-tooltip>
 
-          <v-tooltip text="Assign Manager" location="top">
+          <v-tooltip
+            v-if="store.hasPermission(permissions.activityUpdateManager)"
+            text="Assign Manager"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
-                v-if="
-                  store.user?.data?.role === 'admin' ||
-                  store.user?.data?.role === 'employee' ||
-                  store.user?.data?.role === 'super-admin'
-                "
                 @click="handelAssignManagerIconClick(item)"
                 icon="mdi-cog"
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Remove Manager" location="top">
+          <v-tooltip
+            v-if="store.hasPermission(permissions.activityUpdateManager)"
+            text="Remove Manager"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
-                v-if="
-                  store.user?.data?.role === 'admin' ||
-                  store.user?.data?.role === 'employee' ||
-                  (store.user?.data?.role === 'super-admin' &&
-                    item?.manager?.email)
-                "
+                v-if="item?.manager?.email"
                 @click="handelRemoveManagerIconClick(item)"
                 icon="mdi-link-off"
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Ratings" location="top">
+          <v-tooltip
+            text="Ratings"
+            location="top"
+            v-if="store.hasPermission(permissions.activityUpdateHalalRatings)"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"

@@ -38,7 +38,10 @@
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
-          <v-tooltip text="Details" location="top">
+          <v-tooltip
+            text="Details"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
@@ -52,34 +55,40 @@
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Assign Manager" location="top">
+          <v-tooltip
+            v-if="store.hasPermission(permissions.hotelUpdateManager)"
+            text="Assign Manager"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
-                v-if="
-                  store.user?.data?.role === 'admin' ||
-                  store.user?.data?.role === 'employee' ||
-                  store.user?.data?.role === 'super-admin'
-                "
                 @click="handelAssignManagerIconClick(item)"
                 icon="mdi-cog"
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Remove Manager" location="top">
+          <v-tooltip
+            v-if="store.hasPermission(permissions.hotelUpdateManager)"
+            text="Remove Manager"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
                 v-if="
-                  item?.manager?.email &&
-                  store.user?.data?.permissions?.includes('hotel-all')
+                  item?.manager?.email
                 "
                 @click="handelRemoveManagerIconClick(item)"
                 icon="mdi-link-off"
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Add Ratings" location="top">
+          <v-tooltip
+            text="Add Ratings"
+            location="top"
+            v-if="store.hasPermission(permissions.hotelUpdateHalalRatings)"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
@@ -164,7 +173,10 @@
           >
             Close
           </v-btn>
-          <v-btn color="primary" @click="onAssignManager">
+          <v-btn
+            color="primary"
+            @click="onAssignManager"
+          >
             Assign Manager
           </v-btn>
         </v-card-actions>
@@ -176,10 +188,19 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
+            <v-col
+              cols="12"
+              v-for="(r, index) in ratings"
+              :key="index"
+            >
+              <v-checkbox
+                v-model="selectedRatings"
+                :value="r"
+              >
                 <template #label>
-                  {{ r?.name }} <v-chip class="ms-2"> {{ r?.rating }}% </v-chip>
+                  {{ r?.name }} <v-chip class="ms-2">
+                    {{ r?.rating }}%
+                  </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
@@ -198,7 +219,12 @@
           >
             Close
           </v-btn>
-          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignRating"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
