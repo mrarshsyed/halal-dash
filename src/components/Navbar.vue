@@ -50,7 +50,7 @@
     >
       <v-list nav>
         <div
-          v-for="(item, index) in store.sideBarLinks"
+          v-for="(item, index) in links"
           :key="index"
         >
           <v-list-item
@@ -115,6 +115,9 @@ const data = ref({
   group: null,
   items: navLinks,
   open: []
+})
+const links = computed(() => {
+  return store.sideBarLinks
 })
 
 // const filteredItems = computed(() => {

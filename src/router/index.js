@@ -41,7 +41,6 @@ router.beforeEach(async (to, from, next) => {
           (store.getUser.data.permissions || []).includes(permission)
         )
       ) {
-        console.log(to,userInfo);
         throw new Error('Insufficient permissions')
       }
     } catch (error) {

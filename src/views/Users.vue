@@ -1,24 +1,18 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
       <v-col
+        v-if="store.hasPermission(permissionList.userCreate)"
         cols="12"
         md="4"
       >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
+        <v-btn @click="showDialog" block color="primary">
           + Add New User
         </v-btn>
       </v-col>
@@ -31,26 +25,20 @@
       :items="table_data.serverItems"
       :search="table_data.search"
       item-value="name"
-      :items-per-page-options="table_data.itemsPerPageOption"
       :page="table_data.page"
+      :show-current-page="true"
     >
       <template #item.role="{ item }">
         <v-chip>
-          <div
-            style="min-width: 50px"
-            class="text-center"
-          >
+          <div style="min-width: 50px" class="text-center">
             {{ item?.role }}
           </div>
         </v-chip>
       </template>
       <template #item.permissions="{ item }">
-        <p v-if="!item?.permissions?.length" >-</p>
+        <p v-if="!item?.permissions?.length">-</p>
         <v-chip-group v-else column>
-          <v-chip
-            v-for="(permission, index) in item?.permissions"
-            :key="index"
-          >
+          <v-chip v-for="(permission, index) in item?.permissions" :key="index">
             {{ permission }}
           </v-chip>
         </v-chip-group>
@@ -61,14 +49,11 @@
           color="success"
           icon="mdi-check-circle"
         />
-        <v-icon
-          v-else
-          color="error"
-          icon="mdi-close-circle"
-        />
+        <v-icon v-else color="error" icon="mdi-close-circle" />
       </template>
       <template #item.action="{ item }">
         <v-icon
+          v-if="store.hasPermission(permissionList.userRolePermissionUpdate)"
           @click="onEdit(item)"
           color="primary"
           class="cursor-pointer"
@@ -77,7 +62,7 @@
         </v-icon>
         <v-icon
           @click="onDelete(item)"
-          v-if="canDelete(item)"
+          v-if="store.hasPermission(permissionList.userDelete)"
           color="error"
           class="cursor-pointer"
         >
@@ -93,6 +78,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store/app'
 import axiosInstance from '@/plugins/axios'
+import { permissions as permissionList } from '@/config/userRoutes'
 const store = useAppStore()
 const user = ref(null)
 
@@ -344,7 +330,7 @@ const onDelete = (item) => {
 watch(
   () => store.getFieldValue('role'),
   () => {
-    console.log(store.getFieldValue('role'));
+    console.log(store.getFieldValue('role'))
     if (
       store.getFieldValue('role') === 'admin' ||
       store.getFieldValue('role') === 'employee'
