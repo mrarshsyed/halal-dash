@@ -38,7 +38,10 @@
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
-          <v-tooltip text="Details" location="top">
+          <v-tooltip
+            text="Details"
+            location="top"
+          >
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
@@ -169,7 +172,10 @@
           >
             Close
           </v-btn>
-          <v-btn color="primary" @click="onAssignManager">
+          <v-btn
+            color="primary"
+            @click="onAssignManager"
+          >
             Assign Manager
           </v-btn>
         </v-card-actions>
@@ -181,16 +187,29 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
+            <v-col
+              cols="12"
+              v-for="(r, index) in ratings"
+              :key="index"
+            >
+              <v-checkbox
+                v-model="selectedRatings"
+                :value="r"
+              >
                 <template #label>
-                  {{ r?.name }} <v-chip class="ms-2"> {{ r?.rating }}% </v-chip>
+                  {{ r?.name }} <v-chip class="ms-2">
+                    {{ r?.rating }}
+                  </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="ma-2">
+          <p>
+            Selected Ratings {{ sumOfSelectedRatings }} out of
+            {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
+          </p>
           <v-spacer />
           <v-btn
             color="error"
@@ -203,7 +222,12 @@
           >
             Close
           </v-btn>
-          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="onAssignRating"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -234,6 +258,7 @@ const selectedRatings = ref([])
 const managerSearch = ref('')
 const managerForm = ref()
 const assignRatingDialogShow = ref(false)
+
 
 const table_data = ref({
   loading: true,
@@ -379,6 +404,17 @@ const searchForm = ref({
   isSearched: false,
   exportFunction: onExport
 })
+const sumOfSelectedRatings = computed(() => {
+  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
+})
+const sumOfTotalRating = computed(() => {
+  return ratings.value.reduce((total, r) => total + r.rating, 0)
+})
+const ratingPercentage = computed(() => {
+  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
+})
+
+
 const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page
   await axiosInstance

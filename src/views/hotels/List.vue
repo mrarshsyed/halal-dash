@@ -76,9 +76,7 @@
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
-                v-if="
-                  item?.manager?.email
-                "
+                v-if="item?.manager?.email"
                 @click="handelRemoveManagerIconClick(item)"
                 icon="mdi-link-off"
               />
@@ -184,9 +182,8 @@
     </v-dialog>
     <v-dialog v-model="assignRatingDialogShow">
       <v-card>
-        <v-card-title>Add Rating</v-card-title>
+        <v-card-title>Select Rating</v-card-title>
         <v-card-text>
-          <p>Select Rating</p>
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -198,15 +195,20 @@
                 :value="r"
               >
                 <template #label>
-                  {{ r?.name }} <v-chip class="ms-2">
-                    {{ r?.rating }}%
+                  {{ r?.name }}
+                  <v-chip class="ms-2">
+                    {{ r?.rating }}
                   </v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="ma-2">
+          <p>
+            Selected Ratings {{ sumOfSelectedRatings }} out of
+            {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
+          </p>
           <v-spacer />
           <v-btn
             color="error"
@@ -277,6 +279,16 @@ const table_data = ref({
     { value: 40, title: '40' }
   ],
   hasNextPage: true
+})
+
+const sumOfSelectedRatings = computed(() => {
+  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
+})
+const sumOfTotalRating = computed(() => {
+  return ratings.value.reduce((total, r) => total + r.rating, 0)
+})
+const ratingPercentage = computed(() => {
+  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
 })
 
 const onSearch = async () => {
