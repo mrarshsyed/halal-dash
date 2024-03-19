@@ -1,15 +1,20 @@
 export const permissions = {
+  // user
   userAll: 'user-all',
   userList: 'user-list',
   userCreate: 'user-create',
   userRolePermissionUpdate: 'user-role_permission_update',
   userDelete: 'user-delete',
+
+  // hotel
   hotelAll: 'hotel-all',
   hotelList: 'hotel-list',
   hotelUpdateManager: 'hotel-update_manager',
   hotelUpdateHalalRatings: 'hotel-update_halal_ratings',
   hotelBookingAll: 'hotel_booking-all',
   hotelBookingList: 'hotel_booking-list',
+
+  // activity
   activityAll: 'activity-all',
   activityAddToSystem: 'activity-add_to_system',
   activityList: 'activity-list',
@@ -17,10 +22,17 @@ export const permissions = {
   activityUpdateHalalRatings: 'activity-update_halal_ratings',
   activityBookingAll: 'activity_booking-all',
   activityBookingList: 'activity_booking-list',
-  settingAll:'setting-all',
-  hotelHalalRating :'hotel-halal-rating',
+  hotelHalalRating: 'hotel-halal-rating',
   activityHalalRating: 'activity-halal-rating',
-  profitSettings:'profit-settings',
+
+  // settings
+  profitSettings: 'profit-settings',
+  settingAll: 'setting-all',
+
+  // cruise
+  cruiseAll: 'cruise-all',
+  cruiseMasterData: 'cruise-master-data'
+
 }
 
 export const routes = [
@@ -151,6 +163,44 @@ export const routes = [
     ]
   },
   {
+    path: '/cruise',
+    name: 'cruise',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'destination',
+        component: () => import('@/views/cruise/Destination.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseMasterData]
+        }
+      },
+      {
+        path: 'line',
+        component: () => import('@/views/cruise/Line.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseMasterData]
+        }
+      },
+      {
+        path: 'ship',
+        component: () => import('@/views/cruise/Ship.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseMasterData]
+        }
+      }
+    ]
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -195,8 +245,12 @@ export const navLinks = [
     title: 'Hotels',
     value: 'hotels',
     icon: 'home-city',
-    role: ['super-admin', 'admin', 'employee', 'manager'],    
-    permissions: [permissions.hotelAll, permissions.hotelList, permissions.hotelBookingAll],
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [
+      permissions.hotelAll,
+      permissions.hotelList,
+      permissions.hotelBookingAll
+    ],
     children: [
       {
         icon: 'view-list',
@@ -204,11 +258,7 @@ export const navLinks = [
         to: '/hotels/list',
         value: 'hotels-list',
         role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [
-          permissions.hotelAll,
-          permissions.hotelList,
-         
-        ]
+        permissions: [permissions.hotelAll, permissions.hotelList]
       },
       {
         icon: 'star-box',
@@ -226,7 +276,7 @@ export const navLinks = [
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.hotelBookingAll]
       }
-    ],
+    ]
   },
   {
     title: 'Activity',
@@ -275,6 +325,39 @@ export const navLinks = [
     ]
   },
   {
+    title: 'Cruise',
+    value: 'cruise',
+    icon: 'sail-boat',
+    role: ['super-admin','admin','employee'],
+    permissions: [permissions.cruiseMasterData],
+    children: [
+      {
+        icon: 'map-marker-radius',
+        title: 'Destination',
+        to: '/cruise/destination',
+        value: 'cruise-master-data-destination',
+        role: ['super-admin','admin','employee'],
+        permissions: [permissions.cruiseMasterData]
+      },
+      {
+        icon: 'ballot-outline',
+        title: 'Line',
+        to: '/cruise/line',
+        value: 'cruise-master-data-line',
+        role: ['super-admin','admin','employee'],
+        permissions: [permissions.cruiseMasterData]
+      },
+      {
+        icon: 'ferry',
+        title: 'Ship',
+        to: '/cruise/ship',
+        value: 'cruise-master-data-ship',
+        role: ['super-admin','admin','employee'],
+        permissions: [permissions.cruiseMasterData]
+      }
+    ]
+  },
+  {
     title: 'Settings',
     value: 'settings',
     icon: 'cog',
@@ -289,6 +372,87 @@ export const navLinks = [
         role: ['super-admin'],
         permissions: [permissions.profitSettings]
       }
+    ]
+  }
+]
+
+export const userCreatePermissions = [
+  {
+    title: 'User',
+    value: permissions.userList,
+    children: [
+      // {
+      //   title: 'All',
+      //   value: permissions.userAll
+      // },
+      {
+        title: 'List',
+        value: permissions.userList
+      },
+      {
+        title: 'Create',
+        value: permissions.userCreate
+      },
+      { title: 'Update', value: permissions.userRolePermissionUpdate },
+      { title: 'Delete', value: permissions.userDelete }
+    ]
+  },
+  {
+    title: 'Hotels',
+    value: permissions.hotelList,
+    children: [
+      // {
+      //   title: 'All',
+      //   value: permissions.hotelAll
+      // },
+      {
+        title: 'List',
+        value: permissions.hotelList
+      },
+      {
+        title: 'Assign & Remove Manager',
+        value: permissions.hotelUpdateManager
+      },
+      { title: 'Add Rating', value: permissions.hotelUpdateHalalRatings },
+      { title: 'Order', value: permissions.hotelBookingAll }
+    ]
+  },
+  {
+    title: 'Activities',
+    value: permissions.activityList,
+    children: [
+      // {
+      //   title: 'All',
+      //   value: permissions.activityAll
+      // },
+      {
+        title: 'Search & Add',
+        value: permissions.activityAddToSystem
+      },
+      {
+        title: 'List',
+        value: permissions.activityList
+      },
+      {
+        title: 'Assign & Remove Manager',
+        value: permissions.activityUpdateManager
+      },
+      { title: 'Add Rating', value: permissions.activityUpdateHalalRatings },
+      { title: 'Order', value: permissions.activityBookingAll }
+    ]
+  },
+  {
+    title: 'Cruise',
+    value: permissions.cruiseAll,
+    children: [
+      // {
+      //   title: 'All',
+      //   value: permissions.activityAll
+      // },
+      {
+        title: 'Master Data ( Destination, Line, Ship )',
+        value: permissions.cruiseMasterData
+      },
     ]
   }
 ]
