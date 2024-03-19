@@ -138,17 +138,21 @@ const table_data = ref({
   ]
 })
 
-const maximum_percentage_reached = (rating) => {
-  const total = Number(current_percentage.value) + Number(rating)
-  return total > 100
-}
+const maximum_percentage_reached = (rating, isUpdate = false) => {
+  const total = isUpdate
+    ? Number(current_percentage.value) - rating // Subtract the rating being updated
+    : Number(current_percentage.value) + Number(rating);
+  return total > 100;
+};
+
 
 const saveRating = async () => {
-  if (
-    maximum_percentage_reached(store.dialog.formComponents?.fields[1]?.value)
-  ) {
-    store.showSnackbar('maximum rating can be upto 100%', 'error')
-    return
+  const ratingField = store.dialog.formComponents?.fields[1];
+  const rating = ratingField?.value;
+  const isUpdate = !!ratingForm?.value?.id;
+  if (maximum_percentage_reached(rating, isUpdate)) {
+    store.showSnackbar('Maximum rating can be up to 100%', 'error');
+    return;
   }
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
