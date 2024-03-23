@@ -28,7 +28,7 @@
         {{ item?.name }}
       </template>
       <template #item.description="{ item }">
-        {{ item?.description ?? '-'}}
+        {{ item?.description ?? '-' }}
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
@@ -209,14 +209,14 @@ const showCreateDialog = () => {
 
 const onEdit = async (item) => {
   resetForm()
-  console.log(item);
+  console.log(item)
   store.setRatingDetails(item)
   form.value.id = item?._id
   form.value.fields[0].value = item?.name
   form.value.fields[1].value = item?.description
   form.value.fields[2].value = item?.images
   const dialogModal = {
-    title: 'Update rating',
+    title: `Update ${feature.value}`,
     content: '',
     confirmText: 'Save',
     formComponents: form.value,
