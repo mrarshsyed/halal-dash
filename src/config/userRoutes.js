@@ -31,7 +31,7 @@ export const permissions = {
 
   // cruise
   cruiseAll: 'cruise-all',
-  cruiseMasterData: 'cruise-master-data'
+  cruiseMasterData: 'cruise-master_data'
 
 }
 
