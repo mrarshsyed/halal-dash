@@ -32,7 +32,6 @@ export const permissions = {
   // cruise
   cruiseAll: 'cruise-all',
   cruiseMasterData: 'cruise-master_data'
-
 }
 
 export const routes = [
@@ -331,7 +330,7 @@ export const navLinks = [
     title: 'Cruise',
     value: 'cruise',
     icon: 'sail-boat',
-    role: ['super-admin','admin','employee'],
+    role: ['super-admin', 'admin', 'employee'],
     permissions: [permissions.cruiseMasterData],
     children: [
       {
@@ -339,7 +338,7 @@ export const navLinks = [
         title: 'Destination',
         to: '/cruise/destination',
         value: 'cruise-master-data-destination',
-        role: ['super-admin','admin','employee'],
+        role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
       },
       {
@@ -347,7 +346,7 @@ export const navLinks = [
         title: 'Line',
         to: '/cruise/line',
         value: 'cruise-master-data-line',
-        role: ['super-admin','admin','employee'],
+        role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
       },
       {
@@ -355,7 +354,7 @@ export const navLinks = [
         title: 'Port',
         to: '/cruise/port',
         value: 'cruise-master-data-port',
-        role: ['super-admin','admin','employee'],
+        role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
       }
     ]
@@ -455,7 +454,7 @@ export const userCreatePermissions = [
       {
         title: 'Master Data ( Destination, Line, Port )',
         value: permissions.cruiseMasterData
-      },
+      }
     ]
   }
 ]
