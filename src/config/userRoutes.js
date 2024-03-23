@@ -173,6 +173,7 @@ export const routes = [
     children: [
       {
         path: 'destination',
+        name: 'cruise-destination',
         component: () => import('@/views/cruise/Destination.vue'),
         meta: {
           requiresAuth: true,
@@ -182,6 +183,7 @@ export const routes = [
       },
       {
         path: 'line',
+        name: 'cruise-line',
         component: () => import('@/views/cruise/Line.vue'),
         meta: {
           requiresAuth: true,
@@ -190,8 +192,9 @@ export const routes = [
         }
       },
       {
-        path: 'ship',
-        component: () => import('@/views/cruise/Ship.vue'),
+        path: 'port',
+        name: 'cruise-port',
+        component: () => import('@/views/cruise/Port.vue'),
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee'],
@@ -348,10 +351,10 @@ export const navLinks = [
         permissions: [permissions.cruiseMasterData]
       },
       {
-        icon: 'ferry',
-        title: 'Ship',
-        to: '/cruise/ship',
-        value: 'cruise-master-data-ship',
+        icon: 'passport-biometric',
+        title: 'Port',
+        to: '/cruise/port',
+        value: 'cruise-master-data-port',
         role: ['super-admin','admin','employee'],
         permissions: [permissions.cruiseMasterData]
       }
@@ -450,7 +453,7 @@ export const userCreatePermissions = [
       //   value: permissions.activityAll
       // },
       {
-        title: 'Master Data ( Destination, Line, Ship )',
+        title: 'Master Data ( Destination, Line, Port )',
         value: permissions.cruiseMasterData
       },
     ]

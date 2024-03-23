@@ -4,12 +4,14 @@
 
 .hotels-data-table .v-data-table-footer__info {
   display: none !important;
-
 }
 
-.lp-3{
- text-indent: 4px;
+.lp-3 {
+  text-indent: 4px;
 }
-.v-list-group__items .v-list-item{
+.v-list-group__items .v-list-item {
   padding-inline-start: 4px;
+}
+.ql-container {
+  min-height: 300px;
 }

@@ -51,6 +51,7 @@ export const useAppStore = defineStore('app', {
     managers: [],
     countries: [],
     details: {},
+    cruiseMasterData : {},
     sideBarLinks: JSON.parse(localStorage.getItem('navLinks')) || []
   }),
   getters: {
@@ -242,6 +243,17 @@ export const useAppStore = defineStore('app', {
       } else {
         return false
       }
-    }
+    },
+    setCruiseMasterData(data) {
+      this.cruiseMasterData = data
+    },
+    updateField(key, value) {
+      const fieldIndex = this.dialog.formComponents.fields?.findIndex(
+        (field) => field?.key === key
+      )
+      if (fieldIndex !== -1) {
+        this.dialog.formComponents.fields[fieldIndex].value = value
+      }
+    },
   }
 })

@@ -51,6 +51,15 @@
               <TreeView
                 v-if="component?.type === 'treeview' && component?.show"
               />
+              <HtmlEditor
+                v-if="component?.type === 'html-editor'"
+              />
+              <Images
+                v-if="component?.type === 'images'"
+                :value="component?.value"
+                :label="component?.label"
+                :multiple="component?.multiple ?? true"
+              />
             </v-col>
           </v-row>
         </v-form>
@@ -81,6 +90,8 @@
 import { useAppStore } from '@/store/app'
 import { computed, ref } from 'vue'
 import TreeView from './TreeView.vue'
+import HtmlEditor from './HtmlEditor.vue'
+import Images from './Images.vue'
 
 const store = useAppStore()
 const form = ref()

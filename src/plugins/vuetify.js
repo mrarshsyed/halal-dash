@@ -73,6 +73,14 @@ export default createVuetify({
     VCheckbox: {
       hideDetails: 'auto',
       color: 'primary'
-    }
+    },
+    VFileInput: { 
+      variant: 'outlined',
+      clearable: true,
+      density: 'compact',
+      class: 'mb-2',
+      color: 'primary',
+      hideDetails: 'auto'
+    },
   }
 })

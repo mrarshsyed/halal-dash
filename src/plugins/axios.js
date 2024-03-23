@@ -28,13 +28,14 @@ axios.interceptors.response.use(
   (response) => {
     const store = useAppStore()
     store.stopLoading()
-    if (response?.headers["x-new-access-token"]) {
-      if (response?.headers["x-new-access-token"] !== store.user?.access_token) {
+    if (response?.headers['x-new-access-token']) {
+      if (
+        response?.headers['x-new-access-token'] !== store.user?.access_token
+      ) {
         let user = store.user
-        user.access_token = response?.headers["x-new-access-token"]
+        user.access_token = response?.headers['x-new-access-token']
         store.setUser(user)
-
-      }    
+      }
     }
     return response
   },
@@ -42,11 +43,9 @@ axios.interceptors.response.use(
     const store = useAppStore()
     store.stopLoading()
     if (error.response.status === 401) {
-      // store.logout();
-      // return      
+      return store.logout()
     }
     if (error.response) {
-      
       if (error?.response?.data?.message) {
         store.showSnackbar(error?.response?.data?.message, 'error')
       } else if (error?.response?.data) {
