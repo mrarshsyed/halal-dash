@@ -3,7 +3,10 @@
     <p class="mb-4">
       {{ componentData?.label?? 'Html Content' }}
     </p>
-    <QuillEditor
+    
+    <DocumentEditor v-model="editorData" />
+    
+    <!-- <QuillEditor
       theme="snow"
       toolbar="minimal"
       v-bind="$attrs"
@@ -12,33 +15,36 @@
       content-type="html"
       ref="quillEditor"
       @update:content="updateContent"
-    />
+    /> -->
   </div>
 </template>
 
 <script setup>
 
 import { useAppStore } from '@/store/app';
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref,computed } from 'vue';
+import { computed } from 'vue';
+import DocumentEditor from './DocumentEditor.vue'
 const store =  useAppStore();
-
-
-const quillEditor = ref();
-
-const updateContent = (data)=>{
-  store.updateField('description', data)
-}
 
 
 const componentData = computed(() => {
   return  store?.dialog.formComponents?.fields?.find((x)=> x?.type === 'html-editor')
 })
 
-const content = computed(() => {
-  return componentData.value.value
+
+const editorData = computed({
+  get: () => {
+    return componentData.value.value
+  },
+  set: (newValue) => {
+    store.updateField('description', newValue)
+  }
 })
+
+
+
+
+
 
 </script>
 
