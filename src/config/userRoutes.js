@@ -31,7 +31,8 @@ export const permissions = {
 
   // cruise
   cruiseAll: 'cruise-all',
-  cruiseMasterData: 'cruise-master_data'
+  cruiseMasterData: 'cruise-master_data',
+  cruiseShip:"cruise-ship"
 }
 
 export const routes = [
@@ -199,6 +200,16 @@ export const routes = [
           role: ['super-admin', 'admin', 'employee'],
           permissions: [permissions.cruiseMasterData]
         }
+      },
+      {
+        path: 'ship',
+        name: 'cruise-ship',
+        component: () => import('@/views/cruise/Ship.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseShip]
+        }
       }
     ]
   },
@@ -356,6 +367,14 @@ export const navLinks = [
         value: 'cruise-master-data-port',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
+      },
+      {
+        icon: 'ferry',
+        title: 'Ship',
+        to: '/cruise/ship',
+        value: 'cruise-ship',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.cruiseShip]
       }
     ]
   },
@@ -454,6 +473,10 @@ export const userCreatePermissions = [
       {
         title: 'Master Data ( Destination, Line, Port )',
         value: permissions.cruiseMasterData
+      },
+      {
+        title: 'Ship',
+        value: permissions.cruiseShip
       }
     ]
   }

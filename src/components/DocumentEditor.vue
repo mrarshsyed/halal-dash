@@ -79,7 +79,10 @@ watch(
 
 <template>
   <div class="skn-ck-editor">
-    <textarea ref="editor_ref" :placeholder="placeholder"></textarea>
+    <textarea
+      ref="editor_ref"
+      :placeholder="placeholder"
+    />
   </div>
 </template>
 
