@@ -183,43 +183,6 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </v-col>
-      <!-- policy -->
-      <v-col cols="12">
-        <v-expansion-panels>
-          <v-expansion-panel title="Policies">
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('policies')">
-                    + Add More
-                  </v-btn>
-                </v-col>
-                <v-col
-                  v-for="(policy, index) in formData.policies"
-                  :key="index"
-                  cols="12"
-                  class="border mb-4 rounded"
-                >
-                  <div class="text-right mb-4">
-                    <v-btn
-                      icon="mdi-delete"
-                      color="error"
-                      size="x-small"
-                      @click="RemoveItem('policies', index)"
-                    />
-                  </div>
-                  <v-text-field v-model="policy.name" label="Name" outlined />
-                  <DocumentEditor
-                    :key="docKey"
-                    height="200px"
-                    v-model="policy.description"
-                  />
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
           <v-btn color="error" @click="router.push('/cruise/ship')">
@@ -323,28 +286,6 @@ const initialFormData = {
       description: 'Room 2 description'
     }
   ],
-  policies: [
-    {
-      name: 'Cancellation Policy',
-      description: 'Cancellation Policy description'
-    },
-    {
-      name: 'Gratuities Information',
-      description: 'Gratuities Information description'
-    },
-    {
-      name: 'Pregnancy Policy',
-      description: 'Pregnancy Policy description'
-    },
-    {
-      name: 'Minor Accompany',
-      description: 'Minor Accompany description'
-    },
-    {
-      name: 'Smoking Policy',
-      description: 'Smoking Policy description'
-    }
-  ]
 }
 const formData = ref(initialFormData)
 const form = ref()
