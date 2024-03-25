@@ -60,6 +60,10 @@
                 :label="component?.label"
                 :multiple="component?.multiple ?? true"
               />
+              
+            </v-col>
+            <v-col cols="12">
+              <NoteList v-if="dialog?.formComponents?.fields?.find((x)=>x?.type === 'note-list')" />
             </v-col>
           </v-row>
         </v-form>
@@ -92,6 +96,8 @@ import { computed, ref } from 'vue'
 import TreeView from './TreeView.vue'
 import HtmlEditor from './HtmlEditor.vue'
 import Images from './Images.vue'
+import ImageList from './ImageList.vue'
+import NoteList from './NoteList.vue'
 
 const store = useAppStore()
 const form = ref()

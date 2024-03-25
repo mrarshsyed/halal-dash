@@ -57,7 +57,6 @@ import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 
 const form = ref({
   id: null,
@@ -75,7 +74,15 @@ const form = ref({
     {
       cols: 12,
       md: 12,
-      key: 'images',
+      key: 'image-list',
+      type: 'image-list',
+      value: [],
+      multiple: true
+    },
+    {
+      cols: 12,
+      md: 12,
+      key: 'uploads',
       type: 'images',
       label: 'Images',
       isRequired: false,
@@ -161,16 +168,21 @@ const saveFormData = async () => {
   const payload = {
     name: store.getFieldValue('name'),
     description: store.getFieldValue('description'),
-    images: store.getFieldValue('images')
+    images: store.getFieldValue('image-list'),
+    uploads: store.getFieldValue('uploads')
   }
-  const data = {
+  let data = {
     name: payload.name,
-    description: payload.description
+    description: payload.description,
+    images: payload.images
+  }
+  if (feature.value === 'Port') {
+    data.notes = store.getFieldValue('note-list')
   }
   const uploads = []
 
-  if (payload.images?.length) {
-    payload.images.forEach((image) => {
+  if (payload.uploads?.length) {
+    payload.uploads.forEach((image) => {
       uploads.push(image)
     })
   }
@@ -200,30 +212,49 @@ const saveFormData = async () => {
 
 const showCreateDialog = () => {
   resetForm()
-  const dialogModal = {
+  let dialogModal = {
     title: `Add New ${feature.value}`,
     content: '',
     confirmText: 'Save',
     formComponents: { ...form.value },
     confirmFunction: saveFormData
   }
+  if (feature.value === 'Port') {
+    dialogModal.formComponents.fields.push({
+      cols: 12,
+      md: 12,
+      key: 'note-list',
+      type: 'note-list',
+      value: []
+    })
+  }
   store.showDialog(dialogModal)
 }
 
 const onEdit = async (item) => {
   resetForm()
-  console.log(item)
-  store.setRatingDetails(item)
+  store.setCruiseMasterData(item)
   form.value.id = item?._id
   form.value.fields[0].value = item?.name
   form.value.fields[1].value = item?.description
   form.value.fields[2].value = item?.images
-  const dialogModal = {
+  form.value.fields[3].value = []
+  let dialogModal = {
     title: `Update ${feature.value}`,
     content: '',
     confirmText: 'Save',
-    formComponents: form.value,
+    formComponents: {...form.value},
     confirmFunction: saveFormData
+  }
+  if (feature.value === 'Port') {
+    dialogModal.formComponents.fields[4] = {
+      cols: 12,
+      md: 12,
+      key: 'note-list',
+      type: 'note-list',
+      value: item?.notes?.length ? item?.notes : [] ,
+      update: item.notes
+    }
   }
   store.showDialog(dialogModal)
 }

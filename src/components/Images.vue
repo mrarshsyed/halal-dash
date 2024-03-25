@@ -1,47 +1,56 @@
 <template>
   <div>
     <v-file-input
-      v-model="value"
+      v-model="images"
       :prepend-icon="null"
       prepend-inner-icon="mdi-paperclip"
-      :label="componentData?.label ?? 'Images'"
+      label="Images"
       variant="outlined"
-      :multiple="componentData?.multiple"
-      :chips="componentData?.multiple"
+      :multiple="true"
+      :chips="true"
     />
-    <v-row
-      class="my-4"
-      v-if="value?.length"
-    >
-      <v-col 
-        cols="12" 
-        sm="6" 
-        md="4" 
-        v-for="(i, index) in value" 
+    <v-row v-if="images?.length">
+      <v-col
+        cols="12"
+        sm="6"
+        md="4"
+        v-for="(image, index) in images"
         :key="index"
+        class="pa-4"
       >
-        <v-img
-          :src="getImageUrl(i)"
-          height="250"
-          class="rounded shadow border"
-          alt="image"
-        />
+        <div style="position: relative">
+          <v-img
+            :src="getImageUrl(image)"
+            height="250"
+            class="rounded"
+            alt="image"
+          />
+          <v-btn
+            @click="removeImage(index)"
+            icon="mdi-delete"
+            class="imageDelete"
+            color="error"
+            size="x-small"
+          />
+        </div>
       </v-col>
     </v-row>
+
+    <ImageList />
   </div>
 </template>
 
 <script setup>
+import ImageList from './ImageList.vue';
 import { useAppStore } from '@/store/app'
-import {  computed } from 'vue'
-
+import { computed } from 'vue'
 const store = useAppStore()
 
+const componentData = computed(() => {
+  return store?.dialog.formComponents?.fields?.find((x) => x?.key === 'uploads')
+})
+
 const getImageUrl = (file) => {
-  console.log(typeof file);
-  if (typeof file === "string") {
-    return file    
-  }
   if (!file) {
     console.error('File object is null or undefined.')
     return null
@@ -55,20 +64,24 @@ const getImageUrl = (file) => {
   }
 }
 
+const removeImage = (index) => {
+  images.value.splice(index, 1)
+}
 
-
-const value = computed({
+const images = computed({
   get: () => {
     return componentData?.value?.value?.length ? componentData?.value.value : []
   },
   set: (newValue) => {
-    store.updateField('images', newValue)
+    store.updateField('uploads', newValue)
   }
-})
-
-const componentData = computed(() => {
-  return store?.dialog.formComponents?.fields?.find((x) => x?.type === 'images')
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.imageDelete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+</style>
