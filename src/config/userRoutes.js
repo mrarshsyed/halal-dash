@@ -202,6 +202,16 @@ export const routes = [
         }
       },
       {
+        path: 'room-group',
+        name: 'cruise-room-group',
+        component: () => import('@/views/cruise/RoomGroup.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseMasterData]
+        }
+      },
+      {
         path: 'ship',
         name: 'cruise-ship',
         component: () => import('@/views/cruise/Ship.vue'),
@@ -369,6 +379,14 @@ export const navLinks = [
         permissions: [permissions.cruiseMasterData]
       },
       {
+        icon: 'home-switch',
+        title: 'Room Group',
+        to: '/cruise/room-group',
+        value: 'cruise-master-data-room-group',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.cruiseMasterData]
+      },
+      {
         icon: 'ferry',
         title: 'Ship',
         to: '/cruise/ship',
@@ -471,7 +489,7 @@ export const userCreatePermissions = [
       //   value: permissions.activityAll
       // },
       {
-        title: 'Master Data ( Destination, Line, Port )',
+        title: 'Master Data ( Destination, Line, Port, Room Group )',
         value: permissions.cruiseMasterData
       },
       {

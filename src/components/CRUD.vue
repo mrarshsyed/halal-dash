@@ -113,6 +113,9 @@ const apiUrl = computed(() => {
     case 'Port':
       endpoint = 'ports'
       break
+    case 'Room Group':
+      endpoint = 'room-groups'
+      break
     default:
       // Handle other cases if needed
       break
@@ -264,6 +267,8 @@ onMounted(async () => {
     feature.value = 'Line'
   } else if (route.name === 'cruise-port') {
     feature.value = 'Port'
+  } else if (route.name === 'cruise-room-group') {
+    feature.value = 'Room Group'
   }
   if (feature.value) {
     await loadItems({

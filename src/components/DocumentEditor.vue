@@ -67,6 +67,7 @@ onBeforeUnmount(async () => {
   emit("destroy");
 });
 const setEditorData = (data) => {
+  if (!data) return
   editor.setData(data);
 };
 watch(
