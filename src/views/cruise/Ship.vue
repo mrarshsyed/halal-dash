@@ -1,17 +1,41 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
-    <v-col cols="12" md="8">
-      <v-text-field v-model="table_data.search" placeholder="Enter search here ..." />
+  <v-row
+    class="mb-4"
+    v-if="!formMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
+      <v-text-field
+        v-model="table_data.search"
+        placeholder="Enter search here ..."
+      />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary">
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
         + Add New Ship
       </v-btn>
     </v-col>
     <v-col cols="12">
-      <v-data-table density="compact" :items-per-page="table_data.itemsPerPage" :headers="table_data.headers"
-        :items-length="table_data.totalItems" :items="table_data.serverItems" :search="table_data.search"
-        :items-per-page-options="table_data.itemsPerPageOption" :page="table_data.page" show-current-page>
+      <v-data-table
+        density="compact"
+        :items-per-page="table_data.itemsPerPage"
+        :headers="table_data.headers"
+        :items-length="table_data.totalItems"
+        :items="table_data.serverItems"
+        :search="table_data.search"
+        :items-per-page-options="table_data.itemsPerPageOption"
+        :page="table_data.page"
+        show-current-page
+      >
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
@@ -20,32 +44,77 @@
         </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
-            <v-icon class="cursor-pointer" @click="onEdit(item)" icon="mdi-pencil-box" />
-            <v-icon class="cursor-pointer" @click="onDelete(item)" icon="mdi-delete" />
+            <v-icon
+              class="cursor-pointer"
+              @click="onEdit(item)"
+              icon="mdi-pencil-box"
+            />
+            <v-icon
+              class="cursor-pointer"
+              @click="onDelete(item)"
+              icon="mdi-delete"
+            />
           </div>
         </template>
       </v-data-table>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else>
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else
+  >
     <v-row>
       <v-col cols="12">
-        <v-btn size="x-small" color="primary" icon="mdi-arrow-left" @click="router.push('/cruise/ship')" />
+        <v-btn
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="router.push('/cruise/ship')"
+        />
         <h3 class="mt-4">
           {{ id ? 'Update Ship' : 'Create New Ship' }}
         </h3>
       </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field v-model="formData.name" label="Name" required :rules="[(v) => !!v || 'Name is required']" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.name"
+          label="Name"
+          required
+          :rules="[(v) => !!v || 'Name is required']"
+        />
       </v-col>
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Line" :items="lines" item-title="name" item-value="_id" required
-          :rules="[(v) => !!v || `Line is required`]" v-model="formData.shipLine" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select Line"
+          :items="lines"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || `Line is required`]"
+          v-model="formData.shipLine"
+        />
       </v-col>
 
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
+      </v-col>
+      <v-col cols="12">
+        <ImageUploader
+          :value="formData.uploads"
+          @update="(data) => onImageUpdate(data, 'images')"
+        />
       </v-col>
       <!-- facts -->
       <v-col cols="12">
@@ -53,8 +122,18 @@
           <v-expansion-panel title="Facts">
             <v-expansion-panel-text>
               <v-row>
-                <v-col v-for="(value, key) in formData.facts" :key="key" cols="12" sm="4" md="3">
-                  <v-text-field v-model="formData.facts[key]" :label="formatLabel(key)" outlined />
+                <v-col
+                  v-for="(value, key) in formData.facts"
+                  :key="key"
+                  cols="12"
+                  sm="4"
+                  md="3"
+                >
+                  <v-text-field
+                    v-model="formData.facts[key]"
+                    :label="formatLabel(key)"
+                    outlined
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -67,22 +146,60 @@
           <v-expansion-panel title="Rooms">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('rooms')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('rooms')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
-                <v-col v-for="(room, index) in formData.rooms" :key="index" cols="12" class="border mb-4 rounded">
+                <v-col
+                  v-for="(room, index) in formData.rooms"
+                  :key="index"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
                   <div class="text-right mb-4">
-                    <v-btn icon="mdi-delete" color="error" size="x-small" @click="RemoveItem('rooms', index)" />
+                    <v-btn
+                      icon="mdi-delete"
+                      color="error"
+                      size="x-small"
+                      @click="RemoveItem('rooms', index)"
+                    />
                   </div>
                   <div class="d-flex flex-wrap ga-4">
-                    <v-autocomplete clearable label="Select Room Group" :items="room_groups" item-title="name"
-                      item-value="_id" required :rules="[(v) => !!v || `Room Group is required`]"
-                      v-model="room.room_groups" />
-                    <v-text-field v-model="room.name" label="Name" outlined />
+                    <v-autocomplete
+                      clearable
+                      label="Select Room Group"
+                      :items="room_groups"
+                      item-title="name"
+                      item-value="_id"
+                      required
+                      :rules="[(v) => !!v || `Room Group is required`]"
+                      v-model="room.room_groups"
+                    />
+                    <v-text-field
+                      v-model="room.name"
+                      label="Name"
+                      outlined
+                      :rules="[(v) => !!v || `Name is required`]"
+                    />
                   </div>
-                  <DocumentEditor :key="docKey" height="200px" v-model="room.description" />
+                  <DocumentEditor
+                    :key="docKey"
+                    height="200px"
+                    v-model="room.description"
+                    class="mb-4"
+                  />
+                  <ImageUploader
+                    :key="roomKey"
+                    :value="room.uploads"
+                    @update="(data) => onRoomImageUpdate(data, index)"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -95,18 +212,48 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('highlights')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
-                <v-col v-for="(highlight, index) in formData.highlights" :key="index" cols="12"
-                  class="border mb-4 rounded">
+                <v-col
+                  v-for="(highlight, indexH) in formData.highlights"
+                  :key="indexH"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
                   <div class="text-right mb-4">
-                    <v-btn icon="mdi-delete" color="error" size="x-small" @click="RemoveItem('highlights', index)" />
+                    <v-btn
+                      icon="mdi-delete"
+                      color="error"
+                      size="x-small"
+                      @click="RemoveItem('highlights', indexH)"
+                    />
                   </div>
-                  <v-text-field v-model="highlight.name" label="Name" outlined />
-                  <DocumentEditor :key="docKey" height="200px" v-model="highlight.description" />
+                  <v-text-field
+                    v-model="highlight.name"
+                    label="Name"
+                    outlined
+                    :rules="[(v) => !!v || `Name is required`]"
+                  />
+                  <DocumentEditor
+                    :key="docKey"
+                    height="200px"
+                    v-model="highlight.description"
+                    class="mb-4"
+                  />
+                  <ImageUploader
+                    :value="highlight.uploads"
+                    @update="(data) => onHighlightsImageUpdate(data, indexH)"
+                    :key="highlightsKey"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -115,10 +262,16 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/ship')">
+          <v-btn
+            color="error"
+            @click="router.push('/cruise/ship')"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="saveShip">
+          <v-btn
+            color="primary"
+            @click="saveShip"
+          >
             Save
           </v-btn>
         </div>
@@ -133,13 +286,16 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import store from '@/store';
+import ImageUploader from './components/ImageUploader.vue'
 
 const route = useRoute()
 const router = useRouter()
 const formMode = computed(() => {
   return route?.query?.mode === 'form'
 })
-const docKey = ref(0)
+const docKey = ref(1)
+const roomKey = ref(3)
+const highlightsKey = ref(5)
 const panel = ref([0])
 
 const id = computed(() => {
@@ -172,6 +328,7 @@ const initialFormData = {
   name: null,
   description: '',
   shipLine: null,
+  uploads: [],
   facts: {
     maidenVoyage: '',
     registry: '',
@@ -200,18 +357,18 @@ const initialFormData = {
     wheelchairAccessible: ''
   },
   highlights: [
-    { name: 'Food & Dining', description: 'Food and Dining description' },
-    {
-      name: 'Accommodation',
-      description: 'Accommodation description'
-    },
-    {
-      name: 'Onboard Activities and Entertainment',
-      description: 'Onboard Activities and Entertainment description'
-    }
+    { name: 'Food & Dining', description: 'Food and Dining description', uploads: [] },
+    // {
+    //   name: 'Accommodation',
+    //   description: 'Accommodation description', uploads: []
+    // },
+    // {
+    //   name: 'Onboard Activities and Entertainment',
+    //   description: 'Onboard Activities and Entertainment description', uploads: []
+    // }
   ],
   rooms: [
-    { room_groups: null, name: 'Room 1', description: 'Room 1 description' },
+    { room_groups: null, name: 'Room 1', description: 'Room 1 description', uploads: [] },
   ]
 }
 const formData = ref(initialFormData)
@@ -245,22 +402,102 @@ const formatLabel = (key) => {
 const addMore = async (name) => {
   formData.value[name].unshift({
     name: '',
-    description: ''
+    description: '',
+    uploads: []
   })
   docKey.value = docKey.value + 1
+  roomKey.value = roomKey.value + 1
+  highlightsKey.value = highlightsKey.value + 1
 }
 const RemoveItem = async (name, index) => {
   formData.value[name].splice(index, 1)
+  docKey.value = docKey.value + 1
+  roomKey.value = roomKey.value + 1
+  highlightsKey.value = highlightsKey.value + 1
 }
 
+const removeUploads = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUploads(item));
+  } else if (obj && typeof obj === 'object') {
+    const newObj = { ...obj };
+    if ('uploads' in newObj) {
+      delete newObj.uploads;
+    }
+    for (const key in newObj) {
+      newObj[key] = removeUploads(newObj[key]);
+    }
+    return newObj;
+  } else {
+    return obj;
+  }
+}
+
+const getFilesPayload = () => {
+  const files = []
+  const fileMapper = []
+  if (formData.value?.uploads?.length) {
+    formData.value.uploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'images',
+          name: file.name,
+        })
+      }
+    })
+  }
+  if (formData.value?.highlights?.length) {
+    formData.value.highlights.forEach((highlight, index) => {
+      if (highlight?.uploads?.length) {
+        highlight.uploads.forEach((file) => {
+          if (file instanceof File) {
+            files.push(file)
+            fileMapper.push({
+              resource: `highlights_${index}`,
+              name: file.name,
+            })
+          }
+        })
+      }
+    })
+  }
+  if (formData.value?.rooms?.length) {
+    formData.value.rooms.forEach((room, index) => {
+      if (room?.uploads?.length) {
+        room.uploads.forEach((file) => {
+          if (file instanceof File) {
+            files.push(file)
+            fileMapper.push({
+              resource: `rooms_${index}`,
+              name: file.name,
+            })
+          }
+        })
+      }
+    })
+  }
+  return { files, fileMapper }
+}
+const getDataPayload = () => {
+
+  try {
+    let data = removeUploads(formData.value)
+    let { files, fileMapper } = getFilesPayload()
+    data.fileMapper = fileMapper
+    let formdata = new FormData();
+    formdata.append('data', JSON.stringify(data));
+    formdata.append("uploads", files)
+    return formdata
+  } catch (error) {
+    console.log(error);
+  }
+}
 const saveShip = async () => {
   form.value.validate();
   if (form.value.isValid) {
-    console.log(formData.value);
-    let data = { ...formData.value }
-    const formdata = new FormData()
-    formdata.append('data', JSON.stringify(data))
-    const response = id?.value ? await axios.put(`admin/cruise/ship/${id.value}`, formdata) : await axios.post('admin/cruise/ship', formdata)
+    const payload = getDataPayload();
+    const response = id?.value ? await axios.put(`admin/cruise/ship/${id.value}`, payload) : await axios.post('admin/cruise/ship', payload)
     if (response.data) {
       store.showSuccess("Successfully Saved")
       router.push({ name: 'cruise-ship' })
@@ -268,11 +505,25 @@ const saveShip = async () => {
   }
 
 }
-
+const onImageUpdate = (images) => {
+  formData.value.uploads = images
+}
+const onRoomImageUpdate = (images, index) => {
+  formData.value.rooms[index].uploads = images
+}
+const onHighlightsImageUpdate = (images, index) => {
+  formData.value.highlights[index].uploads = images
+}
 onMounted(async () => {
   await getLines()
   await getRoomGroups()
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.imageDelete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+</style>
