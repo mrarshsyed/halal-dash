@@ -50,10 +50,12 @@
               icon="mdi-pencil-box"
             />
             <v-icon
-              class="cursor-pointer"
               @click="onDelete(item)"
-              icon="mdi-delete"
-            />
+              color="error"
+              class="cursor-pointer"
+            >
+              mdi-delete
+            </v-icon>
           </div>
         </template>
       </v-data-table>
@@ -114,6 +116,8 @@
         <ImageUploader
           :value="formData.uploads"
           @update="(data) => onImageUpdate(data, 'images')"
+          :images="formData.images"
+          @update-image-link="(data) => onUpdateImageLink(data)"
         />
       </v-col>
       <!-- facts -->
@@ -180,7 +184,7 @@
                       item-value="_id"
                       required
                       :rules="[(v) => !!v || `Room Group is required`]"
-                      v-model="room.room_groups"
+                      v-model="room.roomGroup"
                     />
                     <v-text-field
                       v-model="room.name"
@@ -199,6 +203,8 @@
                     :key="roomKey"
                     :value="room.uploads"
                     @update="(data) => onRoomImageUpdate(data, index)"
+                    @update-image-link="(data) => onUpdateImageLinks('room', index, data)"
+                    :images="room?.images ?? []"
                   />
                 </v-col>
               </v-row>
@@ -252,6 +258,8 @@
                   <ImageUploader
                     :value="highlight.uploads"
                     @update="(data) => onHighlightsImageUpdate(data, indexH)"
+                    @update-image-link="(data) => onUpdateImageLinks('highlights', indexH, data)"
+                    :images="highlight?.images ?? []"
                     :key="highlightsKey"
                   />
                 </v-col>
@@ -285,9 +293,11 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
-import store from '@/store';
 import ImageUploader from './components/ImageUploader.vue'
+import { useAppStore } from '@/store/app';
 
+
+const store = useAppStore();
 const route = useRoute()
 const router = useRouter()
 const formMode = computed(() => {
@@ -329,6 +339,7 @@ const initialFormData = {
   description: '',
   shipLine: null,
   uploads: [],
+  images: [],
   facts: {
     maidenVoyage: '',
     registry: '',
@@ -357,7 +368,7 @@ const initialFormData = {
     wheelchairAccessible: ''
   },
   highlights: [
-    { name: 'Food & Dining', description: 'Food and Dining description', uploads: [] },
+    { name: 'Food & Dining', description: 'Food and Dining description', uploads: [], images: [] },
     // {
     //   name: 'Accommodation',
     //   description: 'Accommodation description', uploads: []
@@ -368,7 +379,7 @@ const initialFormData = {
     // }
   ],
   rooms: [
-    { room_groups: null, name: 'Room 1', description: 'Room 1 description', uploads: [] },
+    { roomGroup: null, name: 'Room 1', description: 'Room 1 description', uploads: [], images: [] },
   ]
 }
 const formData = ref(initialFormData)
@@ -376,6 +387,11 @@ const form = ref()
 const formValue = ref(false)
 const lines = ref([])
 const room_groups = ref([])
+
+const onEdit = (item) => {
+  router.push(`/cruise/ship?mode=form&id=${item?._id}`)
+}
+
 const getLines = async () => {
   await axios.get('admin/cruise/ship-lines').then((res) => {
     if (res?.data?.length) {
@@ -403,7 +419,9 @@ const addMore = async (name) => {
   formData.value[name].unshift({
     name: '',
     description: '',
-    uploads: []
+    uploads: [],
+    roomGroup: null,
+    images: []
   })
   docKey.value = docKey.value + 1
   roomKey.value = roomKey.value + 1
@@ -497,9 +515,9 @@ const saveShip = async () => {
   form.value.validate();
   if (form.value.isValid) {
     const payload = getDataPayload();
-    const response = id?.value ? await axios.put(`admin/cruise/ship/${id.value}`, payload) : await axios.post('admin/cruise/ship', payload)
+    const response = id?.value ? await axios.patch(`admin/cruise/ships/${id.value}`, payload) : await axios.post('admin/cruise/ships', payload)
     if (response.data) {
-      store.showSuccess("Successfully Saved")
+      store.showSnackbar("Successfully Saved")
       router.push({ name: 'cruise-ship' })
     }
   }
@@ -514,10 +532,57 @@ const onRoomImageUpdate = (images, index) => {
 const onHighlightsImageUpdate = (images, index) => {
   formData.value.highlights[index].uploads = images
 }
+const loadItems = async () => {
+  await axios
+    .get('admin/cruise/ships',)
+    .then((res) => {
+      if (res?.data?.length) {
+        table_data.value.serverItems = res?.data
+        table_data.value.totalItems = res?.data?.length
+      }
+    })
+}
+
+const confirmDelete = async () => {
+  await axios
+    .delete(`admin/cruise/ships/${store.details?._id}`)
+    .then(async () => {
+      store.showSnackbar('Successfully Deleted')
+      await loadItems()
+      store.closeDialog()
+    })
+}
+const onDelete = (item) => {
+  store.setDetails(item)
+  const dialogModal = {
+    title: 'Delete Ship',
+    content: `Are you sure to delete this Ship?`,
+    confirmText: 'Delete',
+    formComponents: { fields: [] },
+    confirmFunction: confirmDelete
+  }
+  store.showDialog(dialogModal)
+}
 onMounted(async () => {
   await getLines()
   await getRoomGroups()
+  await loadItems()
+  if (id.value && table_data.value.serverItems?.find((x) => x?._id === id.value)) {
+    formData.value = table_data.value.serverItems?.find((x) => x?._id === id.value)
+    formData.value.shipLine = formData.value.shipLine._id
+    formData.value.rooms.forEach(element => {
+      element.roomGroup = element.roomGroup._id
+    });
+    console.log(formData.value);
+  }
 })
+
+const onUpdateImageLink = (data) => {
+  formData.value.images = data
+}
+const onUpdateImageLinks = (key, index, data) => {
+  formData.value[key][index].images = data
+}
 </script>
 
 <style scoped>
