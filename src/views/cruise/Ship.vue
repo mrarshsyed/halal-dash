@@ -42,6 +42,9 @@
         <template #item.description="{ item }">
           {{ item?.description ?? '-' }}
         </template>
+        <template #item.ship_line="{ item }">
+          {{ item?.shipLine?.name ?? '-' }}
+        </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
             <v-icon
@@ -167,7 +170,10 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div class="text-right mb-4">
+                  <div
+                    class="text-right mb-4"
+                    v-if="formData.rooms.length > 1"
+                  >
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -235,7 +241,10 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div class="text-right mb-4">
+                  <div
+                    class="text-right mb-4"
+                    v-if="formData.highlights.length > 1"
+                  >
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -322,6 +331,7 @@ const table_data = ref({
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Description', key: 'description', align: 'start' },
+    { title: 'Ship Line', key: 'ship_line', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -498,11 +508,12 @@ const getFilesPayload = () => {
   return { files, fileMapper }
 }
 const getDataPayload = () => {
-
   try {
-    let data = removeUploads(formData.value)
     let { files, fileMapper } = getFilesPayload()
+    let data = removeUploads(formData.value)
     data.fileMapper = fileMapper
+    console.log(data);
+    console.log(files);
     let formdata = new FormData();
     formdata.append('data', JSON.stringify(data));
     formdata.append("uploads", files)
