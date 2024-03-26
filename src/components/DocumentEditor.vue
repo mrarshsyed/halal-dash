@@ -63,6 +63,9 @@ onMounted(async () => {
   }
 });
 onBeforeUnmount(async () => {
+  if (!editor) {
+    return
+  }
   await editor.destroy();
   emit("destroy");
 });

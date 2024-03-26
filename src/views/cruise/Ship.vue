@@ -66,10 +66,10 @@
   </v-row>
   <v-form
     v-model="formValue"
-    ref="form"
-    v-else
+    ref="form" 
+    v-else-if="formMode"
   >
-    <v-row>
+    <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
           size="x-small"
@@ -119,8 +119,8 @@
         <ImageUploader
           :value="formData.uploads"
           @update="(data) => onImageUpdate(data, 'images')"
-          :images="formData.images"
-          @update-image-link="(data) => onUpdateImageLink(data)"
+          :image-list="formData.images"
+          @updateImageLink="(data) => onUpdateImageLink(data)"
         />
       </v-col>
       <!-- facts -->
@@ -209,8 +209,8 @@
                     :key="roomKey"
                     :value="room.uploads"
                     @update="(data) => onRoomImageUpdate(data, index)"
-                    @update-image-link="(data) => onUpdateImageLinks('room', index, data)"
-                    :images="room?.images ?? []"
+                    @updateImageLink="(data) => onUpdateImageLinks('rooms', index, data)"
+                    :image-list="room?.images ?? []"
                   />
                 </v-col>
               </v-row>
@@ -267,8 +267,8 @@
                   <ImageUploader
                     :value="highlight.uploads"
                     @update="(data) => onHighlightsImageUpdate(data, indexH)"
-                    @update-image-link="(data) => onUpdateImageLinks('highlights', indexH, data)"
-                    :images="highlight?.images ?? []"
+                    @updateImageLink="(data) => onUpdateImageLinks('highlights', indexH, data)"
+                    :image-list="highlight?.images ?? []"
                     :key="highlightsKey"
                   />
                 </v-col>
@@ -298,7 +298,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
@@ -397,6 +397,7 @@ const form = ref()
 const formValue = ref(false)
 const lines = ref([])
 const room_groups = ref([])
+const showForm = ref(false);
 
 const onEdit = (item) => {
   router.push(`/cruise/ship?mode=form&id=${item?._id}`)
@@ -516,7 +517,9 @@ const getDataPayload = () => {
     console.log(files);
     let formdata = new FormData();
     formdata.append('data', JSON.stringify(data));
-    formdata.append("uploads", files)
+    files?.forEach((file)=>{
+      formdata.append('uploads', file);
+    })
     return formdata
   } catch (error) {
     console.log(error);
@@ -574,7 +577,7 @@ const onDelete = (item) => {
   }
   store.showDialog(dialogModal)
 }
-onMounted(async () => {
+onBeforeMount(async () => {
   await getLines()
   await getRoomGroups()
   await loadItems()
@@ -584,12 +587,11 @@ onMounted(async () => {
     formData.value.rooms.forEach(element => {
       element.roomGroup = element.roomGroup._id
     });
-    console.log(formData.value);
   }
+  showForm.value = true
 })
-
 const onUpdateImageLink = (data) => {
-  formData.value.images = data
+  formData.value.images = [...data]
 }
 const onUpdateImageLinks = (key, index, data) => {
   formData.value[key][index].images = data

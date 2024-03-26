@@ -74,7 +74,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  images: {
+  imageList: {
     type: Array,
     default: () => []
   }
@@ -82,7 +82,7 @@ const props = defineProps({
 const emit = defineEmits(['update', 'updateImageLink'])
 
 const uploads = ref([...props.value]);
-const images = ref(props?.images?.length ? props?.images : [])
+const images = ref([...props.imageList]);
 
 const removeImage = (index) => {
   uploads.value.splice(index, 1)
@@ -90,6 +90,7 @@ const removeImage = (index) => {
 
 const removeImageLink = (index) => {
   images.value.splice(index, 1)
+  emit('updateImageLink', images.value)
 }
 
 const getImageUrl = (file) => {
@@ -115,6 +116,8 @@ watch(() => images.value, () => {
   emit('updateImageLink', images.value)
 
 })
+
+
 </script>
 
 <style scoped>
