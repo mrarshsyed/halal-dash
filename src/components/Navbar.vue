@@ -42,6 +42,7 @@
         @click="store.logout('call-api')"
       />
     </v-app-bar>
+   
 
     <v-navigation-drawer
       v-model="drawer"
@@ -94,6 +95,11 @@
 
     <v-main>
       <v-container style="max-width: 1000px">
+        <v-progress-linear
+          v-if="loading"
+          indeterminate
+          color="primary"
+        />
         <v-card class="pa-4 overflow-scroll">
           <slot />
         </v-card>
@@ -119,6 +125,7 @@ const data = ref({
 const links = computed(() => {
   return store.sideBarLinks
 })
+const loading = computed(() => store.isLoading)
 
 // const filteredItems = computed(() => {
 //   return data.value.items.filter((item) => {

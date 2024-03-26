@@ -15,3 +15,7 @@
 .ql-container {
   min-height: 300px;
 }
+.v-overlay__scrim{
+  opacity: 0.9 !important;
+  background: none;
+}
