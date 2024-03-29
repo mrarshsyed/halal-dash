@@ -531,7 +531,6 @@ const panel = ref([0])
 const id = computed(() => {
   return route?.query?.id
 })
-
 const table_data = ref({
   loading: true,
   search: '',
@@ -551,13 +550,12 @@ const table_data = ref({
     { value: -1, title: 'All' }
   ]
 })
-
 const onCreate = () => {
   router.push({ name: 'cruise-package', query: { mode: 'form' } })
 }
 const initialFormData = {
-  name: 'abc',
-  description: 'abc',
+  name: null,
+  description: null,
   currency: null,
   startDate: null,
   endDate: null,
