@@ -54,6 +54,7 @@
             cover
           />
           <v-btn
+            v-if="showImgListDeleteIcon"
             @click="removeImageLink(index)"
             icon="mdi-delete"
             class="imageLinkDelete"
@@ -77,6 +78,10 @@ const props = defineProps({
   imageList: {
     type: Array,
     default: () => []
+  },
+  showImgListDeleteIcon : {
+    type: Boolean,
+    default: true
   }
 })
 const emit = defineEmits(['update', 'updateImageLink'])

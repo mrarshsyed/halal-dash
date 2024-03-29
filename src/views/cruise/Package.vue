@@ -107,6 +107,7 @@
           required
           :rules="[(v) => !!v || `Currency is required`]"
           v-model="formData.currency"
+          return-object
         />
       </v-col>
       <!-- start date -->
@@ -160,6 +161,7 @@
             v-model="formData.endDate"
             color="primary"
             :min="formData.startDate"
+            @update:model-value="onEndDateSelect"
           />
         </v-menu>
       </v-col>
@@ -216,7 +218,7 @@
           v-model="formData.endLocation"
         />
       </v-col>
-      <!-- end location -->
+      <!-- Ship -->
       <v-col
         cols="12"
         md="6"
@@ -230,6 +232,7 @@
           required
           :rules="[(v) => !!v || 'Ship is required']"
           v-model="formData.ship"
+          @update:model-value="onShipSelect"
         />
       </v-col>
 
@@ -241,9 +244,146 @@
           v-model="formData.description"
         />
       </v-col>
-      <!-- highlights -->
+      <!-- images  -->
+      <v-col cols="12">
+        <ImageUploader
+          :value="formData.uploads"
+          @update="(data) => onImageUpdate(data, 'images')"
+          :image-list="formData.images"
+          @update-image-link="(data) => onUpdateImageLink(data)"
+        />
+      </v-col>
+      <!-- panels -->
       <v-col cols="12">
         <v-expansion-panels v-model="panel">
+          <v-expansion-panel title="Itinerary (based on start date and end)">
+            <v-expansion-panel-text>
+              <v-row>
+                <v-col v-if="!formData.itinerary?.length">
+                  <div class="text-center pa-4 border">
+                    Select start date and end date first
+                  </div>
+                </v-col>
+                <v-col
+                  v-else
+                  v-for="(itinerary, indexI) in formData.itinerary"
+                  :key="indexI"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
+                  <div class="d-flex flex-wrap ga-4 mb-2">
+                    <v-text-field
+                      label="Date"
+                      :rules="[(v) => !!v || 'Date is required']"
+                      v-model="itinerary.date"
+                      :clearable="false"
+                      prepend-inner-icon="mdi-calendar"
+                      readonly
+                    />
+                    <v-autocomplete
+                      clearable
+                      label="Select Port"
+                      :items="portList"
+                      item-title="name"
+                      item-value="_id"
+                      required
+                      :rules="[(v) => !!v || 'Port is required']"
+                      v-model="itinerary.port"
+                    />
+                  </div>
+                  <div class="d-flex flex-warp ga-4 mb-2">
+                    <v-text-field
+                      v-model="itinerary.arrivalTime"
+                      :active="itinerary.arrivalTimeMenu"
+                      :focus="itinerary.arrivalTimeMenu"
+                      label="Arrival Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                      required
+                      :rules="[(v) => !!v || 'Arrival Time is required']"
+                    >
+                      <v-menu
+                        v-model="itinerary.arrivalTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="itinerary.arrivalTimeMenu"
+                          v-model="itinerary.arrivalTime"
+                          full-width
+                        />
+                      </v-menu>
+                    </v-text-field>
+                    <v-text-field
+                      v-model="itinerary.departureTime"
+                      :active="itinerary.departureTimeMenu"
+                      :focus="itinerary.departureTimeMenu"
+                      label="Departure Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                    >
+                      <v-menu
+                        v-model="itinerary.departureTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="itinerary.departureTimeMenu"
+                          v-model="itinerary.departureTime"
+                          full-width
+                        />
+                      </v-menu>
+                    </v-text-field>
+                  </div>
+                  <v-textarea
+                    required
+                    :rules="[(v) => !!v || 'Description is required']"
+                    density="compact"
+                    variant="outlined"
+                    v-model="itinerary.description"
+                    class="mb-4"
+                    placeholder="Description"
+                  />
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          <v-expansion-panel title="Price">
+            <v-expansion-panel-text>
+              <v-row>
+                <v-col v-if="!formData.prices?.length">
+                  <div class="text-center pa-4 border">
+                    Select ship first
+                  </div>
+                </v-col>
+                <v-col
+                  v-else
+                  v-for="(price, indexP) in formData.prices"
+                  :key="indexP"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
+                  <div class="d-flex flex-wrap ga-4 mb-2">
+                    <v-text-field
+                      label="Room Name"
+                      :rules="[(v) => !!v || 'Name is required']"
+                      v-model="price.name"
+                      :clearable="false"
+                      readonly
+                    />
+                    <v-text-field
+                      label="Price"
+                      :rules="[(v) => !!v || 'Price is required']"
+                      v-model="price.price"
+                      type="number"
+                    />
+                  </div>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
@@ -294,16 +434,12 @@
                     "
                     :image-list="highlight?.images ?? []"
                     :key="highlightsKey"
+                    :show-img-list-delete-icon="false"
                   />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
           </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-      <!-- policies -->
-      <v-col cols="12">
-        <v-expansion-panels v-model="panel">
           <v-expansion-panel title="Policies">
             <v-expansion-panel-text>
               <v-row>
@@ -353,139 +489,6 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </v-col>
-      <!-- itinerary -->
-      <v-col cols="12">
-        <v-expansion-panels v-model="panel">
-          <v-expansion-panel title="Itinerary">
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('itinerary')"
-                  >
-                    + Add More
-                  </v-btn>
-                </v-col>
-                <v-col
-                  v-for="(itinerary, indexI) in formData.itinerary"
-                  :key="indexI"
-                  cols="12"
-                  class="border mb-4 rounded"
-                >
-                  <div
-                    class="text-right mb-4"
-                    v-if="formData.itinerary.length > 1"
-                  >
-                    <v-btn
-                      icon="mdi-delete"
-                      color="error"
-                      size="x-small"
-                      @click="RemoveItem('itinerary', indexI)"
-                    />
-                  </div>
-                  <div class="d-flex flex-wrap ga-4 mb-2">
-                    <v-menu
-                      v-model="itinerary.dateMenu"
-                      :close-on-content-click="false"
-                    >
-                      <template #activator="{ props }">
-                        <v-text-field
-                          label="Date"
-                          :rules="[(v) => !!v || 'Date is required']"
-                          v-model="itinerary.date"
-                          v-bind="props"
-                          prepend-inner-icon="mdi-calendar"
-                          readonly
-                        />
-                      </template>
-                      <v-date-picker
-                        v-bind="$attrs"
-                        v-model="itinerary.date"
-                        color="primary"
-                      />
-                    </v-menu>
-                    <v-autocomplete
-                      clearable
-                      label="Select Port"
-                      :items="portList"
-                      item-title="name"
-                      item-value="_id"
-                      required
-                      :rules="[(v) => !!v || 'Port is required']"
-                      v-model="itinerary.port"
-                    />
-                  </div>
-                  <div class="d-flex flex-warp ga-4 mb-2">
-                    <v-text-field
-                      v-model="itinerary.arrivalTime"
-                      :active="itinerary.arrivalTimeMenu"
-                      :focus="itinerary.arrivalTimeMenu"
-                      label="Arrival Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                    >
-                      <v-menu
-                        v-model="itinerary.arrivalTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
-                        <v-time-picker
-                          v-if="itinerary.arrivalTimeMenu"
-                          v-model="itinerary.arrivalTime"
-                          full-width
-                        />
-                      </v-menu>
-                    </v-text-field>
-                    <v-text-field
-                      v-model="itinerary.departureTime"
-                      :active="itinerary.departureTimeMenu"
-                      :focus="itinerary.departureTimeMenu"
-                      label="Departure Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                    >
-                      <v-menu
-                        v-model="itinerary.departureTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
-                        <v-time-picker
-                          v-if="itinerary.departureTimeMenu"
-                          v-model="itinerary.departureTime"
-                          full-width
-                        />
-                      </v-menu>
-                    </v-text-field>
-                  </div>
-                  <DocumentEditor
-                    :key="docKey"
-                    height="200px"
-                    v-model="itinerary.description"
-                    class="mb-4"
-                  />
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-
-      <!-- images  -->
-      <v-col cols="12">
-        <ImageUploader
-          :value="formData.uploads"
-          @update="(data) => onImageUpdate(data, 'images')"
-          :image-list="formData.images"
-          @update-image-link="(data) => onUpdateImageLink(data)"
-        />
-      </v-col>
-
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
           <v-btn
@@ -496,7 +499,7 @@
           </v-btn>
           <v-btn
             color="primary"
-            @click="saveShip"
+            @click="save"
           >
             Save
           </v-btn>
@@ -553,8 +556,8 @@ const onCreate = () => {
   router.push({ name: 'cruise-package', query: { mode: 'form' } })
 }
 const initialFormData = {
-  name: null,
-  description: '',
+  name: 'abc',
+  description: 'abc',
   currency: null,
   startDate: null,
   endDate: null,
@@ -562,23 +565,18 @@ const initialFormData = {
   startLocation: null,
   endLocation: null,
   ship: null,
-  highlights: [{ name: null, description: '', uploads: [], images: [] }],
-  policies: [{ name: null, description: '' }],
-  itinerary: [
-    {
-      dateMenu:false,
-      date: null,
-      port: null,
-      description: '',
-      arrivalTime: null,
-      departureTime: null,
-      arrivalTimeMenu: false,
-      departureTimeMenu: false
-    }
+  highlights: [],
+  policies: [
+    { name: 'Cancellation Policy', description: '' },
+    { name: 'Gratuities Information', description: '' },
+    { name: 'Pregnancy Policy', description: '' },
+    { name: 'Minor Accompany', description: '' },
+    { name: 'Smoking Policy', description: '' }
   ],
+  itinerary: [],
   uploads: [],
   images: [],
-  
+  prices: [],
 }
 
 const formData = ref(initialFormData)
@@ -595,6 +593,13 @@ const showForm = ref(false)
 const startDateMenu = ref(false)
 const endDateMenu = ref(false)
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const year = date.getFullYear();
+  return `${month < 10 ? '0' : ''}${month}/${day < 10 ? '0' : ''}${day}/${year}`;
+};
 const onEdit = (item) => {
   router.push(`/cruise/package?mode=form&id=${item?._id}`)
 }
@@ -643,7 +648,7 @@ const getShipList = async () => {
 const addMore = async (name) => {
   if (name === 'itinerary') {
     formData.value[name].unshift({
-      dateMenu:false,
+      dateMenu: false,
       date: null,
       port: null,
       description: '',
@@ -652,8 +657,7 @@ const addMore = async (name) => {
       arrivalTimeMenu: false,
       departureTimeMenu: false
     })
-  }
-  else {
+  } else {
     formData.value[name].unshift({
       name: '',
       description: '',
@@ -661,7 +665,6 @@ const addMore = async (name) => {
       roomGroup: null,
       images: []
     })
-
   }
   docKey.value = docKey.value + 1
   roomKey.value = roomKey.value + 1
@@ -674,21 +677,21 @@ const RemoveItem = async (name, index) => {
   highlightsKey.value = highlightsKey.value + 1
 }
 const removeUploads = (obj) => {
-  if (Array.isArray(obj)) {
-    return obj.map((item) => removeUploads(item))
-  } else if (obj && typeof obj === 'object') {
-    const newObj = { ...obj }
-    if ('uploads' in newObj) {
-      delete newObj.uploads
+  let data = { ...obj }
+  delete data.uploads
+  data?.highlights.forEach(element => {
+    if (element.uploads?.length) {
+      delete element.uploads
     }
-    for (const key in newObj) {
-      newObj[key] = removeUploads(newObj[key])
-    }
-    return newObj
-  } else {
-    return obj
-  }
-}
+  });
+  data.startDate = formatDate(data.startDate);
+  data.endDate = formatDate(data.endDate);
+  data.itinerary?.forEach(element => {
+    element.date = formatDate(element.date)
+  });
+  console.log(data);
+  return data
+};
 const getFilesPayload = () => {
   const files = []
   const fileMapper = []
@@ -723,10 +726,9 @@ const getFilesPayload = () => {
 const getDataPayload = () => {
   try {
     let { files, fileMapper } = getFilesPayload()
-    let data = removeUploads(formData.value)
+    let payload = { ...formData.value }
+    let data = removeUploads(payload)
     data.fileMapper = fileMapper
-    console.log(data)
-    console.log(files)
     let formdata = new FormData()
     formdata.append('data', JSON.stringify(data))
     files?.forEach((file) => {
@@ -737,7 +739,7 @@ const getDataPayload = () => {
     console.log(error)
   }
 }
-const saveShip = async () => {
+const save = async () => {
   form.value.validate()
   if (form.value.isValid) {
     const payload = getDataPayload()
@@ -749,6 +751,9 @@ const saveShip = async () => {
       router.push({ name: 'cruise-ship' })
     }
   }
+  else {
+    panel.value = [0, 1]
+  }
 }
 const onImageUpdate = (images) => {
   formData.value.uploads = images
@@ -757,7 +762,7 @@ const onHighlightsImageUpdate = (images, index) => {
   formData.value.highlights[index].uploads = images
 }
 const loadItems = async () => {
-  await axios.get('admin/cruise/ships').then((res) => {
+  await axios.post('admin/cruise/packages-list').then((res) => {
     if (res?.data?.length) {
       table_data.value.serverItems = res?.data
       table_data.value.totalItems = res?.data?.length
@@ -790,6 +795,39 @@ const onUpdateImageLink = (data) => {
 const onUpdateImageLinks = (key, index, data) => {
   formData.value[key][index].images = data
 }
+const onShipSelect = (data) => {
+  const ship = shipList.value.find((x) => x?._id === data)
+  formData.value.highlights = [...formData.value.highlights, ...ship.highlights],
+    formData.value.prices = ship.rooms?.map((r) => {
+      return {
+        ...r,
+        price: null,
+      }
+    })
+}
+const getDateRange = (firstDate, lastDate) => {
+  const start = new Date(firstDate.toUTCString());
+  const end = new Date(lastDate.toUTCString());
+  const timeDifference = end.getTime() - start.getTime();
+  const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+  return numberOfDays;
+}
+const onEndDateSelect = (endDate) => {
+  if (formData.value.startDate && endDate) {
+    const numberOfDays = getDateRange(formData.value.startDate, endDate)
+    formData.value.itinerary = [...Array(numberOfDays + 1).keys()].map((x) => {
+      return {
+        date: new Date(formData.value.startDate.getTime() + x * 24 * 60 * 60 * 1000),
+        port: null,
+        description: '',
+        arrivalTime: null,
+        departureTime: null,
+        arrivalTimeMenu: false,
+        departureTimeMenu: false
+      }
+    })
+  }
+}
 onBeforeMount(async () => {
   await getLines()
   await getRoomGroups()
@@ -812,7 +850,6 @@ onBeforeMount(async () => {
   // }
   showForm.value = true
 })
-
 </script>
 
 <style scoped>
