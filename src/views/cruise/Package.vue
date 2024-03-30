@@ -235,7 +235,6 @@
           @update:model-value="onShipSelect"
         />
       </v-col>
-
       <!-- description -->
       <v-col cols="12">
         <p>Description</p>
@@ -312,6 +311,7 @@
                           v-if="itinerary.arrivalTimeMenu"
                           v-model="itinerary.arrivalTime"
                           full-width
+                          format="24hr"
                         />
                       </v-menu>
                     </v-text-field>
@@ -333,6 +333,7 @@
                           v-if="itinerary.departureTimeMenu"
                           v-model="itinerary.departureTime"
                           full-width
+                          format="24hr"
                         />
                       </v-menu>
                     </v-text-field>
@@ -369,17 +370,24 @@
                     <v-text-field
                       label="Room Name"
                       :rules="[(v) => !!v || 'Name is required']"
-                      v-model="price.name"
+                      v-model="price.room.name"
                       :clearable="false"
                       readonly
                     />
                     <v-text-field
-                      label="Price"
-                      :rules="[(v) => !!v || 'Price is required']"
-                      v-model="price.price"
-                      type="number"
+                      label="Room Group"
+                      :rules="[(v) => !!v || 'Name is required']"
+                      v-model="price.room.roomGroup.name"
+                      :clearable="false"
+                      readonly
                     />
                   </div>
+                  <v-text-field
+                    label="Price"
+                    :rules="[(v) => !!v || 'Price is required']"
+                    v-model="price.price"
+                    type="number"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -526,7 +534,7 @@ const formMode = computed(() => {
 const docKey = ref(1)
 const roomKey = ref(3)
 const highlightsKey = ref(5)
-const panel = ref([0])
+const panel = ref([0, 1])
 
 const id = computed(() => {
   return route?.query?.id
@@ -675,17 +683,22 @@ const RemoveItem = async (name, index) => {
   highlightsKey.value = highlightsKey.value + 1
 }
 const removeUploads = (obj) => {
-  let data = { ...obj }
+  let data = JSON.parse(JSON.stringify(obj));
   delete data.uploads
   data?.highlights.forEach(element => {
     if (element.uploads?.length) {
       delete element.uploads
     }
   });
-  data.startDate = formatDate(data.startDate);
-  data.endDate = formatDate(data.endDate);
+  data?.prices.forEach(element => {
+    element.room.roomGroup = element.room.roomGroup._id
+  });
+  let startDate = new Date(data.startDate)
+  let endDate = new Date(data.endDate)
+  data.startDate = startDate;
+  data.endDate = endDate;
   data.itinerary?.forEach(element => {
-    element.date = formatDate(element.date)
+    element.date = new Date(element.date);
   });
   console.log(data);
   return data
@@ -724,8 +737,7 @@ const getFilesPayload = () => {
 const getDataPayload = () => {
   try {
     let { files, fileMapper } = getFilesPayload()
-    let payload = { ...formData.value }
-    let data = removeUploads(payload)
+    let data = removeUploads({ ...formData.value })
     data.fileMapper = fileMapper
     let formdata = new FormData()
     formdata.append('data', JSON.stringify(data))
@@ -798,7 +810,7 @@ const onShipSelect = (data) => {
   formData.value.highlights = [...formData.value.highlights, ...ship.highlights],
     formData.value.prices = ship.rooms?.map((r) => {
       return {
-        ...r,
+        room: r,
         price: null,
       }
     })
