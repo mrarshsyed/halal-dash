@@ -1,17 +1,41 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
-    <v-col cols="12" md="8">
-      <v-text-field v-model="table_data.search" placeholder="Enter search here ..." />
+  <v-row
+    class="mb-4"
+    v-if="!formMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
+      <v-text-field
+        v-model="table_data.search"
+        placeholder="Enter search here ..."
+      />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary">
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
         + Add New Package
       </v-btn>
     </v-col>
     <v-col cols="12">
-      <v-data-table density="compact" :items-per-page="table_data.itemsPerPage" :headers="table_data.headers"
-        :items-length="table_data.totalItems" :items="table_data.serverItems" :search="table_data.search"
-        :items-per-page-options="table_data.itemsPerPageOption" :page="table_data.page" show-current-page>
+      <v-data-table
+        density="compact"
+        :items-per-page="table_data.itemsPerPage"
+        :headers="table_data.headers"
+        :items-length="table_data.totalItems"
+        :items="table_data.serverItems"
+        :search="table_data.search"
+        :items-per-page-options="table_data.itemsPerPageOption"
+        :page="table_data.page"
+        show-current-page
+      >
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
@@ -30,8 +54,16 @@
 
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
-            <v-icon class="cursor-pointer" @click="onEdit(item)" icon="mdi-pencil-box" />
-            <v-icon @click="onDelete(item)" color="error" class="cursor-pointer">
+            <v-icon
+              class="cursor-pointer"
+              @click="onEdit(item)"
+              icon="mdi-pencil-box"
+            />
+            <v-icon
+              @click="onDelete(item)"
+              color="error"
+              class="cursor-pointer"
+            >
               mdi-delete
             </v-icon>
           </div>
@@ -39,76 +71,193 @@
       </v-data-table>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
-        <v-btn size="x-small" color="primary" icon="mdi-arrow-left" @click="router.push('/cruise/package')" />
+        <v-btn
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="router.push('/cruise/package')"
+        />
         <h3 class="mt-4">
           {{ id ? 'Update Package' : 'Create New Package' }}
         </h3>
       </v-col>
       <!-- name -->
-      <v-col cols="12" md="6">
-        <v-text-field v-model="formData.name" label="Name" required :rules="[(v) => !!v || 'Name is required']" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.name"
+          label="Name"
+          required
+          :rules="[(v) => !!v || 'Name is required']"
+        />
       </v-col>
       <!-- currency -->
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Currency" :items="currencyList" item-title="name" item-value="_id"
-          required :rules="[(v) => !!v || `Currency is required`]" v-model="formData.currency" return-object />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select Currency"
+          :items="currencyList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || `Currency is required`]"
+          v-model="formData.currency"
+          return-object
+        />
       </v-col>
       <!-- start date -->
-      <v-col cols="12" md="6">
-        <v-menu v-model="startDateMenu" :close-on-content-click="false">
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-menu
+          v-model="startDateMenu"
+          :close-on-content-click="false"
+        >
           <template #activator="{ props }">
-            <v-text-field label="Start Date" :rules="[(v) => !!v || 'Start Date is required']"
-              v-model="formData.startDate" v-bind="props" prepend-inner-icon="mdi-calendar" readonly />
+            <v-text-field
+              label="Start Date"
+              :rules="[(v) => !!v || 'Start Date is required']"
+              v-model="formData.startDate"
+              v-bind="props"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+            />
           </template>
-          <v-date-picker v-bind="$attrs" v-model="formData.startDate" color="primary" />
+          <v-date-picker
+            v-bind="$attrs"
+            v-model="formData.startDate"
+            color="primary"
+          />
         </v-menu>
       </v-col>
       <!-- end date -->
-      <v-col cols="12" md="6">
-        <v-menu :disabled="!formData.startDate" v-model="endDateMenu" :close-on-content-click="false">
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-menu
+          :disabled="!formData.startDate"
+          v-model="endDateMenu"
+          :close-on-content-click="false"
+        >
           <template #activator="{ props }">
-            <v-text-field label="End Date" :rules="[(v) => !!v || 'End Date is required']" v-model="formData.endDate"
-              v-bind="props" prepend-inner-icon="mdi-calendar" readonly />
+            <v-text-field
+              label="End Date"
+              :rules="[(v) => !!v || 'End Date is required']"
+              v-model="formData.endDate"
+              v-bind="props"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+            />
           </template>
-          <v-date-picker v-bind="$attrs" v-model="formData.endDate" color="primary" :min="formData.startDate"
-            @update:model-value="onEndDateSelect" />
+          <v-date-picker
+            v-bind="$attrs"
+            v-model="formData.endDate"
+            color="primary"
+            :min="formData.startDate"
+            @update:model-value="onEndDateSelect"
+          />
         </v-menu>
       </v-col>
       <!-- destination -->
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Destinations" :items="destinationList" item-title="name"
-          item-value="_id" required multiple chips :rules="[
-    (v) =>
-      formData.destinations.length > 0 || `Destinations are required`
-  ]" v-model="formData.destinations" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select Destinations"
+          :items="destinationList"
+          item-title="name"
+          item-value="_id"
+          required
+          multiple
+          chips
+          :rules="[
+            (v) =>
+              formData.destinations.length > 0 || `Destinations are required`
+          ]"
+          v-model="formData.destinations"
+        />
       </v-col>
       <!-- start location -->
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Start Location" :items="portList" item-title="name" item-value="_id"
-          required :rules="[(v) => !!v || 'Start Location is required']" v-model="formData.startLocation" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select Start Location"
+          :items="portList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || 'Start Location is required']"
+          v-model="formData.startLocation"
+        />
       </v-col>
       <!-- end location -->
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select End Location" :items="portList" item-title="name" item-value="_id"
-          required :rules="[(v) => !!v || 'End Location is required']" v-model="formData.endLocation" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select End Location"
+          :items="portList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || 'End Location is required']"
+          v-model="formData.endLocation"
+        />
       </v-col>
       <!-- Ship -->
-      <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Ship" :items="shipList" item-title="name" item-value="_id" required
-          :rules="[(v) => !!v || 'Ship is required']" v-model="formData.ship" @update:model-value="onShipSelect" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Select Ship"
+          :items="shipList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || 'Ship is required']"
+          v-model="formData.ship"
+          @update:model-value="onShipSelect"
+        />
       </v-col>
       <!-- description -->
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
       </v-col>
       <!-- images  -->
       <v-col cols="12">
-        <ImageUploader :value="formData.uploads" @update="(data) => onImageUpdate(data, 'images')"
-          :image-list="formData.images" @update-image-link="(data) => onUpdateImageLink(data)" />
+        <ImageUploader
+          :value="formData.uploads"
+          @update="(data) => onImageUpdate(data, 'images')"
+          :image-list="formData.images"
+          @update-image-link="(data) => onUpdateImageLink(data)"
+        />
       </v-col>
       <!-- panels -->
       <v-col cols="12">
@@ -121,37 +270,90 @@
                     Select start date and end date first
                   </div>
                 </v-col>
-                <v-col v-else v-for="(itinerary, indexI) in formData.itinerary" :key="indexI" cols="12"
-                  class="border mb-4 rounded">
+                <v-col
+                  v-else
+                  v-for="(itinerary, indexI) in formData.itinerary"
+                  :key="indexI"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
                   <div class="d-flex flex-wrap ga-4 mb-2">
-                    <v-text-field label="Date" :rules="[(v) => !!v || 'Date is required']" v-model="itinerary.date"
-                      :clearable="false" prepend-inner-icon="mdi-calendar" readonly />
-                    <v-autocomplete clearable label="Select Port" :items="portList" item-title="name" item-value="_id"
-                      required :rules="[(v) => !!v || 'Port is required']" v-model="itinerary.port" />
+                    <v-text-field
+                      label="Date"
+                      :rules="[(v) => !!v || 'Date is required']"
+                      v-model="itinerary.date"
+                      :clearable="false"
+                      prepend-inner-icon="mdi-calendar"
+                      readonly
+                    />
+                    <v-autocomplete
+                      clearable
+                      label="Select Port"
+                      :items="portList"
+                      item-title="name"
+                      item-value="_id"
+                      required
+                      :rules="[(v) => !!v || 'Port is required']"
+                      v-model="itinerary.port"
+                    />
                   </div>
                   <div class="d-flex flex-warp ga-4 mb-2">
-                    <v-text-field v-model="itinerary.arrivalTime" :active="itinerary.arrivalTimeMenu"
-                      :focus="itinerary.arrivalTimeMenu" label="Arrival Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline" readonly required
-                      :rules="[(v) => !!v || 'Arrival Time is required']">
-                      <v-menu v-model="itinerary.arrivalTimeMenu" :close-on-content-click="false" activator="parent"
-                        transition="scale-transition">
-                        <v-time-picker v-if="itinerary.arrivalTimeMenu" v-model="itinerary.arrivalTime" full-width
-                          format="24hr" />
+                    <v-text-field
+                      v-model="itinerary.arrivalTime"
+                      :active="itinerary.arrivalTimeMenu"
+                      :focus="itinerary.arrivalTimeMenu"
+                      label="Arrival Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                      required
+                      :rules="[(v) => !!v || 'Arrival Time is required']"
+                    >
+                      <v-menu
+                        v-model="itinerary.arrivalTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="itinerary.arrivalTimeMenu"
+                          v-model="itinerary.arrivalTime"
+                          full-width
+                          format="24hr"
+                        />
                       </v-menu>
                     </v-text-field>
-                    <v-text-field v-model="itinerary.departureTime" :active="itinerary.departureTimeMenu"
-                      :focus="itinerary.departureTimeMenu" label="Departure Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline" readonly>
-                      <v-menu v-model="itinerary.departureTimeMenu" :close-on-content-click="false" activator="parent"
-                        transition="scale-transition">
-                        <v-time-picker v-if="itinerary.departureTimeMenu" v-model="itinerary.departureTime" full-width
-                          format="24hr" />
+                    <v-text-field
+                      v-model="itinerary.departureTime"
+                      :active="itinerary.departureTimeMenu"
+                      :focus="itinerary.departureTimeMenu"
+                      label="Departure Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                    >
+                      <v-menu
+                        v-model="itinerary.departureTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="itinerary.departureTimeMenu"
+                          v-model="itinerary.departureTime"
+                          full-width
+                          format="24hr"
+                        />
                       </v-menu>
                     </v-text-field>
                   </div>
-                  <v-textarea required :rules="[(v) => !!v || 'Description is required']" density="compact"
-                    variant="outlined" v-model="itinerary.description" class="mb-4" placeholder="Description" />
+                  <v-textarea
+                    required
+                    :rules="[(v) => !!v || 'Description is required']"
+                    density="compact"
+                    variant="outlined"
+                    v-model="itinerary.description"
+                    class="mb-4"
+                    placeholder="Description"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -164,16 +366,35 @@
                     Select ship first
                   </div>
                 </v-col>
-                <v-col v-else v-for="(price, indexP) in formData.prices" :key="indexP" cols="12"
-                  class="border mb-4 rounded">
+                <v-col
+                  v-else
+                  v-for="(price, indexP) in formData.prices"
+                  :key="indexP"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
                   <div class="d-flex flex-wrap ga-4 mb-2">
-                    <v-text-field label="Room Name" :rules="[(v) => !!v || 'Name is required']"
-                      v-model="price.room.name" :clearable="false" readonly />
-                    <v-text-field label="Room Group" :rules="[(v) => !!v || 'Name is required']"
-                      v-model="price.room.roomGroup.name" :clearable="false" readonly />
+                    <v-text-field
+                      label="Room Name"
+                      :rules="[(v) => !!v || 'Name is required']"
+                      v-model="price.room.name"
+                      :clearable="false"
+                      readonly
+                    />
+                    <v-text-field
+                      label="Room Group"
+                      :rules="[(v) => !!v || 'Name is required']"
+                      v-model="price.room.roomGroup.name"
+                      :clearable="false"
+                      readonly
+                    />
                   </div>
-                  <v-text-field label="Price" :rules="[(v) => !!v || 'Price is required']" v-model="price.price"
-                    type="number" />
+                  <v-text-field
+                    label="Price"
+                    :rules="[(v) => !!v || 'Price is required']"
+                    v-model="price.price"
+                    type="number"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -181,22 +402,55 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('highlights')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
-                <v-col v-for="(highlight, indexH) in formData.highlights" :key="indexH" cols="12"
-                  class="border mb-4 rounded">
-                  <div class="text-right mb-4" v-if="formData.highlights.length > 1">
-                    <v-btn icon="mdi-delete" color="error" size="x-small" @click="RemoveItem('highlights', indexH)" />
+                <v-col
+                  v-for="(highlight, indexH) in formData.highlights"
+                  :key="indexH"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
+                  <div
+                    class="text-right mb-4"
+                    v-if="formData.highlights.length > 1"
+                  >
+                    <v-btn
+                      icon="mdi-delete"
+                      color="error"
+                      size="x-small"
+                      @click="RemoveItem('highlights', indexH)"
+                    />
                   </div>
-                  <v-text-field v-model="highlight.name" label="Name" outlined
-                    :rules="[(v) => !!v || `Name is required`]" />
-                  <DocumentEditor :key="docKey" height="200px" v-model="highlight.description" class="mb-4" />
-                  <ImageUploader :value="highlight.uploads" @update="(data) => onHighlightsImageUpdate(data, indexH)"
+                  <v-text-field
+                    v-model="highlight.name"
+                    label="Name"
+                    outlined
+                    :rules="[(v) => !!v || `Name is required`]"
+                  />
+                  <DocumentEditor
+                    :key="docKey"
+                    height="200px"
+                    v-model="highlight.description"
+                    class="mb-4"
+                  />
+                  <ImageUploader
+                    :value="highlight.uploads"
+                    @update="(data) => onHighlightsImageUpdate(data, indexH)"
                     @update-image-link="(data) => onUpdateImageLinks('highlights', indexH, data)
-    " :image-list="highlight?.images ?? []" :key="highlightsKey" :show-img-list-delete-icon="false" />
+                    "
+                    :image-list="highlight?.images ?? []"
+                    :key="highlightsKey"
+                    :show-img-list-delete-icon="false"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -204,19 +458,46 @@
           <v-expansion-panel title="Policies">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('policies')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('policies')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
-                <v-col v-for="(policy, indexP) in formData.policies" :key="indexP" cols="12"
-                  class="border mb-4 rounded">
-                  <div class="text-right mb-4" v-if="formData.policies.length > 1">
-                    <v-btn icon="mdi-delete" color="error" size="x-small" @click="RemoveItem('policies', indexP)" />
+                <v-col
+                  v-for="(policy, indexP) in formData.policies"
+                  :key="indexP"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
+                  <div
+                    class="text-right mb-4"
+                    v-if="formData.policies.length > 1"
+                  >
+                    <v-btn
+                      icon="mdi-delete"
+                      color="error"
+                      size="x-small"
+                      @click="RemoveItem('policies', indexP)"
+                    />
                   </div>
-                  <v-text-field v-model="policy.name" label="Name" outlined
-                    :rules="[(v) => !!v || `Name is required`]" />
-                  <DocumentEditor :key="docKey" height="200px" v-model="policy.description" class="mb-4" />
+                  <v-text-field
+                    v-model="policy.name"
+                    label="Name"
+                    outlined
+                    :rules="[(v) => !!v || `Name is required`]"
+                  />
+                  <DocumentEditor
+                    :key="docKey"
+                    height="200px"
+                    v-model="policy.description"
+                    class="mb-4"
+                  />
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -225,10 +506,16 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/package')">
+          <v-btn
+            color="error"
+            @click="router.push('/cruise/package')"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="save">
+          <v-btn
+            color="primary"
+            @click="save"
+          >
             Save
           </v-btn>
         </div>
@@ -597,7 +884,12 @@ onBeforeMount(async () => {
           element.date = new Date(element.date)
           element.arrivalTime = convertDateToTime(element.arrivalTime)
           element.departureTime = convertDateToTime(element.departureTime)
+          element.port = element.port._id
         });
+        res.data.destinations = res.data?.destinations.map((x)=> { return x._id})
+        res.data.startLocation = res.data?.startLocation?._id
+        res.data.endLocation = res.data?.endLocation?._id
+        res.data.ship = res?.data?.ship._id
         formData.value = res?.data
       }
     })
