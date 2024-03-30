@@ -15,12 +15,19 @@
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
-        <template #item.description="{ item }">
-          {{ item?.description ?? '-' }}
+        <template #item.ship="{ item }">
+          {{ item?.ship?.name }}
         </template>
-        <template #item.ship_line="{ item }">
-          {{ item?.shipLine?.name ?? '-' }}
+        <template #item.duration="{ item }">
+          {{ item?.duration }} Days
         </template>
+        <template #item.startPrice="{ item }">
+          {{ item?.startPrice }} {{ item?.currency?.code }}
+        </template>
+        <template #item.endPrice="{ item }">
+          {{ item?.endPrice }} {{ item?.currency?.code }}
+        </template>
+
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
             <v-icon class="cursor-pointer" @click="onEdit(item)" icon="mdi-pencil-box" />
@@ -263,8 +270,10 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Description', key: 'description', align: 'start' },
-    { title: 'Ship Line', key: 'ship_line', align: 'start' },
+    { title: 'Ship', key: 'ship', align: 'start' },
+    { title: 'Duration', key: 'duration', align: 'start' },
+    { title: 'Start Price', key: 'startPrice', align: 'start' },
+    { title: 'End Price', key: 'endPrice', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -404,6 +413,12 @@ const convertTimeToDate = (time, target_date) => {
   date = setMinutes(date, min)
   return date.toISOString()
 }
+const convertDateToTime =(date)=>{
+  const dateObject  = new Date(date);
+  const hours = dateObject.getUTCHours().toString().padStart(2, '0'); // Get hours and pad with leading zero if necessary
+const minutes = dateObject.getUTCMinutes().toString().padStart(2, '0'); // Get minutes and pad with leading zero if necessary
+  return `${hours}:${minutes}`
+}
 const removeUploads = (obj) => {
   let data = JSON.parse(JSON.stringify(obj));
   delete data.uploads
@@ -483,7 +498,7 @@ const save = async () => {
       : await axios.post('admin/cruise/packages', payload)
     if (response.data) {
       store.showSnackbar('Successfully Saved')
-      router.push({ name: 'cruise-ship' })
+      router.push({ name: 'cruise-package' })
     }
   }
   else {
@@ -498,8 +513,9 @@ const onHighlightsImageUpdate = (images, index) => {
 }
 const loadItems = async () => {
   await axios.post('admin/cruise/packages-list').then((res) => {
-    if (res?.data?.length) {
-      table_data.value.serverItems = res?.data
+
+    if (res?.data?.data?.length) {
+      table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.length
     }
   })
@@ -548,6 +564,7 @@ const getDateRange = (firstDate, lastDate) => {
   return numberOfDays;
 }
 const onEndDateSelect = (endDate) => {
+  console.log(formData.value.startDate);
   if (formData.value.startDate && endDate) {
     const numberOfDays = getDateRange(formData.value.startDate, endDate)
     formData.value.itinerary = [...Array(numberOfDays + 1).keys()].map((x) => {
@@ -571,18 +588,20 @@ onBeforeMount(async () => {
   await getDestinationList()
   await getPortList()
   await getShipList()
-  // if (
-  //   id.value &&
-  //   table_data.value.serverItems?.find((x) => x?._id === id.value)
-  // ) {
-  //   formData.value = table_data.value.serverItems?.find(
-  //     (x) => x?._id === id.value
-  //   )
-  //   formData.value.shipLine = formData.value.shipLine._id
-  //   formData.value.rooms.forEach((element) => {
-  //     element.roomGroup = element.roomGroup._id
-  //   })
-  // }
+  if (id.value) {
+    await axios.get(`user/cruise/packages/${id.value}`).then((res) => {
+      if (res?.data) {
+        res.data.startDate = new Date(res.data.startDate);
+        res.data.endDate = new Date(res.data.endDate);
+        res?.data?.itinerary.forEach(element => {
+          element.date = new Date(element.date)
+          element.arrivalTime = convertDateToTime(element.arrivalTime)
+          element.departureTime = convertDateToTime(element.departureTime)
+        });
+        formData.value = res?.data
+      }
+    })
+  }
   showForm.value = true
 })
 </script>
