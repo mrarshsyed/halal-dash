@@ -32,8 +32,9 @@ export const permissions = {
   // cruise
   cruiseAll: 'cruise-all',
   cruiseMasterData: 'cruise-master_data',
-  cruiseShip:"cruise-ship",
-  cruisePackage: 'cruise-package'
+  cruiseShip: 'cruise-ship',
+  cruisePackage: 'cruise-package',
+  cruiseEnquiry: 'cruise-enquiry'
 }
 
 export const routes = [
@@ -231,6 +232,16 @@ export const routes = [
           role: ['super-admin', 'admin', 'employee'],
           permissions: [permissions.cruisePackage]
         }
+      },
+      {
+        path: 'enquiry',
+        name: 'cruise-enquiry',
+        component: () => import('@/views/cruise/Enquiry.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.cruiseEnquiry]
+        }
       }
     ]
   },
@@ -412,6 +423,14 @@ export const navLinks = [
         value: 'cruise-package',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruisePackage]
+      },
+      {
+        icon: 'package-variant',
+        title: 'Enquiry',
+        to: '/cruise/enquiry',
+        value: 'cruise-enquiry',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.cruiseEnquiry]
       }
     ]
   },
@@ -518,6 +537,10 @@ export const userCreatePermissions = [
       {
         title: 'Package',
         value: permissions.cruisePackage
+      },
+      {
+        title: 'Enquiry',
+        value: permissions.cruiseEnquiry
       }
     ]
   }
