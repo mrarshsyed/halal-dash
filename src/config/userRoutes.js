@@ -13,6 +13,8 @@ export const permissions = {
   hotelUpdateHalalRatings: 'hotel-update_halal_ratings',
   hotelBookingAll: 'hotel_booking-all',
   hotelBookingList: 'hotel_booking-list',
+  hotelHalalRating: 'hotel-halal-rating',
+  hotelHalalRatingCategory: 'hotel-halal-rating-category',
 
   // activity
   activityAll: 'activity-all',
@@ -22,8 +24,8 @@ export const permissions = {
   activityUpdateHalalRatings: 'activity-update_halal_ratings',
   activityBookingAll: 'activity_booking-all',
   activityBookingList: 'activity_booking-list',
-  hotelHalalRating: 'hotel-halal-rating',
   activityHalalRating: 'activity-halal-rating',
+  activityHalalRatingCategory: 'activity-halal-rating-category',
 
   // settings
   profitSettings: 'profit-settings',
@@ -104,6 +106,15 @@ export const routes = [
         }
       },
       {
+        path: 'ratings-category',
+        component: () => import('@/views/hotels/RatingsCategory.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
         path: 'orders',
         component: () => import('@/views/hotels/Orders.vue'),
         meta: {
@@ -147,6 +158,15 @@ export const routes = [
       {
         path: 'ratings',
         component: () => import('@/views/activity/Ratings.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
+        path: 'ratings-category',
+        component: () => import('@/views/activity/RatingsCategory.vue'),
         meta: {
           requiresAuth: true,
           role: ['super-admin'],
@@ -298,12 +318,12 @@ export const navLinks = [
     ],
     children: [
       {
-        icon: 'view-list',
-        title: 'List',
-        to: '/hotels/list',
-        value: 'hotels-list',
-        role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [permissions.hotelAll, permissions.hotelList]
+        icon: 'list-box',
+        title: 'Ratings Category',
+        to: '/hotels/ratings-category',
+        value: 'hotels-ratings-category',
+        role: ['super-admin'],
+        permissions: [permissions.hotelHalalRatingCategory]
       },
       {
         icon: 'star-box',
@@ -312,6 +332,14 @@ export const navLinks = [
         value: 'hotels-ratings',
         role: ['super-admin'],
         permissions: [permissions.hotelHalalRating]
+      },
+      {
+        icon: 'view-list',
+        title: 'List',
+        to: '/hotels/list',
+        value: 'hotels-list',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.hotelAll, permissions.hotelList]
       },
       {
         icon: 'file-document-multiple',
@@ -344,12 +372,12 @@ export const navLinks = [
         permissions: [permissions.activityAll, permissions.activityAddToSystem]
       },
       {
-        icon: 'view-list',
-        title: 'List',
-        to: '/activity/list',
-        value: 'activity-list',
-        role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [permissions.activityAll, permissions.activityList]
+        icon: 'list-box',
+        title: 'Ratings Category',
+        to: '/activity/ratings-category',
+        value: 'activity-ratings-category',
+        role: ['super-admin'],
+        permissions: [permissions.activityHalalRatingCategory]
       },
       {
         icon: 'star-box',
@@ -359,6 +387,15 @@ export const navLinks = [
         role: ['super-admin'],
         permissions: [permissions.hotelHalalRating]
       },
+      {
+        icon: 'view-list',
+        title: 'List',
+        to: '/activity/list',
+        value: 'activity-list',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.activityAll, permissions.activityList]
+      },
+
       {
         icon: 'file-document-multiple',
         title: 'Orders',
