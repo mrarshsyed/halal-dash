@@ -50,7 +50,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
-const baseUrl = 'admin/hotel/category'
+const baseUrl = 'admin/hotel-halal-rating-categories'
 
 const Form = ref({
   id: null,
@@ -140,7 +140,6 @@ const onEdit = async (item) => {
   store.setRatingDetails(item)
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  Form.value.fields[1].value = item?.rating
   const dialogModal = {
     title: 'Update Category',
     content: '',
