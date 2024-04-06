@@ -73,10 +73,10 @@ import axios from '@/plugins/axios'
 
 const store = useAppStore()
 
-const baseurl = 'admin/activity-halal-ratings'
+const baseurl = 'admin/cruise-halal-ratings'
 const categoryList = ref([])
 const getCategoryList = async () => {
-  await axios.get('admin/activity-halal-rating-categories').then((res) => {
+  await axios.get('admin/cruise-halal-rating-categories').then((res) => {
     if (res.data.length) {
       categoryList.value = res.data
     }

@@ -1,28 +1,13 @@
 <template>
-  <v-row
-    class="mb-4"
-    v-if="!formMode"
-  >
-    <v-col
-      cols="12"
-      md="8"
-    >
+  <v-row class="mb-4" v-if="!formMode">
+    <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col
-      cols="12"
-      md="4"
-    >
-      <v-btn
-        @click="onCreate"
-        block
-        color="primary"
-      >
-        + Add New Ship
-      </v-btn>
+    <v-col cols="12" md="4">
+      <v-btn @click="onCreate" block color="primary"> + Add New Ship </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table
@@ -39,14 +24,27 @@
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
-        <template #item.description="{ item }">
-          {{ item?.description ?? '-' }}
+        <template #item.rating="{ item }">
+          {{ item?.halal_ratings_percentage }}
         </template>
         <template #item.ship_line="{ item }">
           {{ item?.shipLine?.name ?? '-' }}
         </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
+            <v-tooltip
+              text="Ratings"
+              location="top"
+              v-if="store.hasPermission(permissions.cruiseUpdateHalalRatings)"
+            >
+              <template #activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  @click="onRatingIconClick(item)"
+                  icon="mdi-star"
+                />
+              </template>
+            </v-tooltip>
             <v-icon
               class="cursor-pointer"
               @click="onEdit(item)"
@@ -64,11 +62,7 @@
       </v-data-table>
     </v-col>
   </v-row>
-  <v-form
-    v-model="formValue"
-    ref="form" 
-    v-else-if="formMode"
-  >
+  <v-form v-model="formValue" ref="form" v-else-if="formMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -81,10 +75,7 @@
           {{ id ? 'Update Ship' : 'Create New Ship' }}
         </h3>
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -92,10 +83,7 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Line"
@@ -110,17 +98,14 @@
 
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.description"
-        />
+        <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <v-col cols="12">
         <ImageUploader
           :value="formData.uploads"
           @update="(data) => onImageUpdate(data, 'images')"
           :image-list="formData.images"
-          @updateImageLink="(data) => onUpdateImageLink(data)"
+          @update-image-link="(data) => onUpdateImageLink(data)"
         />
       </v-col>
       <!-- facts -->
@@ -153,14 +138,8 @@
           <v-expansion-panel title="Rooms">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('rooms')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('rooms')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -170,10 +149,7 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div
-                    class="text-right mb-4"
-                    v-if="formData.rooms.length > 1"
-                  >
+                  <div class="text-right mb-4" v-if="formData.rooms.length > 1">
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -209,7 +185,9 @@
                     :key="roomKey"
                     :value="room.uploads"
                     @update="(data) => onRoomImageUpdate(data, index)"
-                    @updateImageLink="(data) => onUpdateImageLinks('rooms', index, data)"
+                    @update-image-link="
+                      (data) => onUpdateImageLinks('rooms', index, data)
+                    "
                     :image-list="room?.images ?? []"
                   />
                 </v-col>
@@ -224,14 +202,8 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('highlights')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('highlights')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -267,7 +239,9 @@
                   <ImageUploader
                     :value="highlight.uploads"
                     @update="(data) => onHighlightsImageUpdate(data, indexH)"
-                    @updateImageLink="(data) => onUpdateImageLinks('highlights', indexH, data)"
+                    @update-image-link="
+                      (data) => onUpdateImageLinks('highlights', indexH, data)
+                    "
                     :image-list="highlight?.images ?? []"
                     :key="highlightsKey"
                   />
@@ -279,22 +253,52 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn
-            color="error"
-            @click="router.push('/cruise/ship')"
-          >
+          <v-btn color="error" @click="router.push('/cruise/ship')">
             Cancel
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="saveShip"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="saveShip"> Save </v-btn>
         </div>
       </v-col>
     </v-row>
   </v-form>
+  <v-dialog v-model="assignRatingDialogShow">
+    <v-card>
+      <v-card-title>Select Rating</v-card-title>
+      <v-card-text>
+        <v-row no-gutters>
+          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+            <v-checkbox v-model="selectedRatings" :value="r">
+              <template #label>
+                {{ r?.name }}
+                <v-chip class="ms-2">
+                  {{ r?.rating }}
+                </v-chip>
+              </template>
+            </v-checkbox>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions class="ma-2">
+        <p>
+          Selected Ratings {{ sumOfSelectedRatings }} out of
+          {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
+        </p>
+        <v-spacer />
+        <v-btn
+          color="error"
+          @click="
+            () => {
+              selectedRatings = []
+              assignRatingDialogShow = false
+            }
+          "
+        >
+          Close
+        </v-btn>
+        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -303,10 +307,10 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import ImageUploader from './components/ImageUploader.vue'
-import { useAppStore } from '@/store/app';
+import { useAppStore } from '@/store/app'
+import { permissions } from '@/config/userRoutes'
 
-
-const store = useAppStore();
+const store = useAppStore()
 const route = useRoute()
 const router = useRouter()
 const formMode = computed(() => {
@@ -330,7 +334,7 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Description', key: 'description', align: 'start' },
+    { title: 'Rating(%)', key: 'rating', align: 'start' },
     { title: 'Ship Line', key: 'ship_line', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
@@ -378,7 +382,12 @@ const initialFormData = {
     wheelchairAccessible: ''
   },
   highlights: [
-    { name: 'Food & Dining', description: 'Food and Dining description', uploads: [], images: [] },
+    {
+      name: 'Food & Dining',
+      description: 'Food and Dining description',
+      uploads: [],
+      images: []
+    }
     // {
     //   name: 'Accommodation',
     //   description: 'Accommodation description', uploads: []
@@ -389,7 +398,13 @@ const initialFormData = {
     // }
   ],
   rooms: [
-    { roomGroup: null, name: 'Room 1', description: 'Room 1 description', uploads: [], images: [] },
+    {
+      roomGroup: null,
+      name: 'Room 1',
+      description: 'Room 1 description',
+      uploads: [],
+      images: []
+    }
   ]
 }
 const formData = ref(initialFormData)
@@ -397,12 +412,22 @@ const form = ref()
 const formValue = ref(false)
 const lines = ref([])
 const room_groups = ref([])
-const showForm = ref(false);
+const showForm = ref(false)
+const ratings = ref([])
+const selectedRatings = ref([])
+const assignRatingDialogShow = ref(false)
+
+const onRatingIconClick = async (item) => {
+  store.setDetails(item)
+  if (item?.halal_ratings?.length) {
+    selectedRatings.value = item?.halal_ratings
+  }
+  assignRatingDialogShow.value = true
+}
 
 const onEdit = (item) => {
   router.push(`/cruise/ship?mode=form&id=${item?._id}`)
 }
-
 const getLines = async () => {
   await axios.get('admin/cruise/ship-lines').then((res) => {
     if (res?.data?.length) {
@@ -417,7 +442,6 @@ const getRoomGroups = async () => {
     }
   })
 }
-
 const formatLabel = (key) => {
   return (
     key &&
@@ -444,24 +468,22 @@ const RemoveItem = async (name, index) => {
   roomKey.value = roomKey.value + 1
   highlightsKey.value = highlightsKey.value + 1
 }
-
 const removeUploads = (obj) => {
   if (Array.isArray(obj)) {
-    return obj.map(item => removeUploads(item));
+    return obj.map((item) => removeUploads(item))
   } else if (obj && typeof obj === 'object') {
-    const newObj = { ...obj };
+    const newObj = { ...obj }
     if ('uploads' in newObj) {
-      delete newObj.uploads;
+      delete newObj.uploads
     }
     for (const key in newObj) {
-      newObj[key] = removeUploads(newObj[key]);
+      newObj[key] = removeUploads(newObj[key])
     }
-    return newObj;
+    return newObj
   } else {
-    return obj;
+    return obj
   }
 }
-
 const getFilesPayload = () => {
   const files = []
   const fileMapper = []
@@ -471,7 +493,7 @@ const getFilesPayload = () => {
         files.push(file)
         fileMapper.push({
           resource: 'images',
-          name: file.name,
+          name: file.name
         })
       }
     })
@@ -484,7 +506,7 @@ const getFilesPayload = () => {
             files.push(file)
             fileMapper.push({
               resource: `highlights_${index}`,
-              name: file.name,
+              name: file.name
             })
           }
         })
@@ -499,7 +521,7 @@ const getFilesPayload = () => {
             files.push(file)
             fileMapper.push({
               resource: `rooms_${index}`,
-              name: file.name,
+              name: file.name
             })
           }
         })
@@ -513,29 +535,30 @@ const getDataPayload = () => {
     let { files, fileMapper } = getFilesPayload()
     let data = removeUploads(formData.value)
     data.fileMapper = fileMapper
-    console.log(data);
-    console.log(files);
-    let formdata = new FormData();
-    formdata.append('data', JSON.stringify(data));
-    files?.forEach((file)=>{
-      formdata.append('uploads', file);
+    console.log(data)
+    console.log(files)
+    let formdata = new FormData()
+    formdata.append('data', JSON.stringify(data))
+    files?.forEach((file) => {
+      formdata.append('uploads', file)
     })
     return formdata
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 }
 const saveShip = async () => {
-  form.value.validate();
+  form.value.validate()
   if (form.value.isValid) {
-    const payload = getDataPayload();
-    const response = id?.value ? await axios.patch(`admin/cruise/ships/${id.value}`, payload) : await axios.post('admin/cruise/ships', payload)
+    const payload = getDataPayload()
+    const response = id?.value
+      ? await axios.patch(`admin/cruise/ships/${id.value}`, payload)
+      : await axios.post('admin/cruise/ships', payload)
     if (response.data) {
-      store.showSnackbar("Successfully Saved")
+      store.showSnackbar('Successfully Saved')
       router.push({ name: 'cruise-ship' })
     }
   }
-
 }
 const onImageUpdate = (images) => {
   formData.value.uploads = images
@@ -547,14 +570,12 @@ const onHighlightsImageUpdate = (images, index) => {
   formData.value.highlights[index].uploads = images
 }
 const loadItems = async () => {
-  await axios
-    .get('admin/cruise/ships',)
-    .then((res) => {
-      if (res?.data?.length) {
-        table_data.value.serverItems = res?.data
-        table_data.value.totalItems = res?.data?.length
-      }
-    })
+  await axios.get('admin/cruise/ships').then((res) => {
+    if (res?.data?.length) {
+      table_data.value.serverItems = res?.data
+      table_data.value.totalItems = res?.data?.length
+    }
+  })
 }
 
 const confirmDelete = async () => {
@@ -578,15 +599,27 @@ const onDelete = (item) => {
   store.showDialog(dialogModal)
 }
 onBeforeMount(async () => {
+  if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
+    await axios.get('admin/cruise-halal-ratings').then((res) => {
+      if (res?.data?.length) {
+        ratings.value = res?.data
+      }
+    })
+  }
   await getLines()
   await getRoomGroups()
   await loadItems()
-  if (id.value && table_data.value.serverItems?.find((x) => x?._id === id.value)) {
-    formData.value = table_data.value.serverItems?.find((x) => x?._id === id.value)
+  if (
+    id.value &&
+    table_data.value.serverItems?.find((x) => x?._id === id.value)
+  ) {
+    formData.value = table_data.value.serverItems?.find(
+      (x) => x?._id === id.value
+    )
     formData.value.shipLine = formData.value.shipLine._id
-    formData.value.rooms.forEach(element => {
+    formData.value.rooms.forEach((element) => {
       element.roomGroup = element.roomGroup._id
-    });
+    })
   }
   showForm.value = true
 })
@@ -595,6 +628,35 @@ const onUpdateImageLink = (data) => {
 }
 const onUpdateImageLinks = (key, index, data) => {
   formData.value[key][index].images = data
+}
+const sumOfSelectedRatings = computed(() => {
+  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
+})
+const sumOfTotalRating = computed(() => {
+  return ratings.value.reduce((total, r) => total + r.rating, 0)
+})
+const ratingPercentage = computed(() => {
+  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
+})
+const onAssignRating = async () => {
+  const ids = selectedRatings.value?.map((x) => {
+    return x._id
+  })
+  axios
+    .patch(`admin/ships/${store.details?._id}/update-halal-ratings`, {
+      ratingIds: ids
+    })
+    .then(async (res) => {
+      store.showSnackbar('Ratings updated successfully')
+      store.setDetails({})
+      await loadItems({
+        page: table_data.value.page,
+        itemsPerPage: table_data.value.itemsPerPage,
+        sortBy: 'ascending'
+      })
+      assignRatingDialogShow.value = false
+      selectedRatings.value = []
+    })
 }
 </script>
 

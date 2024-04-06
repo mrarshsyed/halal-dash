@@ -35,8 +35,11 @@ export const permissions = {
   cruiseAll: 'cruise-all',
   cruiseMasterData: 'cruise-master_data',
   cruiseShip: 'cruise-ship',
+  cruiseUpdateManager: 'cruise-update_manager',
   cruisePackage: 'cruise-package',
-  cruiseEnquiry: 'cruise-enquiry'
+  cruiseEnquiry: 'cruise-enquiry',
+  cruiseHalalRatingCategory: 'hotel-halal-rating-category',
+  cruiseUpdateHalalRatings: 'activity-update_halal_ratings'
 }
 
 export const routes = [
@@ -234,6 +237,24 @@ export const routes = [
         }
       },
       {
+        path: 'ratings-category',
+        component: () => import('@/views/cruise/RatingsCategory.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
+        path: 'ratings',
+        component: () => import('@/views/cruise/Ratings.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
         path: 'ship',
         name: 'cruise-ship',
         component: () => import('@/views/cruise/Ship.vue'),
@@ -395,7 +416,6 @@ export const navLinks = [
         role: ['super-admin', 'admin', 'employee', 'manager'],
         permissions: [permissions.activityAll, permissions.activityList]
       },
-
       {
         icon: 'file-document-multiple',
         title: 'Orders',
@@ -444,6 +464,22 @@ export const navLinks = [
         value: 'cruise-master-data-room-group',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
+      },
+      {
+        icon: 'list-box',
+        title: 'Ratings Category',
+        to: '/cruise/ratings-category',
+        value: 'cruise-ratings-category',
+        role: ['super-admin'],
+        permissions: [permissions.cruiseHalalRatingCategory]
+      },
+      {
+        icon: 'star-box',
+        title: 'Ratings',
+        to: '/cruise/ratings',
+        value: 'cruise-ratings',
+        role: ['super-admin'],
+        permissions: [permissions.hotelHalalRating]
       },
       {
         icon: 'ferry',
@@ -566,6 +602,14 @@ export const userCreatePermissions = [
       {
         title: 'Master Data ( Destination, Line, Port, Room Group )',
         value: permissions.cruiseMasterData
+      },
+      {
+        title: 'Assign & Remove Manager(On Ship)',
+        value: permissions.cruiseUpdateManager
+      },
+      {
+        title: 'Add Rating(On Ship)',
+        value: permissions.cruiseUpdateHalalRatings
       },
       {
         title: 'Ship',
