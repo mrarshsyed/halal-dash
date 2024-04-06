@@ -1,10 +1,5 @@
 <template>
-  <v-dialog
-    v-model="dialog.show"
-    max-width="970"
-    persistent
-    scrollable
-  >
+  <v-dialog v-model="dialog.show" max-width="970" persistent scrollable>
     <v-card :title="dialog.title">
       <v-card-text>
         {{ dialog.content }}
@@ -24,8 +19,8 @@
                 :type="component?.type"
                 v-if="
                   component?.type === 'email' ||
-                    component?.type === 'text' ||
-                    component?.type === 'number'
+                  component?.type === 'text' ||
+                  component?.type === 'number'
                 "
                 :label="component?.label"
                 :required="component?.isRequired"
@@ -37,8 +32,8 @@
                 v-if="component?.type === 'select'"
                 :label="component?.label"
                 :items="component?.options ?? []"
-                item-title="title"
-                item-value="id"
+                :item-title="component?.itemTitle ?? 'title'"
+                :item-value="component?.itemValue ?? 'id'"
                 :multiple="component?.multiple"
                 :required="component?.isRequired"
                 :rules="
@@ -47,23 +42,27 @@
                     : []
                 "
                 v-model="component.value"
+                :return-object="component?.returnObject ?? false"
               />
               <TreeView
                 v-if="component?.type === 'treeview' && component?.show"
               />
-              <HtmlEditor
-                v-if="component?.type === 'html-editor'"
-              />
+              <HtmlEditor v-if="component?.type === 'html-editor'" />
               <Images
                 v-if="component?.type === 'images'"
                 :value="component?.value"
                 :label="component?.label"
                 :multiple="component?.multiple ?? true"
               />
-              
             </v-col>
             <v-col cols="12">
-              <NoteList v-if="dialog?.formComponents?.fields?.find((x)=>x?.type === 'note-list')" />
+              <NoteList
+                v-if="
+                  dialog?.formComponents?.fields?.find(
+                    (x) => x?.type === 'note-list'
+                  )
+                "
+              />
             </v-col>
           </v-row>
         </v-form>
@@ -78,12 +77,7 @@
         >
           {{ dialog.cancelText }}
         </v-btn>
-        <v-btn
-          @click="confirm"
-          class="px-4"
-          color="primary"
-          variant="elevated"
-        >
+        <v-btn @click="confirm" class="px-4" color="primary" variant="elevated">
           {{ dialog.confirmText }}
         </v-btn>
       </v-card-actions>

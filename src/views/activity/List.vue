@@ -38,10 +38,7 @@
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
-          <v-tooltip
-            text="Details"
-            location="top"
-          >
+          <v-tooltip text="Details" location="top">
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
@@ -172,10 +169,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignManager"
-          >
+          <v-btn color="primary" @click="onAssignManager">
             Assign Manager
           </v-btn>
         </v-card-actions>
@@ -187,17 +181,11 @@
         <v-card-text>
           <p>Select Rating</p>
           <v-row no-gutters>
-            <v-col
-              cols="12"
-              v-for="(r, index) in ratings"
-              :key="index"
-            >
-              <v-checkbox
-                v-model="selectedRatings"
-                :value="r"
-              >
+            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+              <v-checkbox v-model="selectedRatings" :value="r">
                 <template #label>
-                  {{ r?.name }} <v-chip class="ms-2">
+                  {{ r?.name }}
+                  <v-chip class="ms-2">
                     {{ r?.rating }}
                   </v-chip>
                 </template>
@@ -222,12 +210,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignRating"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -258,7 +241,6 @@ const selectedRatings = ref([])
 const managerSearch = ref('')
 const managerForm = ref()
 const assignRatingDialogShow = ref(false)
-
 
 const table_data = ref({
   loading: true,
@@ -413,7 +395,6 @@ const sumOfTotalRating = computed(() => {
 const ratingPercentage = computed(() => {
   return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
 })
-
 
 const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page

@@ -1,19 +1,13 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="4"
-      >
+      <v-col cols="12" md="4">
         <v-btn
           @click="showDialog"
           :disabled="current_percentage >= 100"
@@ -23,10 +17,7 @@
           + Add New Rating
         </v-btn>
       </v-col>
-      <v-col
-        cols="12"
-        class="d-flex justify-end"
-      >
+      <v-col cols="12" class="d-flex justify-end">
         <div class="d-flex flex-column ga-1">
           <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
           <p>
@@ -53,6 +44,9 @@
       <template #item.rating="{ item }">
         {{ item?.rating }}
       </template>
+      <template #item.category="{ item }">
+        {{ item?.category?.name }}
+      </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
           <v-icon
@@ -76,8 +70,16 @@
 const baseurl = 'admin/activity-halal-ratings'
 import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
-import axiosInstance from '@/plugins/axios'
 import axios from '@/plugins/axios'
+
+const categoryList = ref([])
+const getCategoryList = async () => {
+  await axios.get('admin/activity-halal-rating-categories').then((res) => {
+    if (res.data.length) {
+      categoryList.value = res.data
+    }
+  })
+}
 
 const ratingForm = ref({
   id: null,
@@ -88,6 +90,18 @@ const ratingForm = ref({
       label: 'Rating',
       isRequired: true,
       value: null
+    },
+    {
+      key: 'category',
+      type: 'select',
+      label: 'Select Category',
+      isRequired: true,
+      options: [],
+      value: null,
+      itemTitle: 'name',
+      itemValue: '_id',
+      multiple: false,
+      returnObject: true
     }
   ]
 })
@@ -105,7 +119,7 @@ const resetForm = async () => {
 const store = useAppStore()
 
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
-  await axiosInstance
+  await axios
     .get(baseurl, {
       page: page,
       itemsPerPage: itemsPerPage,
@@ -130,6 +144,7 @@ const table_data = ref({
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Rating', key: 'rating', align: 'start' },
+    { title: 'Category', key: 'category', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -149,22 +164,22 @@ const current_percentage = computed(() => {
 const maximum_percentage_reached = (rating, isUpdate = false) => {
   const total = isUpdate
     ? Number(current_percentage.value) - rating // Subtract the rating being updated
-    : Number(current_percentage.value) + Number(rating);
-  return total > 100;
-};
-
+    : Number(current_percentage.value) + Number(rating)
+  return total > 100
+}
 
 const saveRating = async () => {
-  const ratingField = store.dialog.formComponents?.fields[1];
-  const rating = ratingField?.value;
-  const isUpdate = !!ratingForm?.value?.id;
+  const ratingField = store.dialog.formComponents?.fields[1]
+  const rating = ratingField?.value
+  const isUpdate = !!ratingForm?.value?.id
   if (maximum_percentage_reached(rating, isUpdate)) {
-    store.showSnackbar('Maximum rating can be up to 100%', 'error');
-    return;
+    store.showSnackbar('Maximum rating can be up to 100%', 'error')
+    return
   }
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
-    rating: store.dialog.formComponents?.fields[1]?.value
+    rating: store.dialog.formComponents?.fields[1]?.value,
+    category: store.getFieldValue('category')
   }
   const response = !ratingForm?.value?.id
     ? await axios.post(baseurl, payload)
@@ -183,6 +198,7 @@ const saveRating = async () => {
 
 const showDialog = () => {
   resetForm()
+  ratingForm.value.fields[2].options = categoryList.value
   const dialogModal = {
     title: 'Add new rating',
     content: '',
@@ -196,9 +212,11 @@ const showDialog = () => {
 const onEdit = async (item) => {
   resetForm()
   store.setRatingDetails(item)
+  ratingForm.value.fields[2].options = categoryList.value
   ratingForm.value.id = item?._id
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
+  ratingForm.value.fields[2].value = item.category
   const dialogModal = {
     title: 'Update rating',
     content: '',
@@ -240,8 +258,8 @@ const onDelete = async (item) => {
   store.showDialog(dialogModal)
 }
 
-
 onMounted(async () => {
+  await getCategoryList()
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,
