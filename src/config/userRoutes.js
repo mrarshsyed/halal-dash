@@ -434,6 +434,22 @@ export const navLinks = [
     permissions: [permissions.cruiseMasterData],
     children: [
       {
+        icon: 'list-box',
+        title: 'Ratings Category',
+        to: '/cruise/ratings-category',
+        value: 'cruise-ratings-category',
+        role: ['super-admin'],
+        permissions: [permissions.cruiseHalalRatingCategory]
+      },
+      {
+        icon: 'star-box',
+        title: 'Ratings',
+        to: '/cruise/ratings',
+        value: 'cruise-ratings',
+        role: ['super-admin'],
+        permissions: [permissions.hotelHalalRating]
+      },
+      {
         icon: 'map-marker-radius',
         title: 'Destination',
         to: '/cruise/destination',
@@ -464,22 +480,6 @@ export const navLinks = [
         value: 'cruise-master-data-room-group',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseMasterData]
-      },
-      {
-        icon: 'list-box',
-        title: 'Ratings Category',
-        to: '/cruise/ratings-category',
-        value: 'cruise-ratings-category',
-        role: ['super-admin'],
-        permissions: [permissions.cruiseHalalRatingCategory]
-      },
-      {
-        icon: 'star-box',
-        title: 'Ratings',
-        to: '/cruise/ratings',
-        value: 'cruise-ratings',
-        role: ['super-admin'],
-        permissions: [permissions.hotelHalalRating]
       },
       {
         icon: 'ferry',

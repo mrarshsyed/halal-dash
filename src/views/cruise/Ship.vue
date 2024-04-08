@@ -643,7 +643,7 @@ const onAssignRating = async () => {
     return x._id
   })
   axios
-    .patch(`admin/ships/${store.details?._id}/update-halal-ratings`, {
+    .patch(`admin/cruise/ships/${store.details?._id}/update-halal-ratings`, {
       ratingIds: ids
     })
     .then(async (res) => {
