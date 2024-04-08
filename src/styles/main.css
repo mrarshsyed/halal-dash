@@ -9,13 +9,20 @@
 .lp-3 {
   text-indent: 4px;
 }
+
 .v-list-group__items .v-list-item {
   padding-inline-start: 4px;
 }
+
 .ql-container {
   min-height: 300px;
 }
-.v-overlay__scrim{
+
+.v-overlay__scrim {
   opacity: 0.9 !important;
   background: none;
+}
+
+.v-data-table-footer__items-per-page>.v-select {
+  width: 120px;
 }

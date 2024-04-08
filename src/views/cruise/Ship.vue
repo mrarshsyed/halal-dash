@@ -1,16 +1,31 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
-    <v-col cols="12" md="8">
+  <v-row
+    class="mb-4"
+    v-if="!formMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary"> + Add New Ship </v-btn>
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
+        + Add New Ship
+      </v-btn>
     </v-col>
     <v-col cols="12">
-      <v-data-table
+      <v-data-table-server
         density="compact"
         :items-per-page="table_data.itemsPerPage"
         :headers="table_data.headers"
@@ -20,12 +35,23 @@
         :items-per-page-options="table_data.itemsPerPageOption"
         :page="table_data.page"
         show-current-page
+        @update:options="loadItems"
       >
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
         <template #item.rating="{ item }">
           {{ item?.halal_ratings_percentage }}
+        </template>
+        <template #item.manager="{ item }">
+          {{ item?.manager?.email }}
+        </template>
+        <template #item.manager_name="{ item }">
+          {{
+            item?.manager?.name
+              ? item?.manager?.name
+              : store.getUserName(item?.manager?.email)
+          }}
         </template>
         <template #item.ship_line="{ item }">
           {{ item?.shipLine?.name ?? '-' }}
@@ -45,6 +71,33 @@
                 />
               </template>
             </v-tooltip>
+            <v-tooltip
+              v-if="store.hasPermission(permissions.cruiseUpdateManager)"
+              text="Assign Manager"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  @click="handelAssignManagerIconClick(item)"
+                  icon="mdi-cog"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              v-if="store.hasPermission(permissions.cruiseUpdateManager)"
+              text="Remove Manager"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  v-if="item?.manager?.email"
+                  @click="handelRemoveManagerIconClick(item)"
+                  icon="mdi-link-off"
+                />
+              </template>
+            </v-tooltip>
             <v-icon
               class="cursor-pointer"
               @click="onEdit(item)"
@@ -59,10 +112,14 @@
             </v-icon>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -75,7 +132,10 @@
           {{ id ? 'Update Ship' : 'Create New Ship' }}
         </h3>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -83,7 +143,10 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Line"
@@ -98,7 +161,10 @@
 
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
       </v-col>
       <v-col cols="12">
         <ImageUploader
@@ -138,8 +204,14 @@
           <v-expansion-panel title="Rooms">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('rooms')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('rooms')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -149,7 +221,10 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div class="text-right mb-4" v-if="formData.rooms.length > 1">
+                  <div
+                    class="text-right mb-4"
+                    v-if="formData.rooms.length > 1"
+                  >
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -202,8 +277,14 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('highlights')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -253,10 +334,18 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/ship')">
+          <v-btn
+            color="error"
+            @click="router.push('/cruise/ship')"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="saveShip"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="saveShip"
+          >
+            Save
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -266,8 +355,15 @@
       <v-card-title>Select Rating</v-card-title>
       <v-card-text>
         <v-row no-gutters>
-          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-            <v-checkbox v-model="selectedRatings" :value="r">
+          <v-col
+            cols="12"
+            v-for="(r, index) in ratings"
+            :key="index"
+          >
+            <v-checkbox
+              v-model="selectedRatings"
+              :value="r"
+            >
               <template #label>
                 {{ r?.name }}
                 <v-chip class="ms-2">
@@ -295,7 +391,57 @@
         >
           Close
         </v-btn>
-        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignRating"
+        >
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="assignManagerDialogShow">
+    <v-card>
+      <v-card-title>Assign Manager</v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col cols="12">
+            <v-form ref="managerForm">
+              <v-autocomplete
+                label="Select Manager"
+                no-data-text="Hit enter to create"
+                @update:search="onManagerSearch"
+                :items="managers"
+                item-title="email"
+                return-object
+                v-model="selectedManager"
+                @keydown.enter="onManagerCreate"
+                required
+                :rules="[(v) => !!v || `Manager is required`]"
+              />
+            </v-form>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          color="error"
+          @click="
+            () => {
+              selectedManager = null
+              assignManagerDialogShow = false
+            }
+          "
+        >
+          Close
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignManager"
+        >
+          Assign Manager
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -320,6 +466,8 @@ const docKey = ref(1)
 const roomKey = ref(3)
 const highlightsKey = ref(5)
 const panel = ref([0])
+const managerForm = ref()
+const selectedManager = ref(null)
 
 const id = computed(() => {
   return route?.query?.id
@@ -335,13 +483,15 @@ const table_data = ref({
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Rating(%)', key: 'rating', align: 'start' },
+    { title: 'Manager Name', key: 'manager_name', align: 'start' },
+    { title: 'Manager Email', key: 'manager', align: 'start' },
     { title: 'Ship Line', key: 'ship_line', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
     { value: 10, title: '10' },
-    { value: 100, title: '20' },
-    { value: -1, title: 'All' }
+    { value: 20, title: '20' },
+    { value: 'all', title: 'All' }
   ]
 })
 
@@ -416,6 +566,8 @@ const showForm = ref(false)
 const ratings = ref([])
 const selectedRatings = ref([])
 const assignRatingDialogShow = ref(false)
+const assignManagerDialogShow = ref(false)
+const managerSearch = ref('')
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
@@ -569,15 +721,23 @@ const onRoomImageUpdate = (images, index) => {
 const onHighlightsImageUpdate = (images, index) => {
   formData.value.highlights[index].uploads = images
 }
-const loadItems = async () => {
-  await axios.get('admin/cruise/ships').then((res) => {
-    if (res?.data?.length) {
-      table_data.value.serverItems = res?.data
-      table_data.value.totalItems = res?.data?.length
-    }
-  })
+const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+  await axios
+    .get('admin/cruise/ships', {
+      params: {
+        page: page,
+        perPage: itemsPerPage
+      }
+    })
+    .then((res) => {
+      console.log(res)
+      table_data.value.serverItems = res?.data?.data
+      table_data.value.totalItems = res?.data?.data.length
+    })
 }
-
+const managers = computed(() => {
+  return store.managers
+})
 const confirmDelete = async () => {
   await axios
     .delete(`admin/cruise/ships/${store.details?._id}`)
@@ -599,6 +759,14 @@ const onDelete = (item) => {
   store.showDialog(dialogModal)
 }
 onBeforeMount(async () => {
+  if (store.hasPermission(permissions.userList)) {
+    await axios.get('admin/users').then((res) => {
+      if (res?.data?.length) {
+        const managerList = res?.data?.filter((x) => x?.role === 'manager')
+        store.setManager(managerList)
+      }
+    })
+  }
   if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
     await axios.get('admin/cruise-halal-ratings').then((res) => {
       if (res?.data?.length) {
@@ -608,7 +776,6 @@ onBeforeMount(async () => {
   }
   await getLines()
   await getRoomGroups()
-  await loadItems()
   if (
     id.value &&
     table_data.value.serverItems?.find((x) => x?._id === id.value)
@@ -657,6 +824,95 @@ const onAssignRating = async () => {
       assignRatingDialogShow.value = false
       selectedRatings.value = []
     })
+}
+const onManagerSearch = (data) => {
+  managerSearch.value = data
+}
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email)
+}
+const onManagerCreate = async () => {
+  if (
+    managerSearch.value &&
+    !managers.value?.some((m) => m?.email?.includes(managerSearch.value))
+  ) {
+    const valid = validateEmail(managerSearch.value.trim())
+    if (valid) {
+      await store
+        .createUser(managerSearch.value, 'manager')
+        .then(async (res) => {
+          if (res?.status === 200) {
+            selectedManager.value = res?.data
+            await loadItems({
+              page: table_data.value.page,
+              itemsPerPage: table_data.value.itemsPerPage,
+              sortBy: 'ascending'
+            })
+            store.showSnackbar('Invitation sent Successfully')
+          }
+        })
+    } else {
+      store.showSnackbar('Email must be valid', 'error')
+    }
+  }
+}
+const onAssignManager = async () => {
+  managerForm.value.validate()
+  if (!managerForm?.value?.isValid) return
+  axios
+    .patch(`admin/cruise/ships/${store.details?._id}/update-manager`, {
+      managerId: selectedManager.value?._id
+    })
+    .then(async (res) => {
+      if (res?.status === 200) {
+        store.showSnackbar('Manager assigned successfully')
+        await loadItems({
+          page: table_data.value.page,
+          itemsPerPage: table_data.value.itemsPerPage,
+          sortBy: 'ascending'
+        })
+        selectedManager.value = ''
+        assignManagerDialogShow.value = false
+      }
+    })
+}
+const handelAssignManagerIconClick = (item) => {
+  store.setDetails(item)
+  if (item?.manager?._id) {
+    selectedManager.value = item?.manager
+  }
+  assignManagerDialogShow.value = true
+}
+const removeManager = async () => {
+  await axios
+    .patch(`admin/cruise/ships/${store.details?._id}/update-manager`, {
+      managerId: null
+    })
+    .then(async (res) => {
+      if (res?.status === 200) {
+        store.showSnackbar('Manager removed successfully')
+        await loadItems({
+          page: table_data.value.page,
+          itemsPerPage: table_data.value.itemsPerPage,
+          sortBy: 'ascending'
+        })
+        store.closeDialog()
+      }
+    })
+}
+const handelRemoveManagerIconClick = (item) => {
+  store.setDetails(item)
+  const dialogModal = {
+    title: 'Remove Manager',
+    content: `Are you sure you want to remove ${
+      item?.manager?.name ?? item?.manager?.email
+    } from ${item?.name} ?`,
+    confirmText: 'Remove Manager',
+    formComponents: [],
+    confirmFunction: removeManager
+  }
+  store.showDialog(dialogModal)
 }
 </script>
 
