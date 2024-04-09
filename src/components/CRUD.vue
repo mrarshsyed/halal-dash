@@ -27,9 +27,6 @@
       <template #item.name="{ item }">
         {{ item?.name }}
       </template>
-      <template #item.description="{ item }">
-        {{ item?.description ?? '-' }}
-      </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
           <v-icon
@@ -154,7 +151,6 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Description', key: 'description', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -243,7 +239,7 @@ const onEdit = async (item) => {
     title: `Update ${feature.value}`,
     content: '',
     confirmText: 'Save',
-    formComponents: {...form.value},
+    formComponents: { ...form.value },
     confirmFunction: saveFormData
   }
   if (feature.value === 'Port') {
@@ -252,7 +248,7 @@ const onEdit = async (item) => {
       md: 12,
       key: 'note-list',
       type: 'note-list',
-      value: item?.notes?.length ? item?.notes : [] ,
+      value: item?.notes?.length ? item?.notes : [],
       update: item.notes
     }
   }
