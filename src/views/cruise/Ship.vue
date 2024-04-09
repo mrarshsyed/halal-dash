@@ -1,28 +1,13 @@
 <template>
-  <v-row
-    class="mb-4"
-    v-if="!formMode"
-  >
-    <v-col
-      cols="12"
-      md="8"
-    >
+  <v-row class="mb-4" v-if="!formMode">
+    <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col
-      cols="12"
-      md="4"
-    >
-      <v-btn
-        @click="onCreate"
-        block
-        color="primary"
-      >
-        + Add New Ship
-      </v-btn>
+    <v-col cols="12" md="4">
+      <v-btn @click="onCreate" block color="primary"> + Add New Ship </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table-server
@@ -115,11 +100,7 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form
-    v-model="formValue"
-    ref="form"
-    v-else-if="formMode"
-  >
+  <v-form v-model="formValue" ref="form" v-else-if="formMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -132,10 +113,7 @@
           {{ id ? 'Update Ship' : 'Create New Ship' }}
         </h3>
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -143,10 +121,7 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Line"
@@ -161,10 +136,7 @@
 
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.description"
-        />
+        <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <v-col cols="12">
         <ImageUploader
@@ -204,14 +176,8 @@
           <v-expansion-panel title="Rooms">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('rooms')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('rooms')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -221,10 +187,7 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div
-                    class="text-right mb-4"
-                    v-if="formData.rooms.length > 1"
-                  >
+                  <div class="text-right mb-4" v-if="formData.rooms.length > 1">
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -277,14 +240,8 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('highlights')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('highlights')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -334,18 +291,10 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn
-            color="error"
-            @click="router.push('/cruise/ship')"
-          >
+          <v-btn color="error" @click="router.push('/cruise/ship')">
             Cancel
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="saveShip"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="saveShip"> Save </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -355,15 +304,8 @@
       <v-card-title>Select Rating</v-card-title>
       <v-card-text>
         <v-row no-gutters>
-          <v-col
-            cols="12"
-            v-for="(r, index) in ratings"
-            :key="index"
-          >
-            <v-checkbox
-              v-model="selectedRatings"
-              :value="r"
-            >
+          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+            <v-checkbox v-model="selectedRatings" :value="r">
               <template #label>
                 {{ r?.name }}
                 <v-chip class="ms-2">
@@ -391,12 +333,7 @@
         >
           Close
         </v-btn>
-        <v-btn
-          color="primary"
-          @click="onAssignRating"
-        >
-          Save
-        </v-btn>
+        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -436,12 +373,7 @@
         >
           Close
         </v-btn>
-        <v-btn
-          color="primary"
-          @click="onAssignManager"
-        >
-          Assign Manager
-        </v-btn>
+        <v-btn color="primary" @click="onAssignManager"> Assign Manager </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -534,24 +466,28 @@ const initialFormData = {
   highlights: [
     {
       name: 'Food & Dining',
-      description: 'Food and Dining description',
+      description: '',
+      uploads: [],
+      images: []
+    },
+    {
+      name: 'Accommodation',
+      description: '',
+      uploads: [],
+      images: []
+    },
+    {
+      name: 'Onboard Activities and Entertainment',
+      description: '',
       uploads: [],
       images: []
     }
-    // {
-    //   name: 'Accommodation',
-    //   description: 'Accommodation description', uploads: []
-    // },
-    // {
-    //   name: 'Onboard Activities and Entertainment',
-    //   description: 'Onboard Activities and Entertainment description', uploads: []
-    // }
   ],
   rooms: [
     {
       roomGroup: null,
-      name: 'Room 1',
-      description: 'Room 1 description',
+      name: null,
+      description: '',
       uploads: [],
       images: []
     }

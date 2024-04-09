@@ -1,28 +1,13 @@
 <template>
-  <v-row
-    class="mb-4"
-    v-if="!formMode"
-  >
-    <v-col
-      cols="12"
-      md="8"
-    >
+  <v-row class="mb-4" v-if="!formMode">
+    <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col
-      cols="12"
-      md="4"
-    >
-      <v-btn
-        @click="onCreate"
-        block
-        color="primary"
-      >
-        + Add New Package
-      </v-btn>
+    <v-col cols="12" md="4">
+      <v-btn @click="onCreate" block color="primary"> + Add New Package </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table
@@ -71,11 +56,7 @@
       </v-data-table>
     </v-col>
   </v-row>
-  <v-form
-    v-model="formValue"
-    ref="form"
-    v-else-if="formMode"
-  >
+  <v-form v-model="formValue" ref="form" v-else-if="formMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -89,10 +70,7 @@
         </h3>
       </v-col>
       <!-- name -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -101,10 +79,7 @@
         />
       </v-col>
       <!-- currency -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Currency"
@@ -118,14 +93,8 @@
         />
       </v-col>
       <!-- start date -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-menu
-          v-model="startDateMenu"
-          :close-on-content-click="false"
-        >
+      <v-col cols="12" md="6">
+        <v-menu v-model="startDateMenu" :close-on-content-click="false">
           <template #activator="{ props }">
             <v-text-field
               label="Start Date"
@@ -144,10 +113,7 @@
         </v-menu>
       </v-col>
       <!-- end date -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-menu
           :disabled="!formData.startDate"
           v-model="endDateMenu"
@@ -173,10 +139,7 @@
         </v-menu>
       </v-col>
       <!-- destination -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Destinations"
@@ -194,10 +157,7 @@
         />
       </v-col>
       <!-- start location -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Start Location"
@@ -210,10 +170,7 @@
         />
       </v-col>
       <!-- end location -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select End Location"
@@ -226,10 +183,7 @@
         />
       </v-col>
       <!-- Ship -->
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Ship"
@@ -245,10 +199,7 @@
       <!-- description -->
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.description"
-        />
+        <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <!-- images  -->
       <v-col cols="12">
@@ -362,9 +313,7 @@
             <v-expansion-panel-text>
               <v-row>
                 <v-col v-if="!formData.prices?.length">
-                  <div class="text-center pa-4 border">
-                    Select ship first
-                  </div>
+                  <div class="text-center pa-4 border">Select ship first</div>
                 </v-col>
                 <v-col
                   v-else
@@ -402,14 +351,8 @@
           <v-expansion-panel title="Highlights">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('highlights')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('highlights')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -445,7 +388,8 @@
                   <ImageUploader
                     :value="highlight.uploads"
                     @update="(data) => onHighlightsImageUpdate(data, indexH)"
-                    @update-image-link="(data) => onUpdateImageLinks('highlights', indexH, data)
+                    @update-image-link="
+                      (data) => onUpdateImageLinks('highlights', indexH, data)
                     "
                     :image-list="highlight?.images ?? []"
                     :key="highlightsKey"
@@ -458,14 +402,8 @@
           <v-expansion-panel title="Policies">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('policies')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('policies')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -506,18 +444,10 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn
-            color="error"
-            @click="router.push('/cruise/package')"
-          >
+          <v-btn color="error" @click="router.push('/cruise/package')">
             Cancel
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="save"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="save"> Save </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -531,8 +461,7 @@ import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import ImageUploader from './components/ImageUploader.vue'
 import { useAppStore } from '@/store/app'
-import { startOfDay, setHours, setMinutes } from 'date-fns';
-
+import { startOfDay, setHours, setMinutes } from 'date-fns'
 
 const store = useAppStore()
 const route = useRoute()
@@ -593,7 +522,7 @@ const initialFormData = {
   itinerary: [],
   uploads: [],
   images: [],
-  prices: [],
+  prices: []
 }
 
 const formData = ref(initialFormData)
@@ -611,12 +540,12 @@ const startDateMenu = ref(false)
 const endDateMenu = ref(false)
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const year = date.getFullYear();
-  return `${month < 10 ? '0' : ''}${month}/${day < 10 ? '0' : ''}${day}/${year}`;
-};
+  const date = new Date(dateString)
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const year = date.getFullYear()
+  return `${month < 10 ? '0' : ''}${month}/${day < 10 ? '0' : ''}${day}/${year}`
+}
 const onEdit = (item) => {
   router.push(`/cruise/package?mode=form&id=${item?._id}`)
 }
@@ -695,40 +624,43 @@ const RemoveItem = async (name, index) => {
 }
 const convertTimeToDate = (time, target_date) => {
   const [hour, min] = time.split(':')
-  let date = startOfDay(new Date(target_date));
-  date = setHours(date, hour);
+  let date = startOfDay(new Date(target_date))
+  date = setHours(date, hour)
   date = setMinutes(date, min)
   return date.toISOString()
 }
-const convertDateToTime =(date)=>{
-  const dateObject  = new Date(date);
-  const hours = dateObject.getUTCHours().toString().padStart(2, '0'); // Get hours and pad with leading zero if necessary
-const minutes = dateObject.getUTCMinutes().toString().padStart(2, '0'); // Get minutes and pad with leading zero if necessary
+const convertDateToTime = (date) => {
+  const dateObject = new Date(date)
+  const hours = dateObject.getUTCHours().toString().padStart(2, '0') // Get hours and pad with leading zero if necessary
+  const minutes = dateObject.getUTCMinutes().toString().padStart(2, '0') // Get minutes and pad with leading zero if necessary
   return `${hours}:${minutes}`
 }
 const removeUploads = (obj) => {
-  let data = JSON.parse(JSON.stringify(obj));
+  let data = JSON.parse(JSON.stringify(obj))
   delete data.uploads
-  data?.highlights.forEach(element => {
+  data?.highlights.forEach((element) => {
     if (element.uploads?.length) {
       delete element.uploads
     }
-  });
-  data?.prices.forEach(element => {
+  })
+  data?.prices.forEach((element) => {
     element.room.roomGroup = element.room.roomGroup._id
-  });
-  let startDate = new Date(data.startDate).toISOString();
-  let endDate = new Date(data.endDate).toISOString();
-  data.startDate = startDate;
-  data.endDate = endDate;
-  data.itinerary?.forEach(element => {
-    element.date = new Date(element.date).toISOString();
+  })
+  let startDate = new Date(data.startDate).toISOString()
+  let endDate = new Date(data.endDate).toISOString()
+  data.startDate = startDate
+  data.endDate = endDate
+  data.itinerary?.forEach((element) => {
+    element.date = new Date(element.date).toISOString()
     element.arrivalTime = convertTimeToDate(element.arrivalTime, element.date)
-    element.departureTime = convertTimeToDate(element.departureTime, element.date)
-  });
-  console.log(data);
+    element.departureTime = convertTimeToDate(
+      element.departureTime,
+      element.date
+    )
+  })
+  console.log(data)
   return data
-};
+}
 const getFilesPayload = () => {
   const files = []
   const fileMapper = []
@@ -787,8 +719,7 @@ const save = async () => {
       store.showSnackbar('Successfully Saved')
       router.push({ name: 'cruise-package' })
     }
-  }
-  else {
+  } else {
     panel.value = [0, 1]
   }
 }
@@ -800,7 +731,6 @@ const onHighlightsImageUpdate = (images, index) => {
 }
 const loadItems = async () => {
   await axios.post('admin/cruise/packages-list').then((res) => {
-
     if (res?.data?.data?.length) {
       table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.length
@@ -835,28 +765,33 @@ const onUpdateImageLinks = (key, index, data) => {
 }
 const onShipSelect = (data) => {
   const ship = shipList.value.find((x) => x?._id === data)
-  formData.value.highlights = [...formData.value.highlights, ...ship.highlights],
-    formData.value.prices = ship.rooms?.map((r) => {
+  ;(formData.value.highlights = [
+    ...formData.value.highlights,
+    ...ship.highlights
+  ]),
+    (formData.value.prices = ship.rooms?.map((r) => {
       return {
         room: r,
-        price: null,
+        price: null
       }
-    })
+    }))
 }
 const getDateRange = (firstDate, lastDate) => {
-  const start = new Date(firstDate.toUTCString());
-  const end = new Date(lastDate.toUTCString());
-  const timeDifference = end.getTime() - start.getTime();
-  const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
-  return numberOfDays;
+  const start = new Date(firstDate.toUTCString())
+  const end = new Date(lastDate.toUTCString())
+  const timeDifference = end.getTime() - start.getTime()
+  const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24))
+  return numberOfDays
 }
 const onEndDateSelect = (endDate) => {
-  console.log(formData.value.startDate);
+  console.log(formData.value.startDate)
   if (formData.value.startDate && endDate) {
     const numberOfDays = getDateRange(formData.value.startDate, endDate)
     formData.value.itinerary = [...Array(numberOfDays + 1).keys()].map((x) => {
       return {
-        date: new Date(formData.value.startDate.getTime() + x * 24 * 60 * 60 * 1000),
+        date: new Date(
+          formData.value.startDate.getTime() + x * 24 * 60 * 60 * 1000
+        ),
         port: null,
         description: '',
         arrivalTime: null,
@@ -878,15 +813,17 @@ onBeforeMount(async () => {
   if (id.value) {
     await axios.get(`user/cruise/packages/${id.value}`).then((res) => {
       if (res?.data) {
-        res.data.startDate = new Date(res.data.startDate);
-        res.data.endDate = new Date(res.data.endDate);
-        res?.data?.itinerary.forEach(element => {
+        res.data.startDate = new Date(res.data.startDate)
+        res.data.endDate = new Date(res.data.endDate)
+        res?.data?.itinerary.forEach((element) => {
           element.date = new Date(element.date)
           element.arrivalTime = convertDateToTime(element.arrivalTime)
           element.departureTime = convertDateToTime(element.departureTime)
           element.port = element.port._id
-        });
-        res.data.destinations = res.data?.destinations.map((x)=> { return x._id})
+        })
+        res.data.destinations = res.data?.destinations.map((x) => {
+          return x._id
+        })
         res.data.startLocation = res.data?.startLocation?._id
         res.data.endLocation = res.data?.endLocation?._id
         res.data.ship = res?.data?.ship._id
