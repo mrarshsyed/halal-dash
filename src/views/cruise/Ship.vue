@@ -149,7 +149,7 @@
       <!-- facts -->
       <v-col cols="12">
         <v-expansion-panels>
-          <v-expansion-panel title="Facts">
+          <v-expansion-panel title="Ship Facts">
             <v-expansion-panel-text>
               <v-row>
                 <v-col
@@ -237,7 +237,7 @@
       <!-- highlights -->
       <v-col cols="12">
         <v-expansion-panels>
-          <v-expansion-panel title="Highlights">
+          <v-expansion-panel title="What's Included?">
             <v-expansion-panel-text>
               <v-row>
                 <v-col cols="12" class="text-right">

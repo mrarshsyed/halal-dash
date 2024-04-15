@@ -16,6 +16,9 @@
       <template #item.package="{ item }">
         {{ item?.package?.name }}
       </template>
+      <template #item.user_name="{ item }">
+        {{ item?.name }}
+      </template>
       <template #item.user="{ item }">
         {{ item?.email }}
       </template>
@@ -24,6 +27,33 @@
       </template>
       <template #item.sailingDate="{ item }">
         {{ format(new Date(item?.preferredSailingDate), 'dd MMM yyyy') ?? '-' }}
+      </template>
+      <template #item.note="{ item }">
+        {{ item?.note }}
+      </template>
+      <template #item.guests="{ item }">
+        <div class="d-block" style="width: max-content">
+          <p>Adults : {{ item?.guests?.adults }}</p>
+          <p>Children : {{ item?.guests?.children?.length }}</p>
+          <p>Children Ages: {{ item?.guests?.children?.toString() }}</p>
+          <p>Over 55 age guest : {{ item?.oneGuestOver55 ? 'Yes' : 'No' }}</p>
+        </div>
+      </template>
+      <template #item.room="{ item }">
+        <div class="d-block" style="width: max-content">
+          <v-card
+            v-for="(r, i) in item?.preferredRooms"
+            :key="i"
+            class="mb-2 pa-2"
+          >
+            <p>Name : {{ r?.room?.name }}</p>
+            <p>Room Group : {{ r?.room?.roomGroup }}</p>
+            <p>Price : {{ r?.price }}</p>
+          </v-card>
+        </div>
+      </template>
+      <template #item.port="{ item }">
+        {{ item?.preferredDeparturePort?.name }}
       </template>
     </v-data-table-server>
   </div>
@@ -43,9 +73,16 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Package', key: 'package', align: 'start' },
-    { title: 'User', key: 'user', align: 'start' },
+    { title: 'User Name', key: 'user_name', align: 'start' },
+    { title: 'User Email', key: 'user', align: 'start' },
     { title: 'Contact Number', key: 'contactNumber', align: 'start' },
-    { title: 'Sailing Date', key: 'sailingDate', align: 'start' }
+    { title: 'Sailing Date', key: 'sailingDate', align: 'start' },
+    { title: 'Preference', key: 'note', align: 'start' },
+    { title: 'Guests', key: 'guests', align: 'start' },
+    { title: 'Counter', key: 'country', align: 'start' },
+    { title: 'Status', key: 'status', align: 'start' },
+    { title: 'Room', key: 'room', align: 'start' },
+    { title: 'Port', key: 'port', align: 'start' }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },
