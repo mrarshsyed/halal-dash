@@ -666,7 +666,6 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       }
     })
     .then((res) => {
-      console.log(res)
       table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.data.length
     })
@@ -712,17 +711,15 @@ onBeforeMount(async () => {
   }
   await getLines()
   await getRoomGroups()
-  if (
-    id.value &&
-    table_data.value.serverItems?.find((x) => x?._id === id.value)
-  ) {
-    formData.value = table_data.value.serverItems?.find(
-      (x) => x?._id === id.value
-    )
-    formData.value.shipLine = formData.value.shipLine._id
-    formData.value.rooms.forEach((element) => {
-      element.roomGroup = element.roomGroup._id
-    })
+  if (id.value) {
+    const details = await axios.get(`admin/cruise/ships/${id.value}`)
+    if (details?.data?._id) {
+      formData.value = details.data
+      formData.value.shipLine = formData.value.shipLine._id
+      formData.value.rooms.forEach((element) => {
+        element.roomGroup = element.roomGroup._id
+      })
+    }
   }
   showForm.value = true
 })
