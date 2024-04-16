@@ -1,5 +1,5 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
+  <v-row class="mb-4" v-if="!formMode && !detailsMode">
     <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
@@ -85,14 +85,15 @@
             </v-tooltip>
             <v-icon
               class="cursor-pointer"
+              @click="onDetails(item)"
+              icon="mdi-eye"
+            />
+            <v-icon
+              class="cursor-pointer"
               @click="onEdit(item)"
               icon="mdi-pencil-box"
             />
-            <v-icon
-              @click="onDelete(item)"
-              color="error"
-              class="cursor-pointer"
-            >
+            <v-icon @click="onDelete(item)" class="cursor-pointer">
               mdi-delete
             </v-icon>
           </div>
@@ -100,7 +101,7 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode">
+  <v-form v-model="formValue" ref="form" v-else-if="formMode && !detailsMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -299,6 +300,102 @@
       </v-col>
     </v-row>
   </v-form>
+  <div v-if="!formMode && detailsMode">
+    <v-btn
+      class="mb-4"
+      size="x-small"
+      color="primary"
+      icon="mdi-arrow-left"
+      @click="router.push('/cruise/ship')"
+    />
+    <p class="mb-4">Ship Name : {{ detailsData?.name }}</p>
+    <p class="mb-4">Ship Line : {{ detailsData?.shipLine?.name }}</p>
+    <p class="mb-2">Description :</p>
+    <div class="mb-4" v-html="detailsData?.description" />
+    <p class="mb-2">Images :</p>
+    <v-row class="mb-4">
+      <v-col
+        cols="12"
+        sm="2"
+        md="3"
+        lg="4"
+        xl="5"
+        xxl="6"
+        v-for="(i, index) in detailsData?.images"
+        :key="index"
+      >
+        <v-img cover :src="i" height="150" class="rounded" />
+      </v-col>
+    </v-row>
+    <p class="mb-2">Ship Facts :</p>
+    <v-row class="mb-4">
+      <v-col
+        v-for="(value, key) in detailsData?.facts"
+        :key="key"
+        cols="12"
+        sm="4"
+        md="3"
+      >
+        <p>{{ formatLabel(key) }} : {{ detailsData.facts[key] }}</p>
+      </v-col>
+    </v-row>
+    <p class="mb-2">Rooms :</p>
+    <v-row class="mb-4">
+      <v-col
+        v-for="(room, key) in detailsData?.rooms"
+        :key="key"
+        cols="12"
+        sm="6"
+      >
+        <v-card>
+          <v-card-text>
+            <p>Room Group : {{ room?.roomGroup?.name }}</p>
+            <p class="mb-4">Name : {{ room?.name }}</p>
+            <p class="mb-2">Description :</p>
+            <div class="mb-4" v-html="room?.description" />
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+                v-for="(i, index) in room?.images"
+                :key="index"
+              >
+                <v-img cover :src="i" height="150" class="rounded" />
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <p class="mb-2">What's included? :</p>
+    <v-row class="mb-4">
+      <v-col
+        v-for="(room, key) in detailsData?.highlights"
+        :key="key"
+        cols="12"
+        sm="6"
+      >
+        <v-card>
+          <v-card-text>
+            <p class="mb-4">Name : {{ room?.name }}</p>
+            <p class="mb-2">Description :</p>
+            <div class="mb-4" v-html="room?.description" />
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+                v-for="(i, index) in room?.images"
+                :key="index"
+              >
+                <v-img cover :src="i" height="150" class="rounded" />
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
   <v-dialog v-model="assignRatingDialogShow">
     <v-card>
       <v-card-title>Select Rating</v-card-title>
@@ -393,6 +490,9 @@ const route = useRoute()
 const router = useRouter()
 const formMode = computed(() => {
   return route?.query?.mode === 'form'
+})
+const detailsMode = computed(() => {
+  return route?.query?.mode === 'details'
 })
 const docKey = ref(1)
 const roomKey = ref(3)
@@ -504,6 +604,7 @@ const selectedRatings = ref([])
 const assignRatingDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
 const managerSearch = ref('')
+const detailsData = ref({})
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
@@ -515,6 +616,9 @@ const onRatingIconClick = async (item) => {
 
 const onEdit = (item) => {
   router.push(`/cruise/ship?mode=form&id=${item?._id}`)
+}
+const onDetails = (item) => {
+  router.push(`/cruise/ship?mode=details&id=${item?._id}`)
 }
 const getLines = async () => {
   await axios.get('admin/cruise/ship-lines').then((res) => {
@@ -714,11 +818,15 @@ onBeforeMount(async () => {
   if (id.value) {
     const details = await axios.get(`admin/cruise/ships/${id.value}`)
     if (details?.data?._id) {
-      formData.value = details.data
-      formData.value.shipLine = formData.value.shipLine._id
-      formData.value.rooms.forEach((element) => {
-        element.roomGroup = element.roomGroup._id
-      })
+      if (formMode.value) {
+        formData.value = { ...details?.data }
+        formData.value.shipLine = formData.value.shipLine._id
+        formData.value.rooms.forEach((element) => {
+          element.roomGroup = element.roomGroup._id
+        })
+      } else if (detailsMode.value) {
+        detailsData.value = { ...details?.data }
+      }
     }
   }
   showForm.value = true
