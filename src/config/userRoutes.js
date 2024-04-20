@@ -498,7 +498,7 @@ export const navLinks = [
         permissions: [permissions.cruisePackage]
       },
       {
-        icon: 'package-variant',
+        icon: 'chat-question',
         title: 'Enquiry',
         to: '/cruise/enquiry',
         value: 'cruise-enquiry',
