@@ -1,13 +1,28 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
-    <v-col cols="12" md="8">
+  <v-row
+    class="mb-4"
+    v-if="!formMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary"> + Add New Package </v-btn>
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
+        + Add New Package
+      </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table
@@ -56,7 +71,11 @@
       </v-data-table>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -70,7 +89,10 @@
         </h3>
       </v-col>
       <!-- name -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -79,7 +101,10 @@
         />
       </v-col>
       <!-- currency -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Currency"
@@ -93,8 +118,14 @@
         />
       </v-col>
       <!-- start date -->
-      <v-col cols="12" md="6">
-        <v-menu v-model="startDateMenu" :close-on-content-click="false">
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-menu
+          v-model="startDateMenu"
+          :close-on-content-click="false"
+        >
           <template #activator="{ props }">
             <v-text-field
               label="Start Date"
@@ -113,7 +144,10 @@
         </v-menu>
       </v-col>
       <!-- end date -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-menu
           :disabled="!formData.startDate"
           v-model="endDateMenu"
@@ -139,7 +173,10 @@
         </v-menu>
       </v-col>
       <!-- destination -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Destinations"
@@ -157,7 +194,10 @@
         />
       </v-col>
       <!-- start location -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Start Location"
@@ -170,7 +210,10 @@
         />
       </v-col>
       <!-- end location -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select End Location"
@@ -183,7 +226,10 @@
         />
       </v-col>
       <!-- Ship -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Ship"
@@ -257,7 +303,9 @@
                       prepend-inner-icon="mdi-clock-time-four-outline"
                       readonly
                       required
-                      :rules="[(v) => !!v || 'Arrival Time is required']"
+                      :rules="[(v) => {
+                        return indexI > 0 ? !!v || 'Arrival time is required' : true;
+                      }]"
                     >
                       <v-menu
                         v-model="itinerary.arrivalTimeMenu"
@@ -280,6 +328,10 @@
                       label="Departure Time"
                       prepend-inner-icon="mdi-clock-time-four-outline"
                       readonly
+                      :rules="[(v) => {
+                        // Departure time is required for all except the last itinerary item
+                        return indexI < formData.itinerary.length - 1 ? !!v || 'Departure time is required' : true;
+                      }]"
                     >
                       <v-menu
                         v-model="itinerary.departureTimeMenu"
@@ -313,7 +365,9 @@
             <v-expansion-panel-text>
               <v-row>
                 <v-col v-if="!formData.prices?.length">
-                  <div class="text-center pa-4 border">Select ship first</div>
+                  <div class="text-center pa-4 border">
+                    Select ship first
+                  </div>
                 </v-col>
                 <v-col
                   v-else
@@ -351,8 +405,14 @@
           <v-expansion-panel title="What's Included?">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('highlights')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -402,8 +462,14 @@
           <v-expansion-panel title="Policies">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('policies')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('policies')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -444,10 +510,18 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/package')">
+          <v-btn
+            color="error"
+            @click="router.push('/cruise/package')"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="save"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="save"
+          >
+            Save
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -539,13 +613,7 @@ const showForm = ref(false)
 const startDateMenu = ref(false)
 const endDateMenu = ref(false)
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const year = date.getFullYear()
-  return `${month < 10 ? '0' : ''}${month}/${day < 10 ? '0' : ''}${day}/${year}`
-}
+
 const onEdit = (item) => {
   router.push(`/cruise/package?mode=form&id=${item?._id}`)
 }
@@ -622,19 +690,19 @@ const RemoveItem = async (name, index) => {
   roomKey.value = roomKey.value + 1
   highlightsKey.value = highlightsKey.value + 1
 }
-const convertTimeToDate = (time, target_date) => {
-  const [hour, min] = time.split(':')
-  let date = startOfDay(new Date(target_date))
-  date = setHours(date, hour)
-  date = setMinutes(date, min)
-  return date.toISOString()
-}
-const convertDateToTime = (date) => {
-  const dateObject = new Date(date)
-  const hours = dateObject.getUTCHours().toString().padStart(2, '0') // Get hours and pad with leading zero if necessary
-  const minutes = dateObject.getUTCMinutes().toString().padStart(2, '0') // Get minutes and pad with leading zero if necessary
-  return `${hours}:${minutes}`
-}
+// const convertTimeToDate = (time, target_date) => {
+//   const [hour, min] = time.split(':')
+//   let date = startOfDay(new Date(target_date))
+//   date = setHours(date, hour)
+//   date = setMinutes(date, min)
+//   return date.toISOString()
+// }
+// const convertDateToTime = (date) => {
+//   const dateObject = new Date(date)
+//   const hours = dateObject.getUTCHours().toString().padStart(2, '0') // Get hours and pad with leading zero if necessary
+//   const minutes = dateObject.getUTCMinutes().toString().padStart(2, '0') // Get minutes and pad with leading zero if necessary
+//   return `${hours}:${minutes}`
+// }
 const removeUploads = (obj) => {
   let data = JSON.parse(JSON.stringify(obj))
   delete data.uploads
@@ -652,13 +720,8 @@ const removeUploads = (obj) => {
   data.endDate = endDate
   data.itinerary?.forEach((element) => {
     element.date = new Date(element.date).toISOString()
-    element.arrivalTime = convertTimeToDate(element.arrivalTime, element.date)
-    element.departureTime = convertTimeToDate(
-      element.departureTime,
-      element.date
-    )
   })
-  console.log(data)
+  
   return data
 }
 const getFilesPayload = () => {
@@ -817,8 +880,6 @@ onBeforeMount(async () => {
         res.data.endDate = new Date(res.data.endDate)
         res?.data?.itinerary.forEach((element) => {
           element.date = new Date(element.date)
-          element.arrivalTime = convertDateToTime(element.arrivalTime)
-          element.departureTime = convertDateToTime(element.departureTime)
           element.port = element.port._id
         })
         res.data.destinations = res.data?.destinations.map((x) => {
