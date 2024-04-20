@@ -136,7 +136,7 @@
       </v-col>
 
       <v-col cols="12">
-        <p>Description</p>
+        <p>Ship Info</p>
         <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <v-col cols="12">

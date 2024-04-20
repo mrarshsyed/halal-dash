@@ -198,7 +198,7 @@
       </v-col>
       <!-- description -->
       <v-col cols="12">
-        <p>Description</p>
+        <p>Package Description</p>
         <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <!-- images  -->
