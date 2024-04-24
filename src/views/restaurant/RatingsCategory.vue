@@ -57,16 +57,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
-const baseUrl = 'admin/hotel-halal-rating-categories'
 
+const baseUrl = 'admin/restaurant-halal-rating-categories'
 const Form = ref({
   id: null,
   fields: [{ type: 'text', label: 'Name', isRequired: true, value: null }]
 })
-
 const resetForm = async () => {
   Form.value.id = null
   Form.value.fields = Form.value.fields?.map((form) => {
@@ -76,9 +75,7 @@ const resetForm = async () => {
     }
   })
 }
-
 const store = useAppStore()
-
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axios
     .get(baseUrl, {
@@ -94,7 +91,6 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       }
     })
 }
-
 const table_data = ref({
   loading: true,
   search: '',
@@ -113,7 +109,6 @@ const table_data = ref({
     { value: -1, title: 'All' }
   ]
 })
-
 const saveRating = async () => {
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value
@@ -132,7 +127,6 @@ const saveRating = async () => {
     resetForm()
   }
 }
-
 const showDialog = () => {
   resetForm()
   const dialogModal = {
@@ -144,7 +138,6 @@ const showDialog = () => {
   }
   store.showDialog(dialogModal)
 }
-
 const onEdit = async (item) => {
   resetForm()
   store.setRatingDetails(item)
@@ -159,7 +152,6 @@ const onEdit = async (item) => {
   }
   store.showDialog(dialogModal)
 }
-
 const deleteRating = async () => {
   if (store.rating_details?._id) {
     await axios
@@ -178,7 +170,6 @@ const deleteRating = async () => {
       })
   }
 }
-
 const onDelete = async (item) => {
   store.setRatingDetails(item)
   const dialogModal = {
@@ -190,7 +181,6 @@ const onDelete = async (item) => {
   }
   store.showDialog(dialogModal)
 }
-
 onMounted(async () => {
   await loadItems({
     page: table_data.value.page,

@@ -35,11 +35,19 @@ export const permissions = {
   cruiseAll: 'cruise-all',
   cruiseMasterData: 'cruise-master_data',
   cruiseShip: 'cruise-ship',
-  cruiseUpdateManager: 'cruise-update_manager',
   cruisePackage: 'cruise-package',
   cruiseEnquiry: 'cruise-enquiry',
+  cruiseUpdateManager: 'cruise-update_manager',
   cruiseHalalRatingCategory: 'hotel-halal-rating-category',
-  cruiseUpdateHalalRatings: 'activity-update_halal_ratings'
+  cruiseUpdateHalalRatings: 'cruise-update_halal_ratings',
+
+  // restaurant
+  restaurantHalalRating: 'restaurant-halal-rating',
+  restaurantMasterData: 'restaurant-master_data',
+  restaurantRestaurant: 'restaurant-restaurant',
+  restaurantUpdateManager: 'restaurant-update_manager',
+  restaurantHalalRatingCategory: 'restaurant-halal-rating-category',
+  restaurantUpdateHalalRatings: 'restaurant-update_halal_ratings'
 }
 
 export const routes = [
@@ -287,6 +295,65 @@ export const routes = [
     ]
   },
   {
+    path: '/restaurant',
+    name: 'restaurant',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'ratings-category',
+        component: () => import('@/views/restaurant/RatingsCategory.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
+        path: 'ratings',
+        component: () => import('@/views/restaurant/Ratings.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
+        path: 'cuisine',
+        name: 'restaurant-cuisine',
+        component: () => import('@/views/restaurant/Cuisine.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.restaurantMasterData]
+        }
+      },
+      {
+        path: 'special-diet',
+        name: 'restaurant-special-diet',
+        component: () => import('@/views/restaurant/SpecialDiet.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.restaurantMasterData]
+        }
+      },
+      {
+        path: 'restaurant',
+        name: 'restaurant-restaurant',
+        component: () => import('@/views/restaurant/Restaurant.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.restaurantRestaurant]
+        }
+      }
+    ]
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -430,8 +497,8 @@ export const navLinks = [
     title: 'Cruise',
     value: 'cruise',
     icon: 'sail-boat',
-    role: ['super-admin', 'admin', 'employee'],
-    permissions: [permissions.cruiseMasterData],
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [],
     children: [
       {
         icon: 'list-box',
@@ -486,7 +553,7 @@ export const navLinks = [
         title: 'Ship',
         to: '/cruise/ship',
         value: 'cruise-ship',
-        role: ['super-admin', 'admin', 'employee'],
+        role: ['super-admin', 'admin', 'employee', 'manager'],
         permissions: [permissions.cruiseShip]
       },
       {
@@ -504,6 +571,55 @@ export const navLinks = [
         value: 'cruise-enquiry',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.cruiseEnquiry]
+      }
+    ]
+  },
+  {
+    title: 'Restaurant',
+    value: 'restaurant',
+    icon: 'silverware-fork-knife',
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [],
+    children: [
+      {
+        icon: 'list-box',
+        title: 'Ratings Category',
+        to: '/restaurant/ratings-category',
+        value: 'restaurant-ratings-category',
+        role: ['super-admin'],
+        permissions: [permissions.restaurantHalalRatingCategory]
+      },
+      {
+        icon: 'star-box',
+        title: 'Ratings',
+        to: '/restaurant/ratings',
+        value: 'restaurant-ratings',
+        role: ['super-admin'],
+        permissions: [permissions.restaurantHalalRating]
+      },
+      {
+        icon: 'silverware',
+        title: 'Cuisine',
+        to: '/restaurant/cuisine',
+        value: 'restaurant-master-data-cuisine',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.restaurantMasterData]
+      },
+      {
+        icon: 'food-turkey',
+        title: 'Special Diet',
+        to: '/restaurant/special-diet',
+        value: 'restaurant-master-data-special-diet',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.cruiseMasterData]
+      },
+      {
+        icon: 'food-variant',
+        title: 'Restaurant',
+        to: '/restaurant/restaurant',
+        value: 'restaurant-restaurant',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.restaurantRestaurant]
       }
     ]
   },
@@ -622,6 +738,28 @@ export const userCreatePermissions = [
       {
         title: 'Enquiry',
         value: permissions.cruiseEnquiry
+      }
+    ]
+  },
+  {
+    title: 'Restaurant',
+    value: permissions.restaurantRestaurant,
+    children: [
+      {
+        title: 'Master Data ( Cuisine, Special Diet )',
+        value: permissions.restaurantMasterData
+      },
+      {
+        title: 'Assign & Remove Manager',
+        value: permissions.restaurantUpdateManager
+      },
+      {
+        title: 'Add Rating',
+        value: permissions.restaurantUpdateHalalRatings
+      },
+      {
+        title: 'Restaurant',
+        value: permissions.restaurantRestaurant
       }
     ]
   }

@@ -42,12 +42,12 @@
         @click="store.logout('call-api')"
       />
     </v-app-bar>
-   
 
     <v-navigation-drawer
       v-model="drawer"
       location="left"
       permanent
+      style="min-width: max-content"
     >
       <v-list nav>
         <div
@@ -109,63 +109,28 @@
 </template>
 <script setup>
 import { useAppStore } from '@/store/app'
-import { watch, ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useTheme } from 'vuetify'
-import { navLinks } from '@/config/userRoutes'
 
 const store = useAppStore()
 const theme = useTheme()
 
-const data = ref({
-  drawer: true,
-  group: null,
-  items: navLinks,
-  open: []
-})
 const links = computed(() => {
   return store.sideBarLinks
 })
 const loading = computed(() => store.isLoading)
 
-// const filteredItems = computed(() => {
-//   return data.value.items.filter((item) => {
-//     const hasMainRouteRole = item?.role?.includes(store.getUser?.data?.role)
-//     if (item.children && item.children.length > 0) {
-//       item.children = item.children.filter((child) =>
-//         child?.role?.includes(store.getUser?.data?.role)
-//       )
-//     }
-//     return hasMainRouteRole || (item.children && item.children.length > 0)
-//   })
-// })
-
 const toggleTheme = () => {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
-
-// watch(() => data.value.drawer, (newValue, oldValue) => {
-//   if (
-//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('activity-all')
-//   ) {
-//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Activity'))
-//   }
-//   if (
-//     (store.user?.data?.role === 'admin' || store?.user?.data?.role === 'employee') && !store?.user?.data?.permissions?.includes('hotel-all')
-//   ) {
-//     data.value.items =  data.value.items?.filter((x=> x?.title !=='Hotels'))
-//   }
-
-// })
-
 const drawer = computed({
   get: () => {
-    return store.sideBarLinks?.length ? true: false
+    return store.sideBarLinks?.length ? true : false
   },
   set: (newValue) => {
     // Assuming fields[2] already exists, if not, you may need to initialize it
-    console.log(newValue);
+    console.log(newValue)
   }
 })
-
 </script>

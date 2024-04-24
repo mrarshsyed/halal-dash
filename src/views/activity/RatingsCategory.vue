@@ -1,14 +1,24 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col cols="12" md="4">
-        <v-btn @click="showDialog" block color="primary">
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-btn
+          @click="showDialog"
+          block
+          color="primary"
+        >
           + Add New Category
         </v-btn>
       </v-col>
@@ -91,7 +101,7 @@ const table_data = ref({
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
     // { title: 'Rating', key: 'rating', align: 'start' },
-    { title: 'Action', key: 'action', align: 'center' }
+    { title: 'Action', key: 'action', align: 'start' }
   ],
   itemsPerPageOption: [
     { value: 10, title: '10' },
