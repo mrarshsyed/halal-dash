@@ -55,7 +55,7 @@ export default createVuetify({
       hideDetails: 'auto'
     },
     VCard: {
-      class: 'py-5'
+      class: 'py-5',
     },
     VChip: {
       label: true,
@@ -75,6 +75,14 @@ export default createVuetify({
       color: 'primary'
     },
     VFileInput: { 
+      variant: 'outlined',
+      clearable: true,
+      density: 'compact',
+      class: 'mb-2',
+      color: 'primary',
+      hideDetails: 'auto'
+    },
+    VTextarea: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',

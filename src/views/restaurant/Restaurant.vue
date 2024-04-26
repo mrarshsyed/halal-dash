@@ -1,13 +1,28 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode && !detailsMode">
-    <v-col cols="12" md="8">
+  <v-row
+    class="mb-4"
+    v-if="!formMode && !detailsMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary"> + Add New Ship </v-btn>
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
+        + Add New {{ moduleName }}
+      </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table-server
@@ -37,9 +52,6 @@
               ? item?.manager?.name
               : store.getUserName(item?.manager?.email)
           }}
-        </template>
-        <template #item.ship_line="{ item }">
-          {{ item?.shipLine?.name ?? '-' }}
         </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
@@ -93,7 +105,10 @@
               @click="onEdit(item)"
               icon="mdi-pencil-box"
             />
-            <v-icon @click="onDelete(item)" class="cursor-pointer">
+            <v-icon
+              @click="onDelete(item)"
+              class="cursor-pointer"
+            >
               mdi-delete
             </v-icon>
           </div>
@@ -101,20 +116,27 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode && !detailsMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode && !detailsMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
           size="x-small"
           color="primary"
           icon="mdi-arrow-left"
-          @click="router.push('/cruise/ship')"
+          @click="router.back()"
         />
         <h3 class="mt-4">
-          {{ id ? 'Update Ship' : 'Create New Ship' }}
+          {{ id ? `Update ${moduleName}` : `Create New ${moduleName}` }}
         </h3>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -122,168 +144,243 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.contactNumber"
+          label="Contact Number"
+          required
+          :rules="[(v) => !!v || 'Contact Number is required']"
+        />
+      </v-col>
+      <v-col cols="12">
+        <v-textarea
+          v-model="formData.address"
+          label="Address"
+          required
+          :rules="[(v) => !!v || 'Address is required']"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.website"
+          label="Web Site"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          type="number"
+          v-model="formData.rating"
+          label="Rating"
+          :rules="[
+            (v) => {
+              const rating = parseFloat(v)
+              return (
+                v === null ||
+                (Number.isFinite(rating) && rating >= 0 && rating <= 5) ||
+                'Rating must be a number between 0 and 5'
+              )
+            }
+          ]"
+        />
+      </v-col>
+
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          type="number"
+          v-model.number="formData.startPrice"
+          label="Start Price"
+          :rules="[
+            (v) => v !== null || 'Start Price is required',
+            (v) =>
+              (typeof v === 'number' && v >= 0) ||
+              'Start Price must be a non-negative number'
+          ]"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          type="number"
+          v-model.number="formData.endPrice"
+          label="End Price"
+          :rules="[
+            (v) => v !== null || 'End Price is required',
+            (v) =>
+              (typeof v === 'number' && v >= 0) ||
+              'End Price must be a non-negative number'
+          ]"
+        />
+      </v-col>
+      <v-col cols="12">
+        <p>Description</p>
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
-          label="Select Line"
-          :items="lines"
+          label="Cuisines"
+          :items="cuisinesList"
+          required
+          :rules="[(v) => (v && v.length > 0) || 'This field is required']"
+          v-model="formData.cuisines"
+          multiple
+          chips
           item-title="name"
           item-value="_id"
+          return-object
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Special Diets"
+          :items="specialDietsList"
           required
-          :rules="[(v) => !!v || `Line is required`]"
-          v-model="formData.shipLine"
+          :rules="[(v) => (v && v.length > 0) || 'This field is required']"
+          v-model="formData.specialDiets"
+          multiple
+          chips
+          item-title="name"
+          item-value="_id"
+          return-object
         />
       </v-col>
 
       <v-col cols="12">
-        <p>Ship Info</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <ImageUploader
+          label="Images"
+          :value="formData.uploads"
+          @update="(data) => onUploadsUpdate(data, 'uploads')"
+          :image-list="formData.images"
+          @update-image-link="(data) => onImageUpdate(data, 'images')"
+        />
       </v-col>
       <v-col cols="12">
         <ImageUploader
-          :value="formData.uploads"
-          @update="(data) => onImageUpdate(data, 'images')"
-          :image-list="formData.images"
-          @update-image-link="(data) => onUpdateImageLink(data)"
+          label="Menu"
+          :value="formData.menuUploads"
+          @update="(data) => onUploadsUpdate(data, 'menuUploads')"
+          :image-list="formData.menu"
+          @update-image-link="(data) => onImageUpdate(data, 'menu')"
         />
       </v-col>
-      <!-- facts -->
       <v-col cols="12">
-        <v-expansion-panels>
-          <v-expansion-panel title="Ship Facts">
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col
-                  v-for="(value, key) in formData.facts"
-                  :key="key"
-                  cols="12"
-                  sm="4"
-                  md="3"
-                >
-                  <v-text-field
-                    v-model="formData.facts[key]"
-                    :label="formatLabel(key)"
-                    outlined
-                  />
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
+        <ImageUploader
+          label="Halal Certificate"
+          :value="formData.halalCertificatesUploads"
+          @update="(data) => onUploadsUpdate(data, 'halalCertificatesUploads')"
+          :image-list="formData.menu"
+          @update-image-link="
+            (data) => onImageUpdate(data, 'halalCertificates')
+          "
+        />
       </v-col>
-      <!-- rooms -->
+
       <v-col cols="12">
         <v-expansion-panels v-model="panel">
-          <v-expansion-panel title="Rooms">
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('rooms')">
-                    + Add More
-                  </v-btn>
-                </v-col>
+          <v-expansion-panel title="Working Hours">
+            <v-expansion-panel-text class="pb-10">
+              <v-autocomplete
+                item-title="day"
+                item-value="day"
+                clearable
+                label="Select Working Days"
+                :items="workingDaysList"
+                required
+                :rules="[
+                  (v) => (v && v.length > 0) || 'This field is required'
+                ]"
+                v-model="formData.workingHours"
+                multiple
+                chips
+                return-object
+              />
+              <v-row class="mt-4">
                 <v-col
-                  v-for="(room, index) in formData.rooms"
-                  :key="index"
-                  cols="12"
-                  class="border mb-4 rounded"
-                >
-                  <div class="text-right mb-4" v-if="formData.rooms.length > 1">
-                    <v-btn
-                      icon="mdi-delete"
-                      color="error"
-                      size="x-small"
-                      @click="RemoveItem('rooms', index)"
-                    />
-                  </div>
-                  <div class="d-flex flex-wrap ga-4">
-                    <v-autocomplete
-                      clearable
-                      label="Select Room Group"
-                      :items="room_groups"
-                      item-title="name"
-                      item-value="_id"
-                      required
-                      :rules="[(v) => !!v || `Room Group is required`]"
-                      v-model="room.roomGroup"
-                    />
-                    <v-text-field
-                      v-model="room.name"
-                      label="Name"
-                      outlined
-                      :rules="[(v) => !!v || `Name is required`]"
-                    />
-                  </div>
-                  <DocumentEditor
-                    :key="docKey"
-                    height="200px"
-                    v-model="room.description"
-                    class="mb-4"
-                  />
-                  <ImageUploader
-                    :key="roomKey"
-                    :value="room.uploads"
-                    @update="(data) => onRoomImageUpdate(data, index)"
-                    @update-image-link="
-                      (data) => onUpdateImageLinks('rooms', index, data)
-                    "
-                    :image-list="room?.images ?? []"
-                  />
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-      <!-- highlights -->
-      <v-col cols="12">
-        <v-expansion-panels>
-          <v-expansion-panel title="What's Included?">
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
-                    + Add More
-                  </v-btn>
-                </v-col>
-                <v-col
-                  v-for="(highlight, indexH) in formData.highlights"
+                  v-for="(workingHour, indexH) in formData.workingHours"
                   :key="indexH"
                   cols="12"
-                  class="border mb-4 rounded"
+                  md="6"
+                  class="border px-2 mb-4 rounded"
                 >
-                  <div
-                    class="text-right mb-4"
-                    v-if="formData.highlights.length > 1"
-                  >
-                    <v-btn
-                      icon="mdi-delete"
-                      color="error"
-                      size="x-small"
-                      @click="RemoveItem('highlights', indexH)"
-                    />
-                  </div>
                   <v-text-field
-                    v-model="highlight.name"
-                    label="Name"
-                    outlined
-                    :rules="[(v) => !!v || `Name is required`]"
+                    label="Day"
+                    v-model="workingHour.day"
+                    readonly
+                    :clearable="false"
                   />
-                  <DocumentEditor
-                    :key="docKey"
-                    height="200px"
-                    v-model="highlight.description"
-                    class="mb-4"
-                  />
-                  <ImageUploader
-                    :value="highlight.uploads"
-                    @update="(data) => onHighlightsImageUpdate(data, indexH)"
-                    @update-image-link="
-                      (data) => onUpdateImageLinks('highlights', indexH, data)
-                    "
-                    :image-list="highlight?.images ?? []"
-                    :key="highlightsKey"
-                  />
+                  <div class="d-flex ga-4 flex-wrap">
+                    <v-text-field
+                      v-model="workingHour.startTime"
+                      :active="workingHour.startTimeMenu"
+                      :focus="workingHour.startTimeMenu"
+                      label="Opening Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                      required
+                      :rules="[(v) => !!v || 'Start time is required']"
+                    >
+                      <v-menu
+                        v-model="workingHour.startTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="workingHour.startTimeMenu"
+                          v-model="workingHour.startTime"
+                          full-width
+                          format="24hr"
+                        />
+                      </v-menu>
+                    </v-text-field>
+                    <v-text-field
+                      v-model="workingHour.endTime"
+                      :active="workingHour.endTimeMenu"
+                      :focus="workingHour.endTimeMenu"
+                      label="Closing Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                      :rules="[(v) => !!v || 'Closing time is required']"
+                    >
+                      <v-menu
+                        v-model="workingHour.endTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="workingHour.endTimeMenu"
+                          v-model="workingHour.endTime"
+                          full-width
+                          format="24hr"
+                        />
+                      </v-menu>
+                    </v-text-field>
+                  </div>
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -292,10 +389,18 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/ship')">
+          <v-btn
+            color="error"
+            @click="router.back()"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="saveShip"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="save"
+          >
+            Save
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -308,11 +413,22 @@
       icon="mdi-arrow-left"
       @click="router.push('/cruise/ship')"
     />
-    <p class="mb-4">Ship Name : {{ detailsData?.name }}</p>
-    <p class="mb-4">Ship Line : {{ detailsData?.shipLine?.name }}</p>
-    <p class="mb-2">Description :</p>
-    <div class="mb-4" v-html="detailsData?.description" />
-    <p class="mb-2">Images :</p>
+    <p class="mb-4">
+      Ship Name : {{ detailsData?.name }}
+    </p>
+    <p class="mb-4">
+      Ship Line : {{ detailsData?.shipLine?.name }}
+    </p>
+    <p class="mb-2">
+      Description :
+    </p>
+    <div
+      class="mb-4"
+      v-html="detailsData?.description"
+    />
+    <p class="mb-2">
+      Images :
+    </p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -324,22 +440,15 @@
         v-for="(i, index) in detailsData?.images"
         :key="index"
       >
-        <v-img cover :src="i" height="150" class="rounded" />
+        <v-img
+          cover
+          :src="i"
+          height="150"
+          class="rounded"
+        />
       </v-col>
     </v-row>
-    <p class="mb-2">Ship Facts :</p>
-    <v-row class="mb-4">
-      <v-col
-        v-for="(value, key) in detailsData?.facts"
-        :key="key"
-        cols="12"
-        sm="4"
-        md="3"
-      >
-        <p>{{ formatLabel(key) }} : {{ detailsData.facts[key] }}</p>
-      </v-col>
-    </v-row>
-    <p class="mb-2">Rooms :</p>
+
     <v-row class="mb-4">
       <v-col
         v-for="(room, key) in detailsData?.rooms"
@@ -350,9 +459,16 @@
         <v-card>
           <v-card-text>
             <p>Room Group : {{ room?.roomGroup?.name }}</p>
-            <p class="mb-4">Name : {{ room?.name }}</p>
-            <p class="mb-2">Description :</p>
-            <div class="mb-4" v-html="room?.description" />
+            <p class="mb-4">
+              Name : {{ room?.name }}
+            </p>
+            <p class="mb-2">
+              Description :
+            </p>
+            <div
+              class="mb-4"
+              v-html="room?.description"
+            />
             <v-row>
               <v-col
                 cols="12"
@@ -360,7 +476,12 @@
                 v-for="(i, index) in room?.images"
                 :key="index"
               >
-                <v-img cover :src="i" height="150" class="rounded" />
+                <v-img
+                  cover
+                  :src="i"
+                  height="150"
+                  class="rounded"
+                />
               </v-col>
             </v-row>
           </v-card-text>
@@ -368,7 +489,9 @@
       </v-col>
     </v-row>
 
-    <p class="mb-2">What's included? :</p>
+    <p class="mb-2">
+      What's included? :
+    </p>
     <v-row class="mb-4">
       <v-col
         v-for="(room, key) in detailsData?.highlights"
@@ -378,9 +501,16 @@
       >
         <v-card>
           <v-card-text>
-            <p class="mb-4">Name : {{ room?.name }}</p>
-            <p class="mb-2">Description :</p>
-            <div class="mb-4" v-html="room?.description" />
+            <p class="mb-4">
+              Name : {{ room?.name }}
+            </p>
+            <p class="mb-2">
+              Description :
+            </p>
+            <div
+              class="mb-4"
+              v-html="room?.description"
+            />
             <v-row>
               <v-col
                 cols="12"
@@ -388,7 +518,12 @@
                 v-for="(i, index) in room?.images"
                 :key="index"
               >
-                <v-img cover :src="i" height="150" class="rounded" />
+                <v-img
+                  cover
+                  :src="i"
+                  height="150"
+                  class="rounded"
+                />
               </v-col>
             </v-row>
           </v-card-text>
@@ -401,8 +536,15 @@
       <v-card-title>Select Rating</v-card-title>
       <v-card-text>
         <v-row no-gutters>
-          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-            <v-checkbox v-model="selectedRatings" :value="r">
+          <v-col
+            cols="12"
+            v-for="(r, index) in ratings"
+            :key="index"
+          >
+            <v-checkbox
+              v-model="selectedRatings"
+              :value="r"
+            >
               <template #label>
                 {{ r?.name }}
                 <v-chip class="ms-2">
@@ -430,7 +572,12 @@
         >
           Close
         </v-btn>
-        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignRating"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -470,7 +617,12 @@
         >
           Close
         </v-btn>
-        <v-btn color="primary" @click="onAssignManager"> Assign Manager </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignManager"
+        >
+          Assign Manager
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -485,18 +637,89 @@ import ImageUploader from './components/ImageUploader.vue'
 import { useAppStore } from '@/store/app'
 import { permissions } from '@/config/userRoutes'
 
+const workingDaysList = [
+  {
+    day: 'Monday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Tuesday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Wednesday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Thursday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Friday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Saturday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  },
+  {
+    day: 'Sunday',
+    startTime: '',
+    endTime: '',
+    startTimeMenu: false,
+    endTimeMenu: false
+  }
+]
+
+const initialFormData = {
+  name: '',
+  address: '',
+  contactNumber: '',
+  website: '',
+  rating: null,
+  startPrice: null,
+  endPrice: null,
+  description: '',
+  workingHours: [],
+  cuisines: [],
+  specialDiets: [],
+  uploads: [],
+  images: [],
+  menu: [],
+  menuUploads: [],
+  halalCertificates: [],
+  halalCertificatesUploads: [],
+  fileMapper: []
+}
 const store = useAppStore()
 const route = useRoute()
 const router = useRouter()
+const moduleName = 'Restaurant'
 const formMode = computed(() => {
   return route?.query?.mode === 'form'
 })
 const detailsMode = computed(() => {
   return route?.query?.mode === 'details'
 })
-const docKey = ref(1)
-const roomKey = ref(3)
-const highlightsKey = ref(5)
+
 const panel = ref([0])
 const managerForm = ref()
 const selectedManager = ref(null)
@@ -517,7 +740,6 @@ const table_data = ref({
     { title: 'Rating(%)', key: 'rating', align: 'start' },
     { title: 'Manager Name', key: 'manager_name', align: 'start' },
     { title: 'Manager Email', key: 'manager', align: 'start' },
-    { title: 'Ship Line', key: 'ship_line', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -528,76 +750,11 @@ const table_data = ref({
 })
 
 const onCreate = () => {
-  router.push({ name: 'cruise-ship', query: { mode: 'form' } })
-}
-const initialFormData = {
-  name: null,
-  description: '',
-  shipLine: null,
-  uploads: [],
-  images: [],
-  facts: {
-    maidenVoyage: '',
-    registry: '',
-    grossTonnage: '',
-    builtIn: '',
-    beam: '',
-    maximumSpeed: '',
-    shipLength: '',
-    stateroomsSuites: '',
-    passengerCapacity: '',
-    numberOfCrews: '',
-    crewNationality: '',
-    diningRestaurants: '',
-    numberOfDecks: '',
-    officersNationality: '',
-    barsLounges: '',
-    lounge: '',
-    nonSmokingShip: '',
-    nonSmokingDining: '',
-    spa: '',
-    fitnessCenter: '',
-    elevators: '',
-    kidsFriendly: '',
-    rockClimbing: '',
-    waterSlide: '',
-    wheelchairAccessible: ''
-  },
-  highlights: [
-    {
-      name: 'Food & Dining',
-      description: '',
-      uploads: [],
-      images: []
-    },
-    {
-      name: 'Accommodation',
-      description: '',
-      uploads: [],
-      images: []
-    },
-    {
-      name: 'Onboard Activities and Entertainment',
-      description: '',
-      uploads: [],
-      images: []
-    }
-  ],
-  rooms: [
-    {
-      roomGroup: null,
-      name: null,
-      description: '',
-      uploads: [],
-      images: []
-    }
-  ]
+  router.push({ name: 'restaurant-restaurant', query: { mode: 'form' } })
 }
 const formData = ref(initialFormData)
 const form = ref()
 const formValue = ref(false)
-const lines = ref([])
-const room_groups = ref([])
 const showForm = ref(false)
 const ratings = ref([])
 const selectedRatings = ref([])
@@ -605,6 +762,8 @@ const assignRatingDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
 const managerSearch = ref('')
 const detailsData = ref({})
+const cuisinesList = ref([])
+const specialDietsList = ref([])
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
@@ -613,68 +772,19 @@ const onRatingIconClick = async (item) => {
   }
   assignRatingDialogShow.value = true
 }
-
 const onEdit = (item) => {
-  router.push(`/cruise/ship?mode=form&id=${item?._id}`)
+  router.push(`/restaurant/restaurant?mode=form&id=${item?._id}`)
 }
 const onDetails = (item) => {
-  router.push(`/cruise/ship?mode=details&id=${item?._id}`)
-}
-const getLines = async () => {
-  await axios.get('admin/cruise/ship-lines').then((res) => {
-    if (res?.data?.length) {
-      lines.value = res.data
-    }
-  })
-}
-const getRoomGroups = async () => {
-  await axios.get('admin/cruise/room-groups').then((res) => {
-    if (res?.data?.length) {
-      room_groups.value = res.data
-    }
-  })
-}
-const formatLabel = (key) => {
-  return (
-    key &&
-    key.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) {
-      return str.toUpperCase()
-    })
-  )
-}
-const addMore = async (name) => {
-  formData.value[name].unshift({
-    name: '',
-    description: '',
-    uploads: [],
-    roomGroup: null,
-    images: []
-  })
-  docKey.value = docKey.value + 1
-  roomKey.value = roomKey.value + 1
-  highlightsKey.value = highlightsKey.value + 1
-}
-const RemoveItem = async (name, index) => {
-  formData.value[name].splice(index, 1)
-  docKey.value = docKey.value + 1
-  roomKey.value = roomKey.value + 1
-  highlightsKey.value = highlightsKey.value + 1
+  router.push(`/restaurant/restaurant?mode=details&id=${item?._id}`)
 }
 const removeUploads = (obj) => {
-  if (Array.isArray(obj)) {
-    return obj.map((item) => removeUploads(item))
-  } else if (obj && typeof obj === 'object') {
-    const newObj = { ...obj }
-    if ('uploads' in newObj) {
-      delete newObj.uploads
-    }
-    for (const key in newObj) {
-      newObj[key] = removeUploads(newObj[key])
-    }
-    return newObj
-  } else {
-    return obj
-  }
+  let newObject = { ...obj }
+  delete newObject.uploads
+  delete newObject.menuUploads
+  delete newObject.halalCertificatesUploads
+  console.log(newObject)
+  return newObject
 }
 const getFilesPayload = () => {
   const files = []
@@ -690,32 +800,24 @@ const getFilesPayload = () => {
       }
     })
   }
-  if (formData.value?.highlights?.length) {
-    formData.value.highlights.forEach((highlight, index) => {
-      if (highlight?.uploads?.length) {
-        highlight.uploads.forEach((file) => {
-          if (file instanceof File) {
-            files.push(file)
-            fileMapper.push({
-              resource: `highlights_${index}`,
-              name: file.name
-            })
-          }
+  if (formData.value?.menuUploads?.length) {
+    formData.value.menuUploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'menu',
+          name: file.name
         })
       }
     })
   }
-  if (formData.value?.rooms?.length) {
-    formData.value.rooms.forEach((room, index) => {
-      if (room?.uploads?.length) {
-        room.uploads.forEach((file) => {
-          if (file instanceof File) {
-            files.push(file)
-            fileMapper.push({
-              resource: `rooms_${index}`,
-              name: file.name
-            })
-          }
+  if (formData.value?.halalCertificatesUploads?.length) {
+    formData.value.halalCertificatesUploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'halalCertificates',
+          name: file.name
         })
       }
     })
@@ -727,8 +829,6 @@ const getDataPayload = () => {
     let { files, fileMapper } = getFilesPayload()
     let data = removeUploads(formData.value)
     data.fileMapper = fileMapper
-    console.log(data)
-    console.log(files)
     let formdata = new FormData()
     formdata.append('data', JSON.stringify(data))
     files?.forEach((file) => {
@@ -739,31 +839,27 @@ const getDataPayload = () => {
     console.log(error)
   }
 }
-const saveShip = async () => {
+const save = async () => {
   form.value.validate()
   if (form.value.isValid) {
     const payload = getDataPayload()
     const response = id?.value
-      ? await axios.patch(`admin/cruise/ships/${id.value}`, payload)
-      : await axios.post('admin/cruise/ships', payload)
+      ? await axios.patch(`admin/restaurant/restaurants/${id.value}`, payload)
+      : await axios.post('admin/restaurant/restaurants', payload)
     if (response.data) {
       store.showSnackbar('Successfully Saved')
-      router.push({ name: 'cruise-ship' })
+      router.back()
     }
+  } else {
+    panel.value = [0]
   }
 }
-const onImageUpdate = (images) => {
-  formData.value.uploads = images
-}
-const onRoomImageUpdate = (images, index) => {
-  formData.value.rooms[index].uploads = images
-}
-const onHighlightsImageUpdate = (images, index) => {
-  formData.value.highlights[index].uploads = images
+const onUploadsUpdate = (images, key) => {
+  formData.value[key] = images
 }
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axios
-    .get('admin/cruise/ships', {
+    .post('admin/restaurant/restaurants-list', {
       params: {
         page: page,
         perPage: itemsPerPage
@@ -779,63 +875,30 @@ const managers = computed(() => {
 })
 const confirmDelete = async () => {
   await axios
-    .delete(`admin/cruise/ships/${store.details?._id}`)
+    .delete(`admin/restaurant/restaurants/${store.details?._id}`)
     .then(async () => {
       store.showSnackbar('Successfully Deleted')
-      await loadItems()
+      await loadItems({
+        page: table_data.value.page,
+        itemsPerPage: table_data.value.itemsPerPage,
+        sortBy: 'ascending'
+      })
       store.closeDialog()
     })
 }
 const onDelete = (item) => {
   store.setDetails(item)
   const dialogModal = {
-    title: 'Delete Ship',
-    content: `Are you sure to delete this Ship?`,
+    title: `Delete ${moduleName}`,
+    content: `Are you sure to delete this ${moduleName}?`,
     confirmText: 'Delete',
     formComponents: { fields: [] },
     confirmFunction: confirmDelete
   }
   store.showDialog(dialogModal)
 }
-onBeforeMount(async () => {
-  if (store.hasPermission(permissions.userList)) {
-    await axios.get('admin/users').then((res) => {
-      if (res?.data?.length) {
-        const managerList = res?.data?.filter((x) => x?.role === 'manager')
-        store.setManager(managerList)
-      }
-    })
-  }
-  if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
-    await axios.get('admin/cruise-halal-ratings').then((res) => {
-      if (res?.data?.length) {
-        ratings.value = res?.data
-      }
-    })
-  }
-  await getLines()
-  await getRoomGroups()
-  if (id.value) {
-    const details = await axios.get(`admin/cruise/ships/${id.value}`)
-    if (details?.data?._id) {
-      if (formMode.value) {
-        formData.value = { ...details?.data }
-        formData.value.shipLine = formData.value.shipLine._id
-        formData.value.rooms.forEach((element) => {
-          element.roomGroup = element.roomGroup._id
-        })
-      } else if (detailsMode.value) {
-        detailsData.value = { ...details?.data }
-      }
-    }
-  }
-  showForm.value = true
-})
-const onUpdateImageLink = (data) => {
-  formData.value.images = [...data]
-}
-const onUpdateImageLinks = (key, index, data) => {
-  formData.value[key][index].images = data
+const onImageUpdate = (data, key) => {
+  formData.value[key] = [...data]
 }
 const sumOfSelectedRatings = computed(() => {
   return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
@@ -851,9 +914,12 @@ const onAssignRating = async () => {
     return x._id
   })
   axios
-    .patch(`admin/cruise/ships/${store.details?._id}/update-halal-ratings`, {
-      ratingIds: ids
-    })
+    .patch(
+      `admin/restaurant/restaurants/${store.details?._id}/update-halal-ratings`,
+      {
+        ratingIds: ids
+      }
+    )
     .then(async (res) => {
       store.showSnackbar('Ratings updated successfully')
       store.setDetails({})
@@ -902,7 +968,7 @@ const onAssignManager = async () => {
   managerForm.value.validate()
   if (!managerForm?.value?.isValid) return
   axios
-    .patch(`admin/cruise/ships/${store.details?._id}/update-manager`, {
+    .patch(`admin/restaurant/restaurants/${store.details?._id}/update-manager`, {
       managerId: selectedManager.value?._id
     })
     .then(async (res) => {
@@ -927,7 +993,7 @@ const handelAssignManagerIconClick = (item) => {
 }
 const removeManager = async () => {
   await axios
-    .patch(`admin/cruise/ships/${store.details?._id}/update-manager`, {
+    .patch(`admin/restaurant/restaurants/${store.details?._id}/update-manager`, {
       managerId: null
     })
     .then(async (res) => {
@@ -955,6 +1021,47 @@ const handelRemoveManagerIconClick = (item) => {
   }
   store.showDialog(dialogModal)
 }
+const getCuisinesList = async () => {
+  await axios.get('admin/restaurant/cuisines').then((res) => {
+    cuisinesList.value = res.data
+  })
+}
+const getSpecialDietsList = async () => {
+  await axios.get('admin/restaurant/special-diets').then((res) => {
+    specialDietsList.value = res.data
+  })
+}
+
+onBeforeMount(async () => {
+  if (store.hasPermission(permissions.userList)) {
+    await axios.get('admin/users').then((res) => {
+      if (res?.data?.length) {
+        const managerList = res?.data?.filter((x) => x?.role === 'manager')
+        store.setManager(managerList)
+      }
+    })
+  }
+  if (store.hasPermission(permissions.restaurantUpdateHalalRatings)) {
+    await axios.get('admin/restaurant-halal-ratings').then((res) => {
+      if (res?.data?.length) {
+        ratings.value = res?.data
+      }
+    })
+  }
+  await getCuisinesList()
+  await getSpecialDietsList()
+  if (id.value) {
+    const details = await axios.get(`admin/restaurant/restaurants/${id.value}`)
+    if (details?.data?._id) {
+      if (formMode.value) {
+        formData.value = { ...details?.data }
+      } else if (detailsMode.value) {
+        detailsData.value = { ...details?.data }
+      }
+    }
+  }
+  showForm.value = true
+})
 </script>
 
 <style scoped>

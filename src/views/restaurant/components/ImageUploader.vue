@@ -4,7 +4,7 @@
       v-model="uploads"
       :prepend-icon="null"
       prepend-inner-icon="mdi-paperclip"
-      label="Images"
+      :label="label"
       variant="outlined"
       :multiple="true"
       :chips="true"
@@ -82,6 +82,10 @@ const props = defineProps({
   showImgListDeleteIcon : {
     type: Boolean,
     default: true
+  },
+  label:{
+    type: String,
+    default: 'Images'
   }
 })
 const emit = defineEmits(['update', 'updateImageLink'])

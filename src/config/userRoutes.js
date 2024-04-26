@@ -579,7 +579,7 @@ export const navLinks = [
     value: 'restaurant',
     icon: 'silverware-fork-knife',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    permissions: [],
+    permissions: [permissions.restaurantMasterData,permissions.restaurantRestaurant],
     children: [
       {
         icon: 'list-box',
