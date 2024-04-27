@@ -411,13 +411,28 @@
       size="x-small"
       color="primary"
       icon="mdi-arrow-left"
-      @click="router.push('/cruise/ship')"
+      @click="router.back()"
     />
     <p class="mb-4">
-      Ship Name : {{ detailsData?.name }}
+      Name : {{ detailsData?.name }}
     </p>
     <p class="mb-4">
-      Ship Line : {{ detailsData?.shipLine?.name }}
+      Contact Number : {{ detailsData?.contactNumber }}
+    </p>
+    <p class="mb-4">
+      Address : {{ detailsData?.address }}
+    </p>
+    <p class="mb-4">
+      Website : {{ detailsData?.website }}
+    </p>
+    <p class="mb-4">
+      Rating : {{ detailsData?.rating }}
+    </p>
+    <p class="mb-4">
+      Start Price : {{ detailsData?.startPrice }}
+    </p>
+    <p class="mb-4">
+      End Price : {{ detailsData?.endPrice }}
     </p>
     <p class="mb-2">
       Description :
@@ -426,7 +441,33 @@
       class="mb-4"
       v-html="detailsData?.description"
     />
-    <p class="mb-2">
+    <div class="mb-4">
+      <p class="mb-2">
+        Cuisines:
+      </p>
+      <div class="d-flex flex-wrap ga-4">
+        <v-chip
+          v-for="(c, index) in detailsData?.cuisines"
+          :key="index"
+        >
+          {{ c?.name }}
+        </v-chip>
+      </div>
+    </div>
+    <div class="mb-4">
+      <p class="mb-2">
+        Special Diets:
+      </p>
+      <div class="d-flex flex-wrap ga-4">
+        <v-chip
+          v-for="(s, index) in detailsData?.specialDiets"
+          :key="index"
+        >
+          {{ s?.name }}
+        </v-chip>
+      </div>
+    </div>
+    <p class="mb-4">
       Images :
     </p>
     <v-row class="mb-4">
@@ -448,86 +489,69 @@
         />
       </v-col>
     </v-row>
-
-    <v-row class="mb-4">
-      <v-col
-        v-for="(room, key) in detailsData?.rooms"
-        :key="key"
-        cols="12"
-        sm="6"
-      >
-        <v-card>
-          <v-card-text>
-            <p>Room Group : {{ room?.roomGroup?.name }}</p>
-            <p class="mb-4">
-              Name : {{ room?.name }}
-            </p>
-            <p class="mb-2">
-              Description :
-            </p>
-            <div
-              class="mb-4"
-              v-html="room?.description"
-            />
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                v-for="(i, index) in room?.images"
-                :key="index"
-              >
-                <v-img
-                  cover
-                  :src="i"
-                  height="150"
-                  class="rounded"
-                />
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <p class="mb-2">
-      What's included? :
+    <p class="mb-4">
+      Menu :
     </p>
     <v-row class="mb-4">
       <v-col
-        v-for="(room, key) in detailsData?.highlights"
-        :key="key"
         cols="12"
-        sm="6"
+        sm="2"
+        md="3"
+        lg="4"
+        xl="5"
+        xxl="6"
+        v-for="(i, index) in detailsData?.menu"
+        :key="index"
       >
-        <v-card>
-          <v-card-text>
-            <p class="mb-4">
-              Name : {{ room?.name }}
-            </p>
-            <p class="mb-2">
-              Description :
-            </p>
-            <div
-              class="mb-4"
-              v-html="room?.description"
-            />
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                v-for="(i, index) in room?.images"
-                :key="index"
-              >
-                <v-img
-                  cover
-                  :src="i"
-                  height="150"
-                  class="rounded"
-                />
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
+        <v-img
+          cover
+          :src="i"
+          height="150"
+          class="rounded"
+        />
+      </v-col>
+    </v-row>
+    <p class="mb-4">
+      Halal Certificates :
+    </p>
+    <v-row class="mb-4">
+      <v-col
+        cols="12"
+        sm="2"
+        md="3"
+        lg="4"
+        xl="5"
+        xxl="6"
+        v-for="(i, index) in detailsData?.halalCertificates"
+        :key="index"
+      >
+        <v-img
+          cover
+          :src="i"
+          height="150"
+          class="rounded"
+        />
+      </v-col>
+    </v-row>
+
+    <p class="mb-4">
+      Working Hours :
+    </p>
+    <v-row class="mb-4">
+      <v-col
+        cols="12"
+        sm="2"
+        md="3"
+        lg="4"
+        xl="5"
+        xxl="6"
+        v-for="(i, index) in detailsData?.workingHours"
+        :key="index"
+        class="border rounded"
+      >
+        <p>{{ i?.day }}</p>
+        <p>Opening Time : {{ i?.startTime }}</p>
+        <p>Closing Time : {{ i?.endTime }}</p>
       </v-col>
     </v-row>
   </div>
@@ -968,9 +992,12 @@ const onAssignManager = async () => {
   managerForm.value.validate()
   if (!managerForm?.value?.isValid) return
   axios
-    .patch(`admin/restaurant/restaurants/${store.details?._id}/update-manager`, {
-      managerId: selectedManager.value?._id
-    })
+    .patch(
+      `admin/restaurant/restaurants/${store.details?._id}/update-manager`,
+      {
+        managerId: selectedManager.value?._id
+      }
+    )
     .then(async (res) => {
       if (res?.status === 200) {
         store.showSnackbar('Manager assigned successfully')
@@ -993,9 +1020,12 @@ const handelAssignManagerIconClick = (item) => {
 }
 const removeManager = async () => {
   await axios
-    .patch(`admin/restaurant/restaurants/${store.details?._id}/update-manager`, {
-      managerId: null
-    })
+    .patch(
+      `admin/restaurant/restaurants/${store.details?._id}/update-manager`,
+      {
+        managerId: null
+      }
+    )
     .then(async (res) => {
       if (res?.status === 200) {
         store.showSnackbar('Manager removed successfully')
