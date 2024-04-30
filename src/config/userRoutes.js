@@ -498,7 +498,7 @@ export const navLinks = [
     value: 'cruise',
     icon: 'sail-boat',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    permissions: [],
+    permissions: [permissions.cruiseEnquiry,permissions.cruiseMasterData,permissions.cruisePackage,permissions.cruiseShip],
     children: [
       {
         icon: 'list-box',
