@@ -58,7 +58,7 @@
             <v-tooltip
               text="Ratings"
               location="top"
-              v-if="store.hasPermission(permissions.cruiseUpdateHalalRatings)"
+              v-if="store.hasPermission(permissions.restaurantUpdateHalalRatings)"
             >
               <template #activator="{ props }">
                 <v-icon
@@ -69,7 +69,7 @@
               </template>
             </v-tooltip>
             <v-tooltip
-              v-if="store.hasPermission(permissions.cruiseUpdateManager)"
+              v-if="store.hasPermission(permissions.restaurantUpdateManager)"
               text="Assign Manager"
               location="top"
             >
@@ -82,7 +82,7 @@
               </template>
             </v-tooltip>
             <v-tooltip
-              v-if="store.hasPermission(permissions.cruiseUpdateManager)"
+              v-if="store.hasPermission(permissions.restaurantUpdateManager)"
               text="Remove Manager"
               location="top"
             >
