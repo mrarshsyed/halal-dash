@@ -36,7 +36,7 @@ export const permissions = {
   cruiseMasterData: 'cruise-master_data',
   cruiseShip: 'cruise-ship',
   cruisePackage: 'cruise-package',
-  cruiseEnquiry: 'cruise-enquiry',
+  cruiseEnquiry: 'cruise_enquiry-all',
   cruiseUpdateManager: 'cruise-update_manager',
   cruiseHalalRatingCategory: 'hotel-halal-rating-category',
   cruiseUpdateHalalRatings: 'cruise-update_halal_ratings',

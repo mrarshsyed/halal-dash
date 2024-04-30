@@ -36,30 +36,19 @@
 </template>
 
 <script setup>
-import { navLinks } from '@/config/userRoutes'
 import { useAppStore } from '@/store/app'
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 const store = useAppStore()
-const dashboardRoutes = ref(navLinks)
-const routes = ref([])
-const modules = [
-  {
-    title: 'Users Management',
-    icon: 'account-circle',
-    description: 'Manage All Users',
-    to: '/users'
-  },
-  {
-    title: 'Hotels List',
-    icon: 'home-city',
-    description: 'Manage All hotels',
-    to: '/hotels/list'
-  }
-]
+
 
 onMounted(async () => {
-  routes.value = dashboardRoutes.value?.filter((x) => x?.children)
+  if (store.user?.data?._id) {
+    const userInfo = await store.getUserInfo()
+    if (userInfo?.data?._id) {
+      store.setUser({ data: userInfo.data })
+    }
+  }
 })
 </script>
 

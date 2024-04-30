@@ -236,7 +236,7 @@ export const useAppStore = defineStore('app', {
       )
     },
     hasPermission(permissionName) {
-      if (this.user.data?.role === 'super-admin') {
+      if (this.user?.data?.role === 'super-admin') {
         return true
       } else if (this?.user?.data?.permissions?.includes(permissionName)) {
         return true
