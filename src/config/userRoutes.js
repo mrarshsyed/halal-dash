@@ -47,7 +47,13 @@ export const permissions = {
   restaurantRestaurant: 'restaurant-restaurant',
   restaurantUpdateManager: 'restaurant-update_manager',
   restaurantHalalRatingCategory: 'restaurant-halal-rating-category',
-  restaurantUpdateHalalRatings: 'restaurant-update_halal_ratings'
+  restaurantUpdateHalalRatings: 'restaurant-update_halal_ratings',
+
+  // holiday
+  holidayAll: 'holiday-all',
+  holidayMasterData: 'holiday-master_data',
+  holidayPackage: 'holiday-package',
+  holidayEnquiry: 'holiday_enquiry-all'
 }
 
 export const routes = [
@@ -354,6 +360,47 @@ export const routes = [
     ]
   },
   {
+    path: '/holiday',
+    name: 'holiday',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'inclusion-icon',
+        name: 'holiday-inclusion-icon',
+        component: () => import('@/views/holiday/InclusionIcon.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayMasterData]
+        }
+      },
+      {
+        path: 'package',
+        name: 'holiday-package',
+        component: () => import('@/views/holiday/Package.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayPackage]
+        }
+      },
+      {
+        path: 'enquiry',
+        name: 'holiday-enquiry',
+        component: () => import('@/views/holiday/Enquiry.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayEnquiry]
+        }
+      }
+    ]
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -498,7 +545,12 @@ export const navLinks = [
     value: 'cruise',
     icon: 'sail-boat',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    permissions: [permissions.cruiseEnquiry,permissions.cruiseMasterData,permissions.cruisePackage,permissions.cruiseShip],
+    permissions: [
+      permissions.cruiseEnquiry,
+      permissions.cruiseMasterData,
+      permissions.cruisePackage,
+      permissions.cruiseShip
+    ],
     children: [
       {
         icon: 'list-box',
@@ -579,7 +631,10 @@ export const navLinks = [
     value: 'restaurant',
     icon: 'silverware-fork-knife',
     role: ['super-admin', 'admin', 'employee', 'manager'],
-    permissions: [permissions.restaurantMasterData,permissions.restaurantRestaurant],
+    permissions: [
+      permissions.restaurantMasterData,
+      permissions.restaurantRestaurant
+    ],
     children: [
       {
         icon: 'list-box',
@@ -620,6 +675,43 @@ export const navLinks = [
         value: 'restaurant-restaurant',
         role: ['super-admin', 'admin', 'employee', 'manager'],
         permissions: [permissions.restaurantRestaurant]
+      }
+    ]
+  },
+  {
+    title: 'Holiday',
+    value: 'holiday',
+    icon: 'wan',
+    role: ['super-admin', 'admin', 'employee'],
+    permissions: [
+      permissions.holidayEnquiry,
+      permissions.holidayMasterData,
+      permissions.holidayPackage
+    ],
+    children: [
+      {
+        icon: 'react',
+        title: 'Inclusion Icons',
+        to: '/holiday/inclusion-icon',
+        value: 'holiday-inclusion-icon',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayMasterData]
+      },
+      {
+        icon: 'package-variant',
+        title: 'Package',
+        to: '/holiday/package',
+        value: 'holiday-package',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayPackage]
+      },
+      {
+        icon: 'chat-question',
+        title: 'Enquiry',
+        to: '/holiday/enquiry',
+        value: 'holiday-enquiry',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayEnquiry]
       }
     ]
   },
@@ -760,6 +852,24 @@ export const userCreatePermissions = [
       {
         title: 'Restaurant',
         value: permissions.restaurantRestaurant
+      }
+    ]
+  },
+  {
+    title: 'Holiday',
+    value: permissions.holidayAll,
+    children: [
+      {
+        title: 'Master Data ( Inclusion Icon )',
+        value: permissions.holidayMasterData
+      },
+      {
+        title: 'Package',
+        value: permissions.holidayPackage
+      },
+      {
+        title: 'Enquiry',
+        value: permissions.holidayEnquiry
       }
     ]
   }

@@ -4,9 +4,9 @@
       v-model="images"
       :prepend-icon="null"
       prepend-inner-icon="mdi-paperclip"
-      label="Images"
+      :label="props.label"
       variant="outlined"
-      :multiple="true"
+      :multiple="props.multiple"
       :chips="true"
     />
     <v-row v-if="images?.length">
@@ -41,10 +41,21 @@
 </template>
 
 <script setup>
-import ImageList from './ImageList.vue';
+import ImageList from './ImageList.vue'
 import { useAppStore } from '@/store/app'
 import { computed } from 'vue'
 const store = useAppStore()
+
+const props = defineProps({
+  label: {
+    type: String,
+    default: 'Images'
+  },
+  multiple:{
+    type: Boolean,
+    default: true
+  }
+})
 
 const componentData = computed(() => {
   return store?.dialog.formComponents?.fields?.find((x) => x?.key === 'uploads')
