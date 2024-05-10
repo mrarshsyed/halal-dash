@@ -847,7 +847,6 @@ const getDateRange = (firstDate, lastDate) => {
   return numberOfDays
 }
 const onEndDateSelect = (endDate) => {
-  console.log(formData.value.startDate)
   if (formData.value.startDate && endDate) {
     const numberOfDays = getDateRange(formData.value.startDate, endDate)
     formData.value.itinerary = [...Array(numberOfDays + 1).keys()].map((x) => {

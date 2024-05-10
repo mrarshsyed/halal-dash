@@ -1,1104 +1,875 @@
 <template>
-    <v-row
-      class="mb-4"
-      v-if="!formMode && !detailsMode"
+  <v-row
+    class="mb-4"
+    v-if="!formMode && !detailsMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
     >
+      <v-text-field
+        v-model="table_data.search"
+        placeholder="Enter search here ..."
+      />
+    </v-col>
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
+        + Add New {{ moduleName }}
+      </v-btn>
+    </v-col>
+    <v-col cols="12">
+      <v-data-table-server
+        density="compact"
+        :items-per-page="table_data.itemsPerPage"
+        :headers="table_data.headers"
+        :items-length="table_data.totalItems"
+        :items="table_data.serverItems"
+        :search="table_data.search"
+        :items-per-page-options="table_data.itemsPerPageOption"
+        :page="table_data.page"
+        show-current-page
+        @update:options="loadItems"
+      >
+        <template #item.name="{ item }">
+          {{ item?.name }}
+        </template>
+        <template #item.action="{ item }">
+          <div class="d-flex ga-3">
+            <v-icon
+              class="cursor-pointer"
+              @click="onDetails(item)"
+              icon="mdi-eye"
+            />
+            <v-icon
+              class="cursor-pointer"
+              @click="onEdit(item)"
+              icon="mdi-pencil-box"
+            />
+            <v-icon
+              @click="onDelete(item)"
+              class="cursor-pointer"
+            >
+              mdi-delete
+            </v-icon>
+          </div>
+        </template>
+      </v-data-table-server>
+    </v-col>
+  </v-row>
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode && !detailsMode"
+  >
+    <v-row v-if="showForm">
+      <v-col cols="12">
+        <v-btn
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="router.back()"
+        />
+        <h3 class="mt-4">
+          {{ id ? `Update ${moduleName}` : `Create New ${moduleName}` }}
+        </h3>
+      </v-col>
       <v-col
         cols="12"
-        md="8"
+        md="6"
       >
         <v-text-field
-          v-model="table_data.search"
-          placeholder="Enter search here ..."
+          v-model="formData.name"
+          label="Name"
+          required
+          :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        md="6"
       >
-        <v-btn
-          @click="onCreate"
-          block
-          color="primary"
-        >
-          + Add New {{ moduleName }}
-        </v-btn>
+        <v-autocomplete
+          clearable
+          label="Select Currency"
+          :items="currencyList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[(v) => !!v || `Currency is required`]"
+          v-model="formData.currency"
+          return-object
+        />
       </v-col>
       <v-col cols="12">
-        <v-data-table-server
-          density="compact"
-          :items-per-page="table_data.itemsPerPage"
-          :headers="table_data.headers"
-          :items-length="table_data.totalItems"
-          :items="table_data.serverItems"
-          :search="table_data.search"
-          :items-per-page-options="table_data.itemsPerPageOption"
-          :page="table_data.page"
-          show-current-page
-          @update:options="loadItems"
-        >
-          <template #item.name="{ item }">
-            {{ item?.name }}
-          </template>
-          <template #item.rating="{ item }">
-            {{ item?.halal_ratings_percentage }}
-          </template>
-          <template #item.manager="{ item }">
-            {{ item?.manager?.email }}
-          </template>
-          <template #item.manager_name="{ item }">
-            {{
-              item?.manager?.name
-                ? item?.manager?.name
-                : store.getUserName(item?.manager?.email)
-            }}
-          </template>
-          <template #item.action="{ item }">
-            <div class="d-flex ga-3">
-              <v-tooltip
-                text="Ratings"
-                location="top"
-                v-if="store.hasPermission(permissions.restaurantUpdateHalalRatings)"
-              >
-                <template #activator="{ props }">
-                  <v-icon
-                    v-bind="props"
-                    @click="onRatingIconClick(item)"
-                    icon="mdi-star"
-                  />
-                </template>
-              </v-tooltip>
-              <v-tooltip
-                v-if="store.hasPermission(permissions.restaurantUpdateManager)"
-                text="Assign Manager"
-                location="top"
-              >
-                <template #activator="{ props }">
-                  <v-icon
-                    v-bind="props"
-                    @click="handelAssignManagerIconClick(item)"
-                    icon="mdi-cog"
-                  />
-                </template>
-              </v-tooltip>
-              <v-tooltip
-                v-if="store.hasPermission(permissions.restaurantUpdateManager)"
-                text="Remove Manager"
-                location="top"
-              >
-                <template #activator="{ props }">
-                  <v-icon
-                    v-bind="props"
-                    v-if="item?.manager?.email"
-                    @click="handelRemoveManagerIconClick(item)"
-                    icon="mdi-link-off"
-                  />
-                </template>
-              </v-tooltip>
-              <v-icon
-                class="cursor-pointer"
-                @click="onDetails(item)"
-                icon="mdi-eye"
-              />
-              <v-icon
-                class="cursor-pointer"
-                @click="onEdit(item)"
-                icon="mdi-pencil-box"
-              />
-              <v-icon
-                @click="onDelete(item)"
-                class="cursor-pointer"
-              >
-                mdi-delete
-              </v-icon>
-            </div>
-          </template>
-        </v-data-table-server>
+        <v-textarea
+          v-model="formData.address"
+          label="Address"
+          required
+          :rules="[(v) => !!v || 'Address is required']"
+        />
       </v-col>
-    </v-row>
-    <v-form
-      v-model="formValue"
-      ref="form"
-      v-else-if="formMode && !detailsMode"
-    >
-      <v-row v-if="showForm">
-        <v-col cols="12">
-          <v-btn
-            size="x-small"
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.duration.days"
+          label="Duration (Days)"
+          type="number"
+          :rules="[validatePositiveInteger, validateRequired]"
+          required
+          @update:model-value="
+            () => {
+              formData.startDate = null
+              formData.endDate = null
+            }
+          "
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.duration.nights"
+          label="Duration (Nights)"
+          type="number"
+          :rules="[validatePositiveInteger, validateRequired]"
+          required
+          @update:model-value="
+            () => {
+              formData.startDate = null
+              formData.endDate = null
+            }
+          "
+        />
+      </v-col>
+      <!-- start date -->
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <div
+          class="border pa-4"
+          v-if="
+            formData.duration.nights === '' || formData.duration.days === ''
+          "
+        >
+          Start Date: Add Duration (Days & Nights) First
+        </div>
+        <v-menu
+          v-else
+          v-model="startDateMenu"
+          :close-on-content-click="false"
+        >
+          <template #activator="{ props }">
+            <v-text-field
+              label="Start Date"
+              :rules="[(v) => !!v || 'Start Date is required']"
+              v-model="formData.startDate"
+              v-bind="props"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+            />
+          </template>
+          <v-date-picker
+            v-bind="$attrs"
+            v-model="formData.startDate"
             color="primary"
-            icon="mdi-arrow-left"
-            @click="router.back()"
+            @update:model-value="onStartDateChange"
           />
-          <h3 class="mt-4">
-            {{ id ? `Update ${moduleName}` : `Create New ${moduleName}` }}
-          </h3>
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
+        </v-menu>
+      </v-col>
+      <!-- end date -->
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <div
+          class="border pa-4"
+          v-if="
+            formData.duration.nights === '' || formData.duration.days === ''
+          "
         >
-          <v-text-field
-            v-model="formData.name"
-            label="Name"
-            required
-            :rules="[(v) => !!v || 'Name is required']"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
+          End Date: Add Duration (Days & Nights) First
+        </div>
+        <v-menu
+          v-else
+          v-model="endDateMenu"
+          :close-on-content-click="false"
         >
-          <v-text-field
-            v-model="formData.contactNumber"
-            label="Contact Number"
-            required
-            :rules="[(v) => !!v || 'Contact Number is required']"
+          <template #activator="{ props }">
+            <v-text-field
+              label="End Date"
+              :rules="[(v) => !!v || 'End Date is required']"
+              v-model="formData.endDate"
+              v-bind="props"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+              disabled
+            />
+          </template>
+          <v-date-picker
+            v-bind="$attrs"
+            v-model="formData.endDate"
+            color="primary"
           />
-        </v-col>
-        <v-col cols="12">
-          <v-textarea
-            v-model="formData.address"
-            label="Address"
-            required
-            :rules="[(v) => !!v || 'Address is required']"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            v-model="formData.website"
-            label="Web Site"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            type="number"
-            v-model="formData.rating"
-            label="Rating"
-            :rules="[
-              (v) => {
-                const rating = parseFloat(v)
-                return (
-                  v === null ||
-                  (Number.isFinite(rating) && rating >= 0 && rating <= 5) ||
-                  'Rating must be a number between 0 and 5'
-                )
-              }
-            ]"
-          />
-        </v-col>
-  
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            type="number"
-            v-model.number="formData.startPrice"
-            label="Start Price"
-            :rules="[
-              (v) => v !== null || 'Start Price is required',
-              (v) =>
-                (typeof v === 'number' && v >= 0) ||
-                'Start Price must be a non-negative number'
-            ]"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            type="number"
-            v-model.number="formData.endPrice"
-            label="End Price"
-            :rules="[
-              (v) => v !== null || 'End Price is required',
-              (v) =>
-                (typeof v === 'number' && v >= 0) ||
-                'End Price must be a non-negative number'
-            ]"
-          />
-        </v-col>
-        <v-col cols="12">
-          <p>Description</p>
-          <DocumentEditor
-            height="200px"
-            v-model="formData.description"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-autocomplete
-            clearable
-            label="Cuisines"
-            :items="cuisinesList"
-            required
-            :rules="[(v) => (v && v.length > 0) || 'This field is required']"
-            v-model="formData.cuisines"
-            multiple
-            chips
-            item-title="name"
-            item-value="_id"
-            return-object
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-autocomplete
-            clearable
-            label="Special Diets"
-            :items="specialDietsList"
-            required
-            :rules="[(v) => (v && v.length > 0) || 'This field is required']"
-            v-model="formData.specialDiets"
-            multiple
-            chips
-            item-title="name"
-            item-value="_id"
-            return-object
-          />
-        </v-col>
-  
-        <v-col cols="12">
-          <ImageUploader
-            label="Images"
-            :value="formData.uploads"
-            @update="(data) => onUploadsUpdate(data, 'uploads')"
-            :image-list="formData.images"
-            @update-image-link="(data) => onImageUpdate(data, 'images')"
-          />
-        </v-col>
-        <v-col cols="12">
-          <ImageUploader
-            label="Menu"
-            :value="formData.menuUploads"
-            @update="(data) => onUploadsUpdate(data, 'menuUploads')"
-            :image-list="formData.menu"
-            @update-image-link="(data) => onImageUpdate(data, 'menu')"
-          />
-        </v-col>
-        <v-col cols="12">
-          <ImageUploader
-            label="Halal Certificate"
-            :value="formData.halalCertificatesUploads"
-            @update="(data) => onUploadsUpdate(data, 'halalCertificatesUploads')"
-            :image-list="formData.menu"
-            @update-image-link="
-              (data) => onImageUpdate(data, 'halalCertificates')
-            "
-          />
-        </v-col>
-  
-        <v-col cols="12">
-          <v-expansion-panels v-model="panel">
-            <v-expansion-panel title="Working Hours">
-              <v-expansion-panel-text class="pb-10">
-                <v-autocomplete
-                  item-title="day"
-                  item-value="day"
-                  clearable
-                  label="Select Working Days"
-                  :items="workingDaysList"
-                  required
-                  :rules="[
-                    (v) => (v && v.length > 0) || 'This field is required'
-                  ]"
-                  v-model="formData.workingHours"
-                  multiple
-                  chips
-                  return-object
-                />
-                <v-row class="mt-4">
-                  <v-col
-                    v-for="(workingHour, indexH) in formData.workingHours"
-                    :key="indexH"
-                    cols="12"
-                    md="6"
-                    class="border px-2 mb-4 rounded"
+        </v-menu>
+      </v-col>
+
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.offerType"
+          label="Offer Type"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Inclusion Icons"
+          :items="inclusionIconList"
+          item-title="name"
+          item-value="_id"
+          required
+          :rules="[
+            (v) => formData.inclusionIcons.length > 0 || 'Icons are required'
+          ]"
+          v-model="formData.inclusionIcons"
+          multiple
+          chips
+        />
+      </v-col>
+      <v-col cols="12">
+        <p>Overview</p>
+        <DocumentEditor
+          height="200px"
+          v-model="formData.overview"
+          class="mb-4"
+        />
+      </v-col>
+      <v-col cols="12">
+        <p>Inclusion</p>
+        <DocumentEditor
+          height="200px"
+          v-model="formData.inclusions"
+          class="mb-4"
+        />
+      </v-col>
+      <v-col cols="12">
+        <p>Exclusion</p>
+        <DocumentEditor
+          height="200px"
+          v-model="formData.exclusions"
+          class="mb-4"
+        />
+      </v-col>
+
+      <v-col cols="12">
+        <v-expansion-panels v-model="panel">
+          <v-expansion-panel title="Itinerary (based on start date and end)">
+            <v-expansion-panel-text>
+              <v-row>
+                <v-col v-if="!formData.itinerary?.length">
+                  <div class="text-center pa-4 border">
+                    Select start date first
+                  </div>
+                </v-col>
+                <v-col
+                  v-else
+                  v-for="(itinerary, indexI) in formData.itinerary"
+                  :key="indexI"
+                  cols="12"
+                  class="border mb-4 rounded"
+                >
+                  <v-text-field
+                    label="Date"
+                    :rules="[(v) => !!v || 'Date is required']"
+                    v-model="itinerary.date"
+                    :clearable="false"
+                    prepend-inner-icon="mdi-calendar"
+                    readonly
+                  />
+                  <v-text-field
+                    label="Title"
+                    :rules="[(v) => !!v || 'Title is required']"
+                    v-model="itinerary.title"
+                    :clearable="true"
+                  />
+                  <p class="mt-8 mb-2">
+                    Description
+                  </p>
+                  <DocumentEditor
+                    :key="`itinerary-description-${editorKey}`"
+                    height="200px"
+                    v-model="itinerary.description"
+                    class="mb-4"
+                  />
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          <v-expansion-panel title="Prices">
+            <v-expansion-panel-text class="pb-10">
+              <v-row class="mt-4">
+                <v-col
+                  v-for="(value, key) of formData.prices"
+                  :key="key"
+                  cols="12"
+                  md="6"
+                  class="mb-4 rounded"
+                >
+                  <v-text-field
+                    v-model="formData.prices[key]"
+                    :label="formatLabel(key)"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                  />
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          <v-expansion-panel title="Additional Information">
+            <v-expansion-panel-text class="pb-10">
+              <v-row class="mt-4">
+                <v-col cols="12">
+                  <div class="text-right">
+                    <v-btn
+                      color="primary"
+                      @click="addMoreAdditionalInfo"
+                    >
+                      + Add More
+                    </v-btn>
+                  </div>
+                </v-col>
+                <v-col
+                  v-for="(value, key) in formData.additionalInformation"
+                  :key="key"
+                  cols="12"
+                  class="border px-2 mb-4 rounded"
+                >
+                  <div class="text-right my-4">
+                    <v-btn
+                      color="error"
+                      @click="removeAdditionalInfo(key)"
+                    >
+                      Delete
+                    </v-btn>
+                  </div>
+                  <v-text-field
+                    v-model="value.title"
+                    label="Title"
+                    :rules="[validateRequired]"
+                  />
+                  <p class="mt-6 mb-2">
+                    Description
+                  </p>
+                  <DocumentEditor
+                    :key="`additional-info-description-${editorKey}`"
+                    height="200px"
+                    v-model="value.description"
+                    class=""
+                  />
+                  <p
+                    v-if="!value.description"
+                    class="text-error"
                   >
-                    <v-text-field
-                      label="Day"
-                      v-model="workingHour.day"
-                      readonly
-                      :clearable="false"
-                    />
-                    <div class="d-flex ga-4 flex-wrap">
-                      <v-text-field
-                        v-model="workingHour.startTime"
-                        :active="workingHour.startTimeMenu"
-                        :focus="workingHour.startTimeMenu"
-                        label="Opening Time"
-                        prepend-inner-icon="mdi-clock-time-four-outline"
-                        readonly
-                        required
-                        :rules="[(v) => !!v || 'Start time is required']"
-                      >
-                        <v-menu
-                          v-model="workingHour.startTimeMenu"
-                          :close-on-content-click="false"
-                          activator="parent"
-                          transition="scale-transition"
-                        >
-                          <v-time-picker
-                            v-if="workingHour.startTimeMenu"
-                            v-model="workingHour.startTime"
-                            full-width
-                            format="24hr"
-                          />
-                        </v-menu>
-                      </v-text-field>
-                      <v-text-field
-                        v-model="workingHour.endTime"
-                        :active="workingHour.endTimeMenu"
-                        :focus="workingHour.endTimeMenu"
-                        label="Closing Time"
-                        prepend-inner-icon="mdi-clock-time-four-outline"
-                        readonly
-                        :rules="[(v) => !!v || 'Closing time is required']"
-                      >
-                        <v-menu
-                          v-model="workingHour.endTimeMenu"
-                          :close-on-content-click="false"
-                          activator="parent"
-                          transition="scale-transition"
-                        >
-                          <v-time-picker
-                            v-if="workingHour.endTimeMenu"
-                            v-model="workingHour.endTime"
-                            full-width
-                            format="24hr"
-                          />
-                        </v-menu>
-                      </v-text-field>
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-col>
-        <v-col cols="12">
-          <div class="text-right d-flex justify-end ga-4">
-            <v-btn
-              color="error"
-              @click="router.back()"
-            >
-              Cancel
-            </v-btn>
-            <v-btn
-              color="primary"
-              @click="save"
-            >
-              Save
-            </v-btn>
-          </div>
-        </v-col>
-      </v-row>
-    </v-form>
-    <div v-if="!formMode && detailsMode">
-      <v-btn
-        class="mb-4"
-        size="x-small"
-        color="primary"
-        icon="mdi-arrow-left"
-        @click="router.back()"
-      />
-      <p class="mb-4">
-        Name : {{ detailsData?.name }}
-      </p>
-      <p class="mb-4">
-        Contact Number : {{ detailsData?.contactNumber }}
-      </p>
-      <p class="mb-4">
-        Address : {{ detailsData?.address }}
-      </p>
-      <p class="mb-4">
-        Website : {{ detailsData?.website }}
-      </p>
-      <p class="mb-4">
-        Rating : {{ detailsData?.rating }}
-      </p>
-      <p class="mb-4">
-        Start Price : {{ detailsData?.startPrice }}
-      </p>
-      <p class="mb-4">
-        End Price : {{ detailsData?.endPrice }}
-      </p>
-      <p class="mb-2">
-        Description :
-      </p>
-      <div
-        class="mb-4"
-        v-html="detailsData?.description"
-      />
-      <div class="mb-4">
-        <p class="mb-2">
-          Cuisines:
-        </p>
-        <div class="d-flex flex-wrap ga-4">
-          <v-chip
-            v-for="(c, index) in detailsData?.cuisines"
-            :key="index"
-          >
-            {{ c?.name }}
-          </v-chip>
-        </div>
-      </div>
-      <div class="mb-4">
-        <p class="mb-2">
-          Special Diets:
-        </p>
-        <div class="d-flex flex-wrap ga-4">
-          <v-chip
-            v-for="(s, index) in detailsData?.specialDiets"
-            :key="index"
-          >
-            {{ s?.name }}
-          </v-chip>
-        </div>
-      </div>
-      <p class="mb-4">
-        Images :
-      </p>
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="2"
-          md="3"
-          lg="4"
-          xl="5"
-          xxl="6"
-          v-for="(i, index) in detailsData?.images"
-          :key="index"
-        >
-          <v-img
-            cover
-            :src="i"
-            height="150"
-            class="rounded"
-          />
-        </v-col>
-      </v-row>
-      <p class="mb-4">
-        Menu :
-      </p>
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="2"
-          md="3"
-          lg="4"
-          xl="5"
-          xxl="6"
-          v-for="(i, index) in detailsData?.menu"
-          :key="index"
-        >
-          <v-img
-            cover
-            :src="i"
-            height="150"
-            class="rounded"
-          />
-        </v-col>
-      </v-row>
-      <p class="mb-4">
-        Halal Certificates :
-      </p>
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="2"
-          md="3"
-          lg="4"
-          xl="5"
-          xxl="6"
-          v-for="(i, index) in detailsData?.halalCertificates"
-          :key="index"
-        >
-          <v-img
-            cover
-            :src="i"
-            height="150"
-            class="rounded"
-          />
-        </v-col>
-      </v-row>
-  
-      <p class="mb-4">
-        Working Hours :
-      </p>
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="2"
-          md="3"
-          lg="4"
-          xl="5"
-          xxl="6"
-          v-for="(i, index) in detailsData?.workingHours"
-          :key="index"
-          class="border rounded"
-        >
-          <p>{{ i?.day }}</p>
-          <p>Opening Time : {{ i?.startTime }}</p>
-          <p>Closing Time : {{ i?.endTime }}</p>
-        </v-col>
-      </v-row>
-    </div>
-    <v-dialog v-model="assignRatingDialogShow">
-      <v-card>
-        <v-card-title>Select Rating</v-card-title>
-        <v-card-text>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              v-for="(r, index) in ratings"
-              :key="index"
-            >
-              <v-checkbox
-                v-model="selectedRatings"
-                :value="r"
-              >
-                <template #label>
-                  {{ r?.name }}
-                  <v-chip class="ms-2">
-                    {{ r?.rating }}
-                  </v-chip>
-                </template>
-              </v-checkbox>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions class="ma-2">
-          <p>
-            Selected Ratings {{ sumOfSelectedRatings }} out of
-            {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
-          </p>
-          <v-spacer />
+                    Description is required
+                  </p>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+      <v-col cols="12">
+        <div class="text-right d-flex justify-end ga-4">
           <v-btn
             color="error"
-            @click="
-              () => {
-                selectedRatings = []
-                assignRatingDialogShow = false
-              }
-            "
+            @click="router.back()"
           >
-            Close
+            Cancel
           </v-btn>
           <v-btn
             color="primary"
-            @click="onAssignRating"
+            @click="save"
           >
             Save
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="assignManagerDialogShow">
-      <v-card>
-        <v-card-title>Assign Manager</v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col cols="12">
-              <v-form ref="managerForm">
-                <v-autocomplete
-                  label="Select Manager"
-                  no-data-text="Hit enter to create"
-                  @update:search="onManagerSearch"
-                  :items="managers"
-                  item-title="email"
-                  return-object
-                  v-model="selectedManager"
-                  @keydown.enter="onManagerCreate"
-                  required
-                  :rules="[(v) => !!v || `Manager is required`]"
-                />
-              </v-form>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="error"
-            @click="
-              () => {
-                selectedManager = null
-                assignManagerDialogShow = false
-              }
-            "
-          >
-            Close
-          </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignManager"
-          >
-            Assign Manager
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </template>
-  
-  <script setup>
-  import { ref, onBeforeMount, computed } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import axios from '@/plugins/axios'
-  import DocumentEditor from '@/components/DocumentEditor.vue'
-  import ImageUploader from './components/ImageUploader.vue'
-  import { useAppStore } from '@/store/app'
-  import { permissions } from '@/config/userRoutes'
-  
-  const workingDaysList = [
+        </div>
+      </v-col>
+    </v-row>
+  </v-form>
+  <div v-if="!formMode && detailsMode">
+    <v-btn
+      class="mb-4"
+      size="x-small"
+      color="primary"
+      icon="mdi-arrow-left"
+      @click="router.back()"
+    />
+    <p class="mb-4">
+      Name : {{ detailsData?.name }}
+    </p>
+    <p class="mb-4">
+      Currency : {{ detailsData?.currency?.code }}
+    </p>
+    <p class="mb-4">
+      Address : {{ detailsData?.address }}
+    </p>
+    <p class="mb-4">
+      Duration ( Days ) : {{ detailsData?.duration?.days }}
+    </p>
+    <p class="mb-4">
+      Duration ( Nights ) : {{ detailsData?.duration?.nights }}
+    </p>
+    <p class="mb-4">
+      Start Date :
+      {{
+        detailsData?.startDate
+          ? format(new Date(detailsData?.startDate), 'MM/dd/yyyy')
+          : ''
+      }}
+    </p>
+    <p class="mb-4">
+      End Date :
+      {{
+        detailsData?.endDate
+          ? format(new Date(detailsData?.endDate), 'MM/dd/yyyy')
+          : ''
+      }}
+    </p>
+    <p class="mb-4">
+      Offer Type : {{ detailsData?.offerType }}
+    </p>
+    <div class="mb-4">
+      <p class="mb-2">
+        Inclusion Icons :
+      </p>
+      <v-row>
+        <v-col
+          cols="2"
+          v-for="(i, index) in detailsData?.inclusionIcons"
+          :key="index"
+        >
+          <v-img
+            :src="i?.image"
+            height="70px"
+            width="70px"
+            :alt="i?.name"
+          />
+        </v-col>
+      </v-row>
+    </div>
+    <div class="mb-6">
+      <p class="mb-2">
+        Overview :
+      </p>
+      <div
+        class="mb-4"
+        v-html="detailsData?.overview"
+      />
+    </div>
+    <div class="mb-6">
+      <p class="mb-2">
+        Inclusion :
+      </p>
+      <div
+        class="mb-4"
+        v-html="detailsData?.inclusions"
+      />
+    </div>
+    <div class="mb-6">
+      <p class="mb-2">
+        Exclusion :
+      </p>
+      <div
+        class="mb-4"
+        v-html="detailsData?.exclusions"
+      />
+    </div>
+    <div class="mb-8">
+      <p class="mb-2">
+        Prices:
+      </p>
+      <v-row class="mt-4 border pa-4 shadow">
+        <v-col
+          v-for="(value, key) of detailsData.prices"
+          :key="key"
+          cols="6"
+          class="rounded"
+        >
+          <p>{{ formatLabel(key) }} : {{ value }}</p>
+        </v-col>
+      </v-row>
+    </div>
+    <div class="mb-8">
+      <p class="mb-2">
+        Itinerary:
+      </p>
+      <v-row class="mt-4">
+        <v-col
+          v-for="(value, key) in detailsData?.itinerary"
+          :key="key"
+          cols="6"
+          class="rounded border pa-4 shadow"
+        >
+          <p>Date :  {{ value?.date ? format(new Date (value?.date), 'MM/dd/yyyy') : '' }}</p>
+          <p>Title: {{ value?.title }}</p>
+          <p class="mt-4 mb-2">
+            Description
+          </p>
+          <div v-html="value.description" />
+        </v-col>
+      </v-row>
+    </div>
+    <div class="mb-8">
+      <p class="mb-2">
+        Additional Information:
+      </p>
+      <v-row class="mt-4">
+        <v-col
+          v-for="(value, key) in detailsData?.additionalInformation"
+          :key="key"
+          cols="6"
+          class="rounded border pa-4 shadow"
+        >
+          <p>Title: {{ value?.title }}</p>
+          <p class="mt-4 mb-2">
+            Description
+          </p>
+          <div v-html="value.description" />
+        </v-col>
+      </v-row>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onBeforeMount, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from '@/plugins/axios'
+import DocumentEditor from '@/components/DocumentEditor.vue'
+import { useAppStore } from '@/store/app'
+import { permissions } from '@/config/userRoutes'
+import { addDays, format } from 'date-fns'
+
+const validatePositiveInteger = (value) => {
+  // Ensure the value is an integer greater than zero
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(value) ||
+    !Number.isInteger(Number(value))
+  ) {
+    return 'Value must be a positive integer'
+  }
+  return true
+}
+
+const validateRequired = (value) => {
+  // Check if the value is null, undefined, or an empty string
+  if (value === null || value === undefined || value === '') {
+    return 'This field is required'
+  }
+  return true
+}
+const formatLabel = (key) => {
+  return (
+    key &&
+    key.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) {
+      return str.toUpperCase()
+    })
+  )
+}
+
+const currencyList = ref([])
+const inclusionIconList = ref([])
+const editorKey = ref(0)
+
+const startDateMenu = ref(false)
+const endDateMenu = ref(false)
+
+const initialFormData = {
+  name: '',
+  address: '',
+  contactNumber: '',
+  duration: {
+    nights: '',
+    days: ''
+  },
+  startDate: null,
+  endDate: null,
+  currency: null,
+  prices: {
+    adultSingleOccupancy: '',
+    adultDoubleOccupancy: '',
+    adultTripleOccupancy: '',
+    child: '',
+    infant: ''
+  },
+  offerType: '',
+  overview: '',
+  inclusions: '',
+  exclusions: '',
+  additionalInformation: [
     {
-      day: 'Monday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Tuesday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Wednesday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Thursday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Friday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Saturday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
-    },
-    {
-      day: 'Sunday',
-      startTime: '',
-      endTime: '',
-      startTimeMenu: false,
-      endTimeMenu: false
+      title: '',
+      description: ''
     }
+  ],
+  inclusionIcons: [],
+  itinerary: []
+}
+const store = useAppStore()
+const route = useRoute()
+const router = useRouter()
+const moduleName = 'Package'
+const formMode = computed(() => {
+  return route?.query?.mode === 'form'
+})
+const detailsMode = computed(() => {
+  return route?.query?.mode === 'details'
+})
+const panel = ref([0])
+const id = computed(() => {
+  return route?.query?.id
+})
+
+const table_data = ref({
+  loading: true,
+  search: '',
+  itemsPerPage: 10,
+  totalItems: 0,
+  page: 1,
+  serverItems: [],
+  headers: [
+    { title: 'Name', key: 'name', align: 'start' },
+    { title: 'Action', key: 'action', align: 'start' }
+  ],
+  itemsPerPageOption: [
+    { value: 10, title: '10' },
+    { value: 20, title: '20' },
+    { value: 'all', title: 'All' }
   ]
-  
-  const initialFormData = {
-    name: '',
-    address: '',
-    contactNumber: '',
-    website: '',
-    rating: null,
-    startPrice: null,
-    endPrice: null,
-    description: '',
-    workingHours: [],
-    cuisines: [],
-    specialDiets: [],
-    uploads: [],
-    images: [],
-    menu: [],
-    menuUploads: [],
-    halalCertificates: [],
-    halalCertificatesUploads: [],
-    fileMapper: []
-  }
-  const store = useAppStore()
-  const route = useRoute()
-  const router = useRouter()
-  const moduleName = 'Restaurant'
-  const formMode = computed(() => {
-    return route?.query?.mode === 'form'
-  })
-  const detailsMode = computed(() => {
-    return route?.query?.mode === 'details'
-  })
-  
-  const panel = ref([0])
-  const managerForm = ref()
-  const selectedManager = ref(null)
-  
-  const id = computed(() => {
-    return route?.query?.id
-  })
-  
-  const table_data = ref({
-    loading: true,
-    search: '',
-    itemsPerPage: 10,
-    totalItems: 0,
-    page: 1,
-    serverItems: [],
-    headers: [
-      { title: 'Name', key: 'name', align: 'start' },
-      { title: 'Rating(%)', key: 'rating', align: 'start' },
-      { title: 'Manager Name', key: 'manager_name', align: 'start' },
-      { title: 'Manager Email', key: 'manager', align: 'start' },
-      { title: 'Action', key: 'action', align: 'center' }
-    ],
-    itemsPerPageOption: [
-      { value: 10, title: '10' },
-      { value: 20, title: '20' },
-      { value: 'all', title: 'All' }
-    ]
-  })
-  
-  const onCreate = () => {
-    router.push({ name: 'restaurant-restaurant', query: { mode: 'form' } })
-  }
-  const formData = ref(initialFormData)
-  const form = ref()
-  const formValue = ref(false)
-  const showForm = ref(false)
-  const ratings = ref([])
-  const selectedRatings = ref([])
-  const assignRatingDialogShow = ref(false)
-  const assignManagerDialogShow = ref(false)
-  const managerSearch = ref('')
-  const detailsData = ref({})
-  const cuisinesList = ref([])
-  const specialDietsList = ref([])
-  
-  const onRatingIconClick = async (item) => {
-    store.setDetails(item)
-    if (item?.halal_ratings?.length) {
-      selectedRatings.value = item?.halal_ratings
-    }
-    assignRatingDialogShow.value = true
-  }
-  const onEdit = (item) => {
-    router.push(`/restaurant/restaurant?mode=form&id=${item?._id}`)
-  }
-  const onDetails = (item) => {
-    router.push(`/restaurant/restaurant?mode=details&id=${item?._id}`)
-  }
-  const removeUploads = (obj) => {
-    let newObject = { ...obj }
-    delete newObject.uploads
-    delete newObject.menuUploads
-    delete newObject.halalCertificatesUploads
-    console.log(newObject)
-    return newObject
-  }
-  const getFilesPayload = () => {
-    const files = []
-    const fileMapper = []
-    if (formData.value?.uploads?.length) {
-      formData.value.uploads.forEach((file) => {
-        if (file instanceof File) {
-          files.push(file)
-          fileMapper.push({
-            resource: 'images',
-            name: file.name
-          })
-        }
-      })
-    }
-    if (formData.value?.menuUploads?.length) {
-      formData.value.menuUploads.forEach((file) => {
-        if (file instanceof File) {
-          files.push(file)
-          fileMapper.push({
-            resource: 'menu',
-            name: file.name
-          })
-        }
-      })
-    }
-    if (formData.value?.halalCertificatesUploads?.length) {
-      formData.value.halalCertificatesUploads.forEach((file) => {
-        if (file instanceof File) {
-          files.push(file)
-          fileMapper.push({
-            resource: 'halalCertificates',
-            name: file.name
-          })
-        }
-      })
-    }
-    return { files, fileMapper }
-  }
-  const getDataPayload = () => {
-    try {
-      let { files, fileMapper } = getFilesPayload()
-      let data = removeUploads(formData.value)
-      data.fileMapper = fileMapper
-      let formdata = new FormData()
-      formdata.append('data', JSON.stringify(data))
-      files?.forEach((file) => {
-        formdata.append('uploads', file)
-      })
-      return formdata
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  const save = async () => {
-    form.value.validate()
-    if (form.value.isValid) {
-      const payload = getDataPayload()
-      const response = id?.value
-        ? await axios.patch(`admin/restaurant/restaurants/${id.value}`, payload)
-        : await axios.post('admin/restaurant/restaurants', payload)
-      if (response.data) {
-        store.showSnackbar('Successfully Saved')
-        router.back()
-      }
-    } else {
-      panel.value = [0]
-    }
-  }
-  const onUploadsUpdate = (images, key) => {
-    formData.value[key] = images
-  }
-  const loadItems = async ({ page, itemsPerPage, sortBy }) => {
-    await axios
-      .post('admin/restaurant/restaurants-list', {
-        params: {
-          page: page,
-          perPage: itemsPerPage
-        }
-      })
-      .then((res) => {
-        table_data.value.serverItems = res?.data?.data
-        table_data.value.totalItems = res?.data?.data.length
-      })
-  }
-  const managers = computed(() => {
-    return store.managers
-  })
-  const confirmDelete = async () => {
-    await axios
-      .delete(`admin/restaurant/restaurants/${store.details?._id}`)
-      .then(async () => {
-        store.showSnackbar('Successfully Deleted')
-        await loadItems({
-          page: table_data.value.page,
-          itemsPerPage: table_data.value.itemsPerPage,
-          sortBy: 'ascending'
+})
+
+const onCreate = () => {
+  router.push({ name: 'holiday-package', query: { mode: 'form' } })
+}
+
+const formData = ref(initialFormData)
+const form = ref()
+const formValue = ref(false)
+const showForm = ref(false)
+const detailsData = ref({})
+const onEdit = (item) => {
+  router.push(`/holiday/package?mode=form&id=${item?._id}`)
+}
+const onDetails = (item) => {
+  router.push(`/holiday/package?mode=details&id=${item?._id}`)
+}
+const removeUploads = (obj) => {
+  let newObject = { ...obj }
+  delete newObject.uploads
+  delete newObject.menuUploads
+  delete newObject.halalCertificatesUploads
+  console.log(newObject)
+  return newObject
+}
+const getFilesPayload = () => {
+  const files = []
+  const fileMapper = []
+  if (formData.value?.uploads?.length) {
+    formData.value.uploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'images',
+          name: file.name
         })
-        store.closeDialog()
-      })
-  }
-  const onDelete = (item) => {
-    store.setDetails(item)
-    const dialogModal = {
-      title: `Delete ${moduleName}`,
-      content: `Are you sure to delete this ${moduleName}?`,
-      confirmText: 'Delete',
-      formComponents: { fields: [] },
-      confirmFunction: confirmDelete
-    }
-    store.showDialog(dialogModal)
-  }
-  const onImageUpdate = (data, key) => {
-    formData.value[key] = [...data]
-  }
-  const sumOfSelectedRatings = computed(() => {
-    return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
-  })
-  const sumOfTotalRating = computed(() => {
-    return ratings.value.reduce((total, r) => total + r.rating, 0)
-  })
-  const ratingPercentage = computed(() => {
-    return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
-  })
-  const onAssignRating = async () => {
-    const ids = selectedRatings.value?.map((x) => {
-      return x._id
+      }
     })
-    axios
-      .patch(
-        `admin/restaurant/restaurants/${store.details?._id}/update-halal-ratings`,
-        {
-          ratingIds: ids
-        }
-      )
-      .then(async (res) => {
-        store.showSnackbar('Ratings updated successfully')
-        store.setDetails({})
-        await loadItems({
-          page: table_data.value.page,
-          itemsPerPage: table_data.value.itemsPerPage,
-          sortBy: 'ascending'
+  }
+  if (formData.value?.menuUploads?.length) {
+    formData.value.menuUploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'menu',
+          name: file.name
         })
-        assignRatingDialogShow.value = false
-        selectedRatings.value = []
-      })
-  }
-  const onManagerSearch = (data) => {
-    managerSearch.value = data
-  }
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return re.test(email)
-  }
-  const onManagerCreate = async () => {
-    if (
-      managerSearch.value &&
-      !managers.value?.some((m) => m?.email?.includes(managerSearch.value))
-    ) {
-      const valid = validateEmail(managerSearch.value.trim())
-      if (valid) {
-        await store
-          .createUser(managerSearch.value, 'manager')
-          .then(async (res) => {
-            if (res?.status === 200) {
-              selectedManager.value = res?.data
-              await loadItems({
-                page: table_data.value.page,
-                itemsPerPage: table_data.value.itemsPerPage,
-                sortBy: 'ascending'
-              })
-              store.showSnackbar('Invitation sent Successfully')
-            }
-          })
-      } else {
-        store.showSnackbar('Email must be valid', 'error')
       }
-    }
-  }
-  const onAssignManager = async () => {
-    managerForm.value.validate()
-    if (!managerForm?.value?.isValid) return
-    axios
-      .patch(
-        `admin/restaurant/restaurants/${store.details?._id}/update-manager`,
-        {
-          managerId: selectedManager.value?._id
-        }
-      )
-      .then(async (res) => {
-        if (res?.status === 200) {
-          store.showSnackbar('Manager assigned successfully')
-          await loadItems({
-            page: table_data.value.page,
-            itemsPerPage: table_data.value.itemsPerPage,
-            sortBy: 'ascending'
-          })
-          selectedManager.value = ''
-          assignManagerDialogShow.value = false
-        }
-      })
-  }
-  const handelAssignManagerIconClick = (item) => {
-    store.setDetails(item)
-    if (item?.manager?._id) {
-      selectedManager.value = item?.manager
-    }
-    assignManagerDialogShow.value = true
-  }
-  const removeManager = async () => {
-    await axios
-      .patch(
-        `admin/restaurant/restaurants/${store.details?._id}/update-manager`,
-        {
-          managerId: null
-        }
-      )
-      .then(async (res) => {
-        if (res?.status === 200) {
-          store.showSnackbar('Manager removed successfully')
-          await loadItems({
-            page: table_data.value.page,
-            itemsPerPage: table_data.value.itemsPerPage,
-            sortBy: 'ascending'
-          })
-          store.closeDialog()
-        }
-      })
-  }
-  const handelRemoveManagerIconClick = (item) => {
-    store.setDetails(item)
-    const dialogModal = {
-      title: 'Remove Manager',
-      content: `Are you sure you want to remove ${
-        item?.manager?.name ?? item?.manager?.email
-      } from ${item?.name} ?`,
-      confirmText: 'Remove Manager',
-      formComponents: [],
-      confirmFunction: removeManager
-    }
-    store.showDialog(dialogModal)
-  }
-  const getCuisinesList = async () => {
-    await axios.get('admin/restaurant/cuisines').then((res) => {
-      cuisinesList.value = res.data
     })
   }
-  const getSpecialDietsList = async () => {
-    await axios.get('admin/restaurant/special-diets').then((res) => {
-      specialDietsList.value = res.data
+  if (formData.value?.halalCertificatesUploads?.length) {
+    formData.value.halalCertificatesUploads.forEach((file) => {
+      if (file instanceof File) {
+        files.push(file)
+        fileMapper.push({
+          resource: 'halalCertificates',
+          name: file.name
+        })
+      }
     })
   }
-  
-  onBeforeMount(async () => {
-    if (store.hasPermission(permissions.userList)) {
-      await axios.get('admin/users').then((res) => {
-        if (res?.data?.length) {
-          const managerList = res?.data?.filter((x) => x?.role === 'manager')
-          store.setManager(managerList)
-        }
-      })
+  return { files, fileMapper }
+}
+const getDataPayload = () => {
+  try {
+    let { files, fileMapper } = getFilesPayload()
+    let data = removeUploads(formData.value)
+    data.fileMapper = fileMapper
+    let formdata = new FormData()
+    formdata.append('data', JSON.stringify(data))
+    files?.forEach((file) => {
+      formdata.append('uploads', file)
+    })
+    return formdata
+  } catch (error) {
+    console.log(error)
+  }
+}
+const save = async () => {
+  panel.value = [0, 1, 2]
+  form.value.validate()
+  if (form.value.isValid) {
+    const payload = getDataPayload()
+    const response = id?.value
+      ? await axios.patch(`admin/holiday/packages/${id.value}`, formData.value)
+      : await axios.post('admin/holiday/packages', formData.value)
+    if (response.data) {
+      store.showSnackbar('Successfully Saved')
+      router.back()
     }
-    if (store.hasPermission(permissions.restaurantUpdateHalalRatings)) {
-      await axios.get('admin/restaurant-halal-ratings').then((res) => {
-        if (res?.data?.length) {
-          ratings.value = res?.data
-        }
-      })
-    }
-    await getCuisinesList()
-    await getSpecialDietsList()
-    if (id.value) {
-      const details = await axios.get(`admin/restaurant/restaurants/${id.value}`)
-      if (details?.data?._id) {
-        if (formMode.value) {
-          formData.value = { ...details?.data }
-        } else if (detailsMode.value) {
-          detailsData.value = { ...details?.data }
-        }
+  }
+}
+
+const loadItems = async ({ page, itemsPerPage }) => {
+  await axios
+    .post('admin/holiday/packages-list', {
+      params: {
+        page: page,
+        perPage: itemsPerPage
       }
+    })
+    .then((res) => {
+      table_data.value.serverItems = res?.data?.data
+      table_data.value.totalItems = res?.data?.data.length
+    })
+}
+const confirmDelete = async () => {
+  await axios
+    .delete(`admin/holiday/packages/${store.details?._id}`)
+    .then(async () => {
+      store.showSnackbar('Successfully Deleted')
+      await loadItems({
+        page: table_data.value.page,
+        itemsPerPage: table_data.value.itemsPerPage,
+        sortBy: 'ascending'
+      })
+      store.closeDialog()
+    })
+}
+const onDelete = (item) => {
+  store.setDetails(item)
+  const dialogModal = {
+    title: `Delete ${moduleName}`,
+    content: `Are you sure to delete this ${moduleName}?`,
+    confirmText: 'Delete',
+    formComponents: { fields: [] },
+    confirmFunction: confirmDelete
+  }
+  store.showDialog(dialogModal)
+}
+const getCurrencyList = async () => {
+  await axios.get('misc/currencies').then((res) => {
+    if (res?.data?.length) {
+      currencyList.value = res.data
     }
-    showForm.value = true
   })
-  </script>
-  
-  <style scoped>
-  .imageDelete {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+}
+const getInclusionIconList = async () => {
+  await axios.get('/admin/holiday/inclusion-icons').then((res) => {
+    if (res?.data?.length) {
+      inclusionIconList.value = res.data
+    }
+  })
+}
+const onStartDateChange = (date) => {
+  let daysNeedToAdd = 0
+  if (formData.value.duration.days === formData.value.duration.nights) {
+    daysNeedToAdd = formData.value.duration.days
+  } else if (formData.value.duration.days > formData.value.duration.nights) {
+    daysNeedToAdd = formData.value.duration.days
+  } else {
+    daysNeedToAdd = formData.value.duration.nights
   }
-  </style>
-  
+  const dayNumber = Number(daysNeedToAdd)
+  formData.value.endDate = addDays(date, dayNumber)
+
+  formData.value.itinerary = [...Array(dayNumber + 1).keys()].map((x) => {
+    return {
+      date: new Date(
+        formData.value.startDate.getTime() + x * 24 * 60 * 60 * 1000
+      ),
+      title: '',
+      description: ''
+    }
+  })
+}
+const removeAdditionalInfo = (index) => {
+  formData.value.additionalInformation.splice(index, 1)
+}
+const addMoreAdditionalInfo = () => {
+  formData.value.additionalInformation.unshift({
+    title: '',
+    description: ''
+  })
+  editorKey.value = editorKey.value + 1
+}
+
+onBeforeMount(async () => {
+  await getCurrencyList()
+  await getInclusionIconList()
+  if (id.value) {
+    const details = await axios.get(`admin/holiday/packages/${id.value}`)
+
+    if (details?.data?._id) {
+      if (formMode.value) {
+        details.data.startDate = new Date(details?.data?.startDate)
+        details.data.endDate = new Date(details?.data?.endDate)
+        details.data.itinerary.forEach((element) => {
+          element.date = new Date(element.date)
+        })
+        details.data.inclusionIcons = details.data.inclusionIcons.map(
+          (x) => x?._id
+        )
+        formData.value = { ...details?.data }
+      } else if (detailsMode.value) {
+        detailsData.value = { ...details?.data }
+      }
+    }
+  }
+  showForm.value = true
+})
+</script>
+
+<style scoped>
+.imageDelete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+</style>
