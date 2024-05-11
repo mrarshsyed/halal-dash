@@ -292,7 +292,7 @@
           label="Halal Certificate"
           :value="formData.halalCertificatesUploads"
           @update="(data) => onUploadsUpdate(data, 'halalCertificatesUploads')"
-          :image-list="formData.menu"
+          :image-list="formData.halalCertificates"
           @update-image-link="
             (data) => onImageUpdate(data, 'halalCertificates')
           "

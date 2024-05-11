@@ -224,13 +224,14 @@
         </v-menu>
       </v-col>
 
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
+      <v-col cols="12">
+        <p class="mb-2">
+          Offer Type
+        </p>
+        <DocumentEditor
+          height="200px"
           v-model="formData.offerType"
-          label="Offer Type"
+          class="mb-4"
         />
       </v-col>
       <v-col
@@ -250,6 +251,15 @@
           v-model="formData.inclusionIcons"
           multiple
           chips
+        />
+      </v-col>
+      <v-col cols="12">
+        <ImageUploader
+          label="Images"
+          :value="formData.uploads"
+          @update="(data) => onUploadsUpdate(data, 'uploads')"
+          :image-list="formData.images"
+          @update-image-link="(data) => onImageUpdate(data, 'images')"
         />
       </v-col>
       <v-col cols="12">
@@ -450,9 +460,13 @@
           : ''
       }}
     </p>
-    <p class="mb-4">
-      Offer Type : {{ detailsData?.offerType }}
+    <p class="mb-2">
+      Offer Type :
     </p>
+    <div
+      class="mb-5"
+      v-html="detailsData?.offerType"
+    />
     <div class="mb-4">
       <p class="mb-2">
         Inclusion Icons :
@@ -525,7 +539,10 @@
           cols="6"
           class="rounded border pa-4 shadow"
         >
-          <p>Date :  {{ value?.date ? format(new Date (value?.date), 'MM/dd/yyyy') : '' }}</p>
+          <p>
+            Date :
+            {{ value?.date ? format(new Date(value?.date), 'MM/dd/yyyy') : '' }}
+          </p>
           <p>Title: {{ value?.title }}</p>
           <p class="mt-4 mb-2">
             Description
@@ -562,8 +579,8 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import { useAppStore } from '@/store/app'
-import { permissions } from '@/config/userRoutes'
 import { addDays, format } from 'date-fns'
+import ImageUploader from './components/ImageUploader.vue'
 
 const validatePositiveInteger = (value) => {
   // Ensure the value is an integer greater than zero
@@ -630,7 +647,9 @@ const initialFormData = {
     }
   ],
   inclusionIcons: [],
-  itinerary: []
+  itinerary: [],
+  images: [],
+  uploads: []
 }
 const store = useAppStore()
 const route = useRoute()
@@ -683,9 +702,6 @@ const onDetails = (item) => {
 const removeUploads = (obj) => {
   let newObject = { ...obj }
   delete newObject.uploads
-  delete newObject.menuUploads
-  delete newObject.halalCertificatesUploads
-  console.log(newObject)
   return newObject
 }
 const getFilesPayload = () => {
@@ -697,28 +713,6 @@ const getFilesPayload = () => {
         files.push(file)
         fileMapper.push({
           resource: 'images',
-          name: file.name
-        })
-      }
-    })
-  }
-  if (formData.value?.menuUploads?.length) {
-    formData.value.menuUploads.forEach((file) => {
-      if (file instanceof File) {
-        files.push(file)
-        fileMapper.push({
-          resource: 'menu',
-          name: file.name
-        })
-      }
-    })
-  }
-  if (formData.value?.halalCertificatesUploads?.length) {
-    formData.value.halalCertificatesUploads.forEach((file) => {
-      if (file instanceof File) {
-        files.push(file)
-        fileMapper.push({
-          resource: 'halalCertificates',
           name: file.name
         })
       }
@@ -747,8 +741,8 @@ const save = async () => {
   if (form.value.isValid) {
     const payload = getDataPayload()
     const response = id?.value
-      ? await axios.patch(`admin/holiday/packages/${id.value}`, formData.value)
-      : await axios.post('admin/holiday/packages', formData.value)
+      ? await axios.patch(`admin/holiday/packages/${id.value}`, payload)
+      : await axios.post('admin/holiday/packages', payload)
     if (response.data) {
       store.showSnackbar('Successfully Saved')
       router.back()
@@ -839,7 +833,12 @@ const addMoreAdditionalInfo = () => {
   })
   editorKey.value = editorKey.value + 1
 }
-
+const onUploadsUpdate = (images, key) => {
+  formData.value[key] = images
+}
+const onImageUpdate = (data, key) => {
+  formData.value[key] = [...data]
+}
 onBeforeMount(async () => {
   await getCurrencyList()
   await getInclusionIconList()
