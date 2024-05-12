@@ -875,18 +875,18 @@ onBeforeMount(async () => {
   if (id.value) {
     await axios.get(`user/cruise/packages/${id.value}`).then((res) => {
       if (res?.data) {
-        res.data.startDate = new Date(res.data.startDate)
-        res.data.endDate = new Date(res.data.endDate)
+        res.data.startDate = new Date(res.data?.startDate)
+        res.data.endDate = new Date(res.data?.endDate)
         res?.data?.itinerary.forEach((element) => {
-          element.date = new Date(element.date)
-          element.port = element.port._id
+          element.date = new Date(element?.date)
+          element.port = element.port?._id
         })
-        res.data.destinations = res.data?.destinations.map((x) => {
-          return x._id
+        res.data.destinations = res.data?.destinations?.map((x) => {
+          return x?._id
         })
         res.data.startLocation = res.data?.startLocation?._id
         res.data.endLocation = res.data?.endLocation?._id
-        res.data.ship = res?.data?.ship._id
+        res.data.ship = res?.data?.ship?._id
         formData.value = res?.data
       }
     })
