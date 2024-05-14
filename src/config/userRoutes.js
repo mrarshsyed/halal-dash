@@ -305,7 +305,7 @@ export const routes = [
     name: 'restaurant',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee'],
+      role: ['super-admin', 'admin', 'employee','manager'],
       permissions: []
     },
     children: [
