@@ -228,7 +228,9 @@ export const useAppStore = defineStore('app', {
           permissions.activityList,
           permissions.activityUpdateHalalRatings,
           permissions.cruiseShip,
-          permissions.cruiseUpdateHalalRatings
+          permissions.cruiseUpdateHalalRatings,
+          permissions.restaurantRestaurant,
+          permissions.restaurantUpdateHalalRatings
         ]
       }
 
