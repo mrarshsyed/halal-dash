@@ -353,7 +353,7 @@ export const routes = [
         component: () => import('@/views/restaurant/Restaurant.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee'],
+          role: ['super-admin', 'admin', 'employee','manager'],
           permissions: [permissions.restaurantRestaurant]
         }
       }
