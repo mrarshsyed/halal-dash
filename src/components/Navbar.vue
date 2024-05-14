@@ -1,6 +1,9 @@
 <template>
   <v-layout>
-    <v-app-bar density="comfortable">
+    <v-app-bar
+      density="comfortable"
+      class="py-1"
+    >
       <!-- <v-app-bar-nav-icon
         v-if="store?.user?.data._id"
         variant="text"
@@ -12,9 +15,9 @@
         @click="$router.push('/')"
       >
         <v-img
-          src="@/assets/logo.png"
-          height="56px"
-          width="156px"
+          src="@/assets/logo.svg"
+          height="80px"
+          width="220px"
         />
       </v-app-bar-title>
 
@@ -48,6 +51,7 @@
       location="left"
       permanent
       style="min-width: max-content"
+      class="py-2"
     >
       <v-list nav>
         <div

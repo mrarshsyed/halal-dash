@@ -16,16 +16,6 @@ export default defineConfig({
     vuetify({
       autoImport: true
     }),
-    ViteFonts({
-      google: {
-        families: [
-          {
-            name: 'Roboto',
-            styles: 'wght@100;300;400;500;700;900'
-          }
-        ]
-      }
-    })
   ],
   define: { 'process.env': process.env },
   resolve: {

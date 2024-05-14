@@ -26,3 +26,6 @@
 .v-data-table-footer__items-per-page>.v-select {
   width: 120px;
 }
+body {
+  font-family: "Poppins";
+}

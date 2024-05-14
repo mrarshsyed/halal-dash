@@ -10,9 +10,9 @@
           <!-- <v-card> -->
           <div class="d-flex w-100 justify-center align-center">
             <v-img
-              src="@/assets/logo.png"
-              height="56px"
-              width="156px"
+              src="@/assets/logo.svg"
+              height="80px"
+              width="220px"
             />
           </div>
 
