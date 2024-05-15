@@ -206,7 +206,7 @@ export const routes = [
     name: 'cruise',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee'],
+      role: ['super-admin', 'admin', 'employee', 'manager'],
       permissions: []
     },
     children: [
@@ -274,8 +274,11 @@ export const routes = [
         component: () => import('@/views/cruise/Ship.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee'],
-          permissions: [permissions.cruiseShip]
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: [
+            permissions.cruiseShip,
+            permissions.cruiseUpdateHalalRatings
+          ]
         }
       },
       {
@@ -305,7 +308,7 @@ export const routes = [
     name: 'restaurant',
     meta: {
       requiresAuth: true,
-      role: ['super-admin', 'admin', 'employee','manager'],
+      role: ['super-admin', 'admin', 'employee', 'manager'],
       permissions: []
     },
     children: [
@@ -353,7 +356,7 @@ export const routes = [
         component: () => import('@/views/restaurant/Restaurant.vue'),
         meta: {
           requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee','manager'],
+          role: ['super-admin', 'admin', 'employee', 'manager'],
           permissions: [permissions.restaurantRestaurant]
         }
       }
