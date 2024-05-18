@@ -223,14 +223,21 @@ export const useAppStore = defineStore('app', {
       }
       if (payload.role === 'manager') {
         payload.permissions = [
+          // hotel
           permissions.hotelList,
           permissions.hotelUpdateHalalRatings,
+
+          // activity
           permissions.activityList,
           permissions.activityUpdateHalalRatings,
+
+          // ship
           permissions.cruiseShip,
           permissions.cruiseUpdateHalalRatings,
+
+          // restaurant
           permissions.restaurantRestaurant,
-          permissions.restaurantUpdateHalalRatings
+          permissions.restaurantUpdateHalalRatings,
         ]
       }
 
@@ -259,5 +266,11 @@ export const useAppStore = defineStore('app', {
         this.dialog.formComponents.fields[fieldIndex].value = value
       }
     },
+    isRoleManager(){
+      if (this.user?.data?.role === 'manager') {
+        return true
+      }
+      else return false
+    }
   }
 })

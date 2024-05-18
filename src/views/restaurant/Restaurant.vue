@@ -17,6 +17,7 @@
       md="4"
     >
       <v-btn
+        v-if="!store.isRoleManager()"
         @click="onCreate"
         block
         color="primary"
@@ -58,7 +59,9 @@
             <v-tooltip
               text="Ratings"
               location="top"
-              v-if="store.hasPermission(permissions.restaurantUpdateHalalRatings)"
+              v-if="
+                store.hasPermission(permissions.restaurantUpdateHalalRatings)
+              "
             >
               <template #activator="{ props }">
                 <v-icon
@@ -96,16 +99,19 @@
               </template>
             </v-tooltip>
             <v-icon
+              v-if="!store.isRoleManager()"
               class="cursor-pointer"
               @click="onDetails(item)"
               icon="mdi-eye"
             />
             <v-icon
+              v-if="!store.isRoleManager()"
               class="cursor-pointer"
               @click="onEdit(item)"
               icon="mdi-pencil-box"
             />
             <v-icon
+              v-if="!store.isRoleManager()"
               @click="onDelete(item)"
               class="cursor-pointer"
             >

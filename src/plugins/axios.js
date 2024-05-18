@@ -42,7 +42,7 @@ axios.interceptors.response.use(
   (error) => {
     const store = useAppStore()
     store.stopLoading()
-    if (error.response.status === 401) {
+    if (error.response?.data?.code === 13331) {
       return store.logout()
     }
     if (error.response) {
