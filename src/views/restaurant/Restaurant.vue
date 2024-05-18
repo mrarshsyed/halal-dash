@@ -285,24 +285,74 @@
         />
       </v-col>
       <v-col cols="12">
-        <ImageUploader
+        <v-file-input
+          v-if="formData.menu?.length === 0"
           label="Menu"
-          :value="formData.menuUploads"
-          @update="(data) => onUploadsUpdate(data, 'menuUploads')"
-          :image-list="formData.menu"
-          @update-image-link="(data) => onImageUpdate(data, 'menu')"
+          :prepend-icon="null"
+          prepend-inner-icon="mdi-file-pdf-box"
+          variant="outlined"
+          :chips="true"
+          :multiple="false"
+          accept="application/pdf"
+          v-model:model-value="formData.menuUploads"
         />
+        <div
+          v-else
+          class="d-flex flex-wrap ga-4 align-center"
+        >
+          <p>Menu : </p>
+          <a
+            :href="formData.menu?.[0]"
+            target="_blank"
+            :download="getFileName(formData.menu?.[0])"
+          >
+            <v-chip append-icon="mdi-open-in-new">{{
+              getFileName(formData.menu?.[0])
+            }}</v-chip>
+          </a>
+          <v-btn
+            @click="formData.menu=[]"
+            icon="mdi-delete"
+            class="imageLinkDelete"
+            color="error"
+            size="x-small"
+          />
+        </div>
       </v-col>
       <v-col cols="12">
-        <ImageUploader
+        <v-file-input
+          v-if="formData.halalCertificates?.length === 0"
           label="Halal Certificate"
-          :value="formData.halalCertificatesUploads"
-          @update="(data) => onUploadsUpdate(data, 'halalCertificatesUploads')"
-          :image-list="formData.halalCertificates"
-          @update-image-link="
-            (data) => onImageUpdate(data, 'halalCertificates')
-          "
+          :prepend-icon="null"
+          prepend-inner-icon="mdi-file-pdf-box"
+          variant="outlined"
+          :chips="true"
+          :multiple="false"
+          accept="application/pdf"
+          v-model:model-value="formData.halalCertificatesUploads"
         />
+        <div
+          v-else
+          class="d-flex flex-wrap ga-4 align-center"
+        >
+          <p>Halal Certificate : </p>
+          <a
+            :href="formData.halalCertificates?.[0]"
+            target="_blank"
+            :download="getFileName(formData.halalCertificates?.[0])"
+          >
+            <v-chip append-icon="mdi-open-in-new">{{
+              getFileName(formData.halalCertificates?.[0])
+            }}</v-chip>
+          </a>
+          <v-btn
+            @click="formData.halalCertificates=[]"
+            icon="mdi-delete"
+            class="imageLinkDelete"
+            color="error"
+            size="x-small"
+          />
+        </div>
       </v-col>
 
       <v-col cols="12">
@@ -501,20 +551,16 @@
     <v-row class="mb-4">
       <v-col
         cols="12"
-        sm="2"
-        md="3"
-        lg="4"
-        xl="5"
-        xxl="6"
         v-for="(i, index) in detailsData?.menu"
         :key="index"
       >
-        <v-img
-          cover
-          :src="i"
-          height="150"
-          class="rounded"
-        />
+        <a
+          :href="i"
+          target="_blank"
+          :download="getFileName(i)"
+        >
+          <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
+        </a>
       </v-col>
     </v-row>
     <p class="mb-4">
@@ -523,20 +569,16 @@
     <v-row class="mb-4">
       <v-col
         cols="12"
-        sm="2"
-        md="3"
-        lg="4"
-        xl="5"
-        xxl="6"
         v-for="(i, index) in detailsData?.halalCertificates"
         :key="index"
       >
-        <v-img
-          cover
-          :src="i"
-          height="150"
-          class="rounded"
-        />
+        <a
+          :href="i"
+          target="_blank"
+          :download="getFileName(i)"
+        >
+          <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
+        </a>
       </v-col>
     </v-row>
 
@@ -1066,6 +1108,10 @@ const getSpecialDietsList = async () => {
   await axios.get('admin/restaurant/special-diets').then((res) => {
     specialDietsList.value = res.data
   })
+}
+const getFileName = (url) => {
+  if (!url) return 'File'
+  return url.split('/').pop()
 }
 
 onBeforeMount(async () => {
