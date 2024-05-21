@@ -209,6 +209,7 @@ const handleLogin = async () => {
     })
     .then(async (res) => {
       if (res) {
+        await store.setAuthToken(res?.data?.access_token)
         await store.setUser(res.data)
         router.push('/dashboard')
       }

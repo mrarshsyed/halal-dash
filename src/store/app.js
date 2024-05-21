@@ -111,50 +111,63 @@ export const useAppStore = defineStore('app', {
     },
     getNavbarList(user) {
       if (!user) return []
-
+    
       const userRole = user?.data?.role
-      const userPermissions = user?.data?.permissions
-
+      const userPermissions = user?.data?.permissions 
       // Define a recursive function to filter the links and their children
       function filterLinks(links) {
-        return links.filter((link) => {
-          // If the user is super-admin, return true for all links
+        return links.map((link) => {
+          // Create a shallow copy of the link
+          const newLink = { ...link }
+    
+          // If the user is super-admin, return the link with all children
           if (userRole === 'super-admin') {
-            return true
-          }
-
-          // If the link doesn't have permissions, allow it
-          if (link.permissions.length === 0) {
-            return true
-          }
-
-          // Check if any of the user's permissions match the link's permissions
-          if (
-            link.permissions.some((permission) =>
-              userPermissions.includes(permission)
-            )
-          ) {
-            // If the link has children, filter them recursively
-            if (link.children && link.children.length > 0) {
-              link.children = filterLinks(link.children) // Recursive call to filter children
+            if (newLink.children && newLink.children.length > 0) {
+              newLink.children = filterLinks(newLink.children) // Recursive call to include all children
             }
-            return true
+            return newLink
           }
-
-          return false
-        })
+    
+          // If the link doesn't have permissions, allow it
+          if (newLink.permissions.length === 0) {
+            if (newLink.children && newLink.children.length > 0) {
+              newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+            }
+            return newLink
+          }
+    
+          // Check if any of the user's permissions match the link's permissions
+          if (newLink.permissions.some((permission) =>
+            userPermissions.includes(permission)
+          )) {
+            if (newLink.children && newLink.children.length > 0) {
+              newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+            }
+            return newLink
+          }
+    
+          return null
+        }).filter(link => link !== null) // Filter out null links
       }
-
+    
       // Filter the top-level navigation links
       const filteredNavLinks = filterLinks(navLinks)
-
+    
       return filteredNavLinks
     },
+    
     setUser(user) {
       this.user = user
       localStorage.setItem('user', JSON.stringify(this.user))
-      this.sideBarLinks = this.getNavbarList(user)
+      const links = this.getNavbarList(user)
+      this.sideBarLinks = [...links]
       localStorage.setItem('navLinks', JSON.stringify(this.sideBarLinks))
+    },
+    setAuthToken(token){
+      localStorage.setItem('authToken', token)
+    },
+    getAuthToken(){
+      localStorage.getItem('authToken')
     },
     setTokens(tokens) {
       this.tokens = tokens
@@ -168,13 +181,13 @@ export const useAppStore = defineStore('app', {
         localStorage.clear()
         this.user = null
         this.tokens = null
-        this.sideBarLinks = null
+        this.sideBarLinks = []
         this.router.replace('/authentication?mode=Login')
       } catch (error) {
         localStorage.clear()
         this.user = null
         this.tokens = null
-        this.sideBarLinks = null
+        this.sideBarLinks = []
         this.router.replace('/authentication?mode=Login')
       }
     },

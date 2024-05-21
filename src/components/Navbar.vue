@@ -52,6 +52,7 @@
       permanent
       style="min-width: max-content"
       class="py-2"
+      :key="navKey"
     >
       <v-list nav>
         <div
@@ -121,6 +122,10 @@ const theme = useTheme()
 
 const links = computed(() => {
   return store.sideBarLinks
+})
+
+const navKey = computed(() => {
+  return store.sideBarLinks?.length ? store.sideBarLinks.length : 0
 })
 const loading = computed(() => store.isLoading)
 

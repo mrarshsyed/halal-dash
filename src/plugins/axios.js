@@ -10,11 +10,10 @@ axios.interceptors.request.use(
   (config) => {
     const store = useAppStore()
     store.startLoading()
-    const token = store.user?.access_token
+    const token = store.getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-
     return config
   },
   (error) => {
@@ -29,13 +28,7 @@ axios.interceptors.response.use(
     const store = useAppStore()
     store.stopLoading()
     if (response?.headers['x-new-access-token']) {
-      if (
-        response?.headers['x-new-access-token'] !== store.user?.access_token
-      ) {
-        let user = store.user
-        user.access_token = response?.headers['x-new-access-token']
-        store.setUser(user)
-      }
+      store.setAuthToken(response?.headers['x-new-access-token'])
     }
     return response
   },

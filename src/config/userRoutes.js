@@ -314,6 +314,7 @@ export const routes = [
     children: [
       {
         path: 'ratings-category',
+        name: 'restaurant-ratings-category',
         component: () => import('@/views/restaurant/RatingsCategory.vue'),
         meta: {
           requiresAuth: true,
@@ -323,6 +324,7 @@ export const routes = [
       },
       {
         path: 'ratings',
+        name: 'restaurant-ratings',
         component: () => import('@/views/restaurant/Ratings.vue'),
         meta: {
           requiresAuth: true,
