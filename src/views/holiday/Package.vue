@@ -335,15 +335,52 @@
             <v-expansion-panel-text class="pb-10">
               <v-row class="mt-4">
                 <v-col
-                  v-for="(value, key) of formData.prices"
-                  :key="key"
                   cols="12"
                   md="6"
-                  class="mb-4 rounded"
                 >
                   <v-text-field
-                    v-model="formData.prices[key]"
-                    :label="formatLabel(key)"
+                    v-model="formData.prices.adultDoubleOccupancy"
+                    label="Adult (Double Occupancy)"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.prices.adultTripleOccupancy"
+                    label="Adult (Triple Occupancy)"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.prices.adultSingleOccupancy"
+                    label="Adult (Single Occupancy)"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.prices.child"
+                    label="Child"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.prices.infant"
+                    label="Infant"
                     :rules="[validatePositiveInteger, validateRequired]"
                   />
                 </v-col>
@@ -517,14 +554,36 @@
       <p class="mb-2">
         Prices:
       </p>
-      <v-row class="mt-4 border pa-4 shadow">
+      <v-row class="mt-4 border pa-4">
         <v-col
-          v-for="(value, key) of detailsData.prices"
-          :key="key"
-          cols="6"
-          class="rounded"
+          cols="12"
+          md="6"
         >
-          <p>{{ formatLabel(key) }} : {{ value }}</p>
+          <p>Adult (Double Occupancy) : {{ detailsData?.prices?.adultDoubleOccupancy }}</p>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <p>Adult (Triple Occupancy) : {{ detailsData?.prices?.adultTripleOccupancy }}</p>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <p>Adult (Single Occupancy) : {{ detailsData?.prices?.adultSingleOccupancy }}</p>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <p>Child : {{ detailsData?.prices?.child }}</p>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <p>Infant : {{ detailsData?.prices?.infant }}</p>
         </v-col>
       </v-row>
     </div>
@@ -802,15 +861,10 @@ const getInclusionIconList = async () => {
   })
 }
 const onStartDateChange = (date) => {
-  let daysNeedToAdd = 0
-  if (formData.value.duration.days === formData.value.duration.nights) {
-    daysNeedToAdd = formData.value.duration.days
-  } else if (formData.value.duration.days > formData.value.duration.nights) {
-    daysNeedToAdd = formData.value.duration.days
-  } else {
-    daysNeedToAdd = formData.value.duration.nights
-  }
-  const dayNumber = Number(daysNeedToAdd)
+  let daysNeedToAdd = formData.value.duration.days
+  const reduceDay = Number(daysNeedToAdd) -1
+  const dayNumber = Number(reduceDay)
+  
   formData.value.endDate = addDays(date, dayNumber)
 
   formData.value.itinerary = [...Array(dayNumber + 1).keys()].map((x) => {
