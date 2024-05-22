@@ -630,9 +630,9 @@ const initialFormData = {
   endDate: null,
   currency: null,
   prices: {
-    adultSingleOccupancy: '',
     adultDoubleOccupancy: '',
     adultTripleOccupancy: '',
+    adultSingleOccupancy: '',
     child: '',
     infant: ''
   },
