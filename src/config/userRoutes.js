@@ -53,7 +53,13 @@ export const permissions = {
   holidayAll: 'holiday-all',
   holidayMasterData: 'holiday-master_data',
   holidayPackage: 'holiday-package',
-  holidayEnquiry: 'holiday_enquiry-all'
+  holidayEnquiry: 'holiday_enquiry-all',
+
+  // insurance
+  insuranceAll: 'insurance-all', //
+  insuranceMasterData: 'insurance-master_data',
+  insurancePackage: 'insurance-package',
+  insuranceOrder: 'insurance_order-all'
 }
 
 export const routes = [
@@ -406,6 +412,97 @@ export const routes = [
     ]
   },
   {
+    path: '/insurance',
+    name: 'insurance',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'type',
+        name: 'insurance-type',
+        component: () => import('@/views/insurance/Type.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'name',
+        name: 'insurance-name',
+        component: () => import('@/views/insurance/Name.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'policy',
+        name: 'insurance-policy',
+        component: () => import('@/views/insurance/Policy.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'area',
+        name: 'insurance-area',
+        component: () => import('@/views/insurance/Area.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'traveller',
+        name: 'insurance-traveller',
+        component: () => import('@/views/insurance/Traveller.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'insurance',
+        name: 'insurance-insurance',
+        component: () => import('@/views/insurance/Insurance.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceMasterData]
+        }
+      },
+      {
+        path: 'package',
+        name: 'insurance-package',
+        component: () => import('@/views/insurance/Package.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insurancePackage]
+        }
+      },
+      {
+        path: 'order',
+        name: 'insurance-order',
+        component: () => import('@/views/insurance/Order.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.insuranceOrder]
+        }
+      }
+    ]
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -721,6 +818,83 @@ export const navLinks = [
     ]
   },
   {
+    title: 'Insurance',
+    value: 'insurance',
+    icon: 'security',
+    role: ['super-admin', 'admin', 'employee'],
+    permissions: [
+      permissions.insurancePackage,
+      permissions.insuranceMasterData,
+      permissions.insuranceOrder
+    ],
+    children: [
+      {
+        icon: 'candy-outline',
+        title: 'Type',
+        to: '/insurance/type',
+        value: 'insurance-type',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'text-box-plus-outline',
+        title: 'Name',
+        to: '/insurance/name',
+        value: 'insurance-name',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'list-box-outline',
+        title: 'Policy Type',
+        to: '/insurance/policy',
+        value: 'insurance-policy',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'map-marker-radius',
+        title: 'Area',
+        to: '/insurance/area',
+        value: 'insurance-area',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'card-account-details',
+        title: 'Traveller Type',
+        to: '/insurance/traveller',
+        value: 'insurance-traveller',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'cards',
+        title: 'Insurance Type',
+        to: '/insurance/insurance',
+        value: 'insurance-insurance',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'package-variant',
+        title: 'Package',
+        to: '/insurance/package',
+        value: 'insurance-package',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insurancePackage]
+      },
+      {
+        icon: 'file-document-multiple',
+        title: 'Orders',
+        to: '/insurance/order',
+        value: 'insurance-order',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceOrder]
+      }
+    ]
+  },
+  {
     title: 'Settings',
     value: 'settings',
     icon: 'cog',
@@ -875,6 +1049,24 @@ export const userCreatePermissions = [
       {
         title: 'Enquiry',
         value: permissions.holidayEnquiry
+      }
+    ]
+  },
+  {
+    title: 'Insurance',
+    value: permissions.insuranceAll,
+    children: [
+      {
+        title: 'Master Data ( Area, Name ,... )',
+        value: permissions.insuranceMasterData
+      },
+      {
+        title: 'Package',
+        value: permissions.insurancePackage
+      },
+      {
+        title: 'Orders',
+        value: permissions.insuranceOrder
       }
     ]
   }

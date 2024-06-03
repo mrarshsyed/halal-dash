@@ -17,14 +17,14 @@
           :type="component?.type"
           v-if="
             component?.type === 'email' ||
-            component?.type === 'text' ||
-            component?.type === 'number'
+              component?.type === 'text' ||
+              component?.type === 'number'
           "
           :label="component?.label"
           :required="component?.isRequired"
           :rules="getValidationRules(component)"
           v-model="component.value"
-        ></v-text-field>
+        />
         <v-autocomplete
           clearable
           v-if="component?.type === 'select'"
@@ -40,21 +40,31 @@
               : []
           "
           v-model="component.value"
-        ></v-autocomplete>
+        />
       </v-col>
     </v-row>
-    <v-row class="justify-end" v-if="store.formComponents.fields.length">
-      <v-col cols="12" md="4"
-        ><v-btn
+    <v-row
+      class="justify-end"
+      v-if="store.formComponents.fields.length"
+    >
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-btn
           block
           color="error"
           variant="outlined"
           class="px-4"
           @click="reset"
-          >Reset
-        </v-btn></v-col
+        >
+          Reset
+        </v-btn>
+      </v-col>
+      <v-col
+        cols="12"
+        md="4"
       >
-      <v-col cols="12" md="4">
         <v-btn
           block
           @click="confirm"
@@ -79,7 +89,7 @@
           item-key="title"
           item-value="value"
           v-model="store.formComponents.selectedExportOption"
-        ></v-select>
+        />
       </v-col>
     </v-row>
   </v-form>
