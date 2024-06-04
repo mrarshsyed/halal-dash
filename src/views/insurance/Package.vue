@@ -76,16 +76,18 @@
         </template>
         <template #item.createdAt="{ item }">
           {{
-            format(new Date(item?.createdBy?.createdAt), 'dd MMM yyyy') ?? '-'
+            item?.createdAt
+              ? format(new Date(item?.createdAt), 'dd MMM yyyy')
+              : '-'
           }}
         </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
-            <v-icon
+            <!-- <v-icon
               class="cursor-pointer"
               @click="onDetails(item)"
               icon="mdi-eye"
-            />
+            /> -->
             <v-icon
               class="cursor-pointer"
               @click="onEdit(item)"
@@ -204,6 +206,7 @@
           :rules="[(v) => !!v || 'Traveler Type is required']"
           v-model="formData.travelerType"
           chips
+          return-object
           item-title="name"
           item-value="_id"
         />
@@ -222,55 +225,6 @@
           chips
           item-title="name"
           item-value="_id"
-        />
-      </v-col>
-
-      <v-col
-        cols="12"
-        md="3"
-      >
-        <v-text-field
-          v-model="formData.ageStart"
-          label="Start Age"
-          type="number"
-          required
-          :rules="[(v) => !!v || 'Start Age is required']"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="3"
-      >
-        <v-text-field
-          v-model="formData.ageEnd"
-          label="End Age"
-          type="number"
-          required
-          :rules="[(v) => !!v || 'End Age is required']"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="3"
-      >
-        <v-text-field
-          v-model="formData.durationStart"
-          label="Start Duration"
-          type="number"
-          required
-          :rules="[(v) => !!v || 'Start Duration is required']"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="3"
-      >
-        <v-text-field
-          v-model="formData.durationEnd"
-          label="End Duration"
-          type="number"
-          required
-          :rules="[(v) => !!v || 'End Duration is required']"
         />
       </v-col>
       <v-col
@@ -292,8 +246,13 @@
         <v-select
           v-model="formData.terrorismExtension"
           label="Terrorism Extension"
-          :items="['Yes', 'No']"
+          :items="[
+            { value: true, title: 'Yes' },
+            { value: false, title: 'No' }
+          ]"
           required
+          item-title="title"
+          item-value="value"
           :rules="[(v) => !!v || 'Terrorism Extension is required']"
         />
       </v-col>
@@ -341,42 +300,6 @@
           :rules="[(v) => !!v || 'Covid-19 Coverage is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.price"
-          label="Price"
-          type="number"
-          required
-          :rules="[(v) => !!v || 'Price is required']"
-          @update:model-value="updateVatAndTotal"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.vat"
-          label="VAT"
-          type="number"
-          readonly
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.total"
-          label="Total"
-          type="number"
-          readonly
-        />
-      </v-col>
-
       <v-col cols="12">
         <v-file-input
           v-if="formData.files?.length === 0"
@@ -387,7 +310,7 @@
           :chips="true"
           :multiple="true"
           accept="application/pdf"
-          v-model:model-value="formData.filesUploads"
+          v-model:model-value="formData.uploads"
         />
         <div
           v-else
@@ -404,13 +327,129 @@
             }}</v-chip>
           </a>
           <v-btn
-            @click="formData.menu = []"
+            @click="formData.files = []"
             icon="mdi-delete"
             class="imageLinkDelete"
             color="error"
             size="x-small"
           />
         </div>
+      </v-col>
+
+      <v-col cols="12">
+        <v-card title="Prices">
+          <v-card-text>
+            <div class="text-right mb-6">
+              <v-btn
+                @click="addMorePrice"
+                color="primary"
+              >
+                + Add more price
+              </v-btn>
+            </div>
+            <v-row
+              v-for="(price, index) in formData.prices"
+              class="mb-5"
+              :key="index"
+            >
+              <v-col
+                cols="12"
+                class="text-right"
+                v-if="formData.prices?.length > 1"
+              >
+                <v-btn
+                  @click="removePrice(index)"
+                  color="error"
+                  icon="mdi-delete"
+                  size="x-small"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.ageStart"
+                  label="Start Age"
+                  type="number"
+                  required
+                  :rules="[(v) => !!v || 'Start Age is required']"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.ageEnd"
+                  label="End Age"
+                  type="number"
+                  required
+                  :rules="[(v) => !!v || 'End Age is required']"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.durationStart"
+                  label="Start Duration"
+                  type="number"
+                  required
+                  :rules="[(v) => !!v || 'Start Duration is required']"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.durationEnd"
+                  label="End Duration"
+                  type="number"
+                  required
+                  :rules="[(v) => !!v || 'End Duration is required']"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.price"
+                  label="Price"
+                  type="number"
+                  required
+                  :rules="[(v) => !!v || 'Price is required']"
+                  @update:model-value="(data) => updateVatAndTotal(data, index)"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.vat"
+                  label="VAT"
+                  type="number"
+                  readonly
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="price.total"
+                  label="Total"
+                  type="number"
+                  readonly
+                />
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
       </v-col>
 
       <v-col cols="12">
@@ -597,21 +636,26 @@ const initialFormData = {
   insuranceArea: null,
   travelerType: null,
   insuranceRestType: null,
-  ageStart: null,
-  ageEnd: null,
-  durationStart: null,
-  durationEnd: null,
   tripType: null,
   terrorismExtension: null,
   maximumMedicalExpense: null,
   lossOfBaggage: '',
   personalLiability: '',
   covid19Coverage: '',
-  price: null,
-  vat: null,
-  total: null,
+  prices: [
+    {
+      ageStart: null,
+      ageEnd: null,
+      durationStart: null,
+      durationEnd: null,
+      price: null,
+      vat: null,
+      total: null
+    }
+  ],
+
   files: [],
-  filesUploads: [],
+  uploads: [],
   fileMapper: []
 }
 const store = useAppStore()
@@ -624,8 +668,6 @@ const formMode = computed(() => {
 const detailsMode = computed(() => {
   return route?.query?.mode === 'details'
 })
-
-const panel = ref([0])
 
 const id = computed(() => {
   return route?.query?.id
@@ -671,7 +713,7 @@ const showForm = ref(false)
 const detailsData = ref({})
 
 const onEdit = (item) => {
-  router.push(`/restaurant/restaurant?mode=form&id=${item?._id}`)
+  router.push(`/insurance/package?mode=form&id=${item?._id}`)
 }
 const onDetails = (item) => {
   router.push(`/restaurant/restaurant?mode=details&id=${item?._id}`)
@@ -679,9 +721,6 @@ const onDetails = (item) => {
 const removeUploads = (obj) => {
   let newObject = { ...obj }
   delete newObject.uploads
-  delete newObject.menuUploads
-  delete newObject.halalCertificatesUploads
-  console.log(newObject)
   return newObject
 }
 const getFilesPayload = () => {
@@ -693,28 +732,6 @@ const getFilesPayload = () => {
         files.push(file)
         fileMapper.push({
           resource: 'images',
-          name: file.name
-        })
-      }
-    })
-  }
-  if (formData.value?.menuUploads?.length) {
-    formData.value.menuUploads.forEach((file) => {
-      if (file instanceof File) {
-        files.push(file)
-        fileMapper.push({
-          resource: 'menu',
-          name: file.name
-        })
-      }
-    })
-  }
-  if (formData.value?.halalCertificatesUploads?.length) {
-    formData.value.halalCertificatesUploads.forEach((file) => {
-      if (file instanceof File) {
-        files.push(file)
-        fileMapper.push({
-          resource: 'halalCertificates',
           name: file.name
         })
       }
@@ -765,7 +782,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
 }
 const confirmDelete = async () => {
   await axios
-    .delete(`admin/restaurant/restaurants/${store.details?._id}`)
+    .delete(`admin/insurance/packages/${store.details?._id}`)
     .then(async () => {
       store.showSnackbar('Successfully Deleted')
       await loadItems({
@@ -828,15 +845,30 @@ const getInsuranceRestTypeList = async () => {
   })
 }
 
-const updateVatAndTotal = (data) => {
+const updateVatAndTotal = (data, index) => {
   if (!data) {
     formData.value.vat = null
     formData.value.total = null
     return
   }
   let dataNumber = Number(data)
-  formData.value.vat = dataNumber * 0.5
-  formData.value.total = dataNumber + formData.value.vat
+  formData.value.prices[index].vat = dataNumber * 0.5
+  formData.value.prices[index].total =
+    dataNumber + formData.value.prices[index].vat
+}
+const addMorePrice = () => {
+  formData.value.prices.unshift({
+    ageStart: null,
+    ageEnd: null,
+    durationStart: null,
+    durationEnd: null,
+    price: null,
+    vat: null,
+    total: null
+  })
+}
+const removePrice = (index) => {
+  formData.value.prices.splice(index, 1)
 }
 
 onBeforeMount(async () => {
@@ -849,10 +881,15 @@ onBeforeMount(async () => {
   // add
 
   if (id.value) {
-    const details = await axios.get(`admin/restaurant/restaurants/${id.value}`)
+    const details = await axios.get(`admin/insurance/packages/${id.value}`)
     if (details?.data?._id) {
       if (formMode.value) {
         formData.value = { ...details?.data }
+        formData.value.insuranceArea = formData.value.insuranceArea?._id
+        formData.value.insuranceName = formData.value.insuranceName?._id
+        formData.value.insurancePolicy = formData.value.insurancePolicy?._id
+        formData.value.insuranceType = formData.value.insuranceType?._id
+        formData.value.insuranceRestType = formData.value.insuranceRestType?._id
       } else if (detailsMode.value) {
         detailsData.value = { ...details?.data }
       }
