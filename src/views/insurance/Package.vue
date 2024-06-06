@@ -865,7 +865,7 @@ const updateVatAndTotal = (data, index) => {
     return
   }
   let dataNumber = Number(data)
-  formData.value.prices[index].vat = dataNumber * 0.5
+  formData.value.prices[index].vat = dataNumber * 0.05
   formData.value.prices[index].total =
     dataNumber + formData.value.prices[index].vat
 }
