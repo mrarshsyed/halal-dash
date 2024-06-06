@@ -143,6 +143,7 @@
           chips
           item-title="name"
           item-value="_id"
+          @update:model-value="onTypeSelect"
         />
       </v-col>
 
@@ -160,6 +161,7 @@
           chips
           item-title="name"
           item-value="_id"
+          @update:model-value="onNameSelect"
         />
       </v-col>
       <v-col
@@ -176,6 +178,7 @@
           chips
           item-title="name"
           item-value="_id"
+          @update:model-value="onPolicySelect"
         />
       </v-col>
       <v-col
@@ -234,7 +237,7 @@
         <v-select
           v-model="formData.tripType"
           label="Trip Type"
-          :items="['single', 'multiple']"
+          :items="[{title:'Single',value: 'single'}, {title:'Double',value:'double'}, {title:'Multiple',value: 'multiple'}]"
           required
           :rules="[(v) => !!v || 'Trip Type is required']"
         />
@@ -623,8 +626,11 @@ import { format } from 'date-fns'
 
 const insuranceTypeList = ref([])
 const insuranceNameList = ref([])
+const masterInsuranceNameList = ref([])
 const insurancePolicyList = ref([])
+const masterInsurancePolicyList = ref([])
 const insuranceAreaList = ref([])
+const masterInsuranceAreaList = ref([])
 const travelerTypeList = ref([])
 const insuranceRestTypeList = ref([])
 
@@ -818,18 +824,21 @@ const getInsuranceTypeList = async () => {
 const getInsuranceNameList = async () => {
   await axios.get('admin/insurance/names').then((res) => {
     insuranceNameList.value = res.data
+    masterInsuranceNameList.value = res.data
   })
 }
 
 const getInsurancePolicyList = async () => {
   await axios.get('admin/insurance/policies').then((res) => {
     insurancePolicyList.value = res.data
+    masterInsurancePolicyList.value = res.data
   })
 }
 
 const getInsuranceAreaList = async () => {
   await axios.get('admin/insurance/areas').then((res) => {
     insuranceAreaList.value = res.data
+    masterInsuranceAreaList.value = res.data
   })
 }
 
@@ -871,6 +880,28 @@ const removePrice = (index) => {
   formData.value.prices.splice(index, 1)
 }
 
+ const onTypeSelect = (data) => {
+  formData.value.insuranceName = null
+  formData.value.insurancePolicy = null
+  formData.value.insuranceArea = null
+  insuranceNameList.value = masterInsuranceNameList.value.filter(
+    (item) => item?.insuranceType?._id === data
+  )
+}
+const onNameSelect = (data) => {
+  formData.value.insurancePolicy = null
+  formData.value.insuranceArea = null
+  insurancePolicyList.value = masterInsurancePolicyList.value.filter(
+    (item) => item?.insuranceName?._id === data
+  )
+}
+const onPolicySelect = (data) => {
+  formData.value.insuranceArea = null
+  insuranceAreaList.value = masterInsuranceAreaList.value.filter(
+    (item) => item?.insurancePolicy?._id === data
+  )
+}
+
 onBeforeMount(async () => {
   await getInsuranceTypeList()
   await getInsuranceNameList()
@@ -885,12 +916,12 @@ onBeforeMount(async () => {
     if (details?.data?._id) {
       if (formMode.value) {
         formData.value = { ...details?.data }
-        formData.value.insuranceArea = formData.value.insuranceArea?._id
+        formData.value.insuranceType = formData.value.insuranceType?._id
         formData.value.insuranceName = formData.value.insuranceName?._id
         formData.value.insurancePolicy = formData.value.insurancePolicy?._id
-        formData.value.insuranceType = formData.value.insuranceType?._id
+        formData.value.insuranceArea = formData.value.insuranceArea?._id
         formData.value.insuranceRestType = formData.value.insuranceRestType?._id
-      } else if (detailsMode.value) {
+       } else if (detailsMode.value) {
         detailsData.value = { ...details?.data }
       }
     }

@@ -870,7 +870,7 @@ export const navLinks = [
       },
       {
         icon: 'cards',
-        title: 'Insurance Type',
+        title: 'Rest Type',
         to: '/insurance/insurance',
         value: 'insurance-insurance',
         role: ['super-admin', 'admin', 'employee'],
