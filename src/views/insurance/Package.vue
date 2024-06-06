@@ -162,6 +162,7 @@
           item-title="name"
           item-value="_id"
           @update:model-value="onNameSelect"
+          :disabled="!formData.insuranceType"
         />
       </v-col>
       <v-col
@@ -179,6 +180,8 @@
           item-title="name"
           item-value="_id"
           @update:model-value="onPolicySelect"
+          
+          :disabled="!formData.insuranceName"
         />
       </v-col>
       <v-col
@@ -195,6 +198,7 @@
           chips
           item-title="name"
           item-value="_id"
+          :disabled="!formData.insurancePolicy"
         />
       </v-col>
       <v-col
