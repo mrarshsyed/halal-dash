@@ -129,6 +129,7 @@
           :rules="[(v) => !!v || 'Package Name is required']"
         />
       </v-col>
+
       <v-col
         cols="12"
         md="6"
@@ -146,7 +147,6 @@
           @update:model-value="onTypeSelect"
         />
       </v-col>
-
       <v-col
         cols="12"
         md="6"
@@ -180,7 +180,6 @@
           item-title="name"
           item-value="_id"
           @update:model-value="onPolicySelect"
-          
           :disabled="!formData.insuranceName"
         />
       </v-col>
@@ -199,6 +198,24 @@
           item-title="name"
           item-value="_id"
           :disabled="!formData.insurancePolicy"
+          @update:model-value="onAreaSelect"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-autocomplete
+          clearable
+          label="Rest Type"
+          :items="insuranceRestTypeList"
+          required
+          :rules="[(v) => !!v || 'Insurance Rest Type is required']"
+          v-model="formData.insuranceRestType"
+          chips
+          item-title="name"
+          item-value="_id"
+          :disabled="!formData.insuranceArea"
         />
       </v-col>
       <v-col
@@ -218,22 +235,7 @@
           item-value="_id"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Insurance Rest Type"
-          :items="insuranceRestTypeList"
-          required
-          :rules="[(v) => !!v || 'Insurance Rest Type is required']"
-          v-model="formData.insuranceRestType"
-          chips
-          item-title="name"
-          item-value="_id"
-        />
-      </v-col>
+
       <v-col
         cols="12"
         md="6"
@@ -637,6 +639,7 @@ const insuranceAreaList = ref([])
 const masterInsuranceAreaList = ref([])
 const travelerTypeList = ref([])
 const insuranceRestTypeList = ref([])
+const masterInsuranceRestTypeList = ref([])
 
 const initialFormData = {
   name: '',
@@ -855,6 +858,7 @@ const getTravelerTypeList = async () => {
 const getInsuranceRestTypeList = async () => {
   await axios.get('admin/insurance/rest-types').then((res) => {
     insuranceRestTypeList.value = res.data
+    masterInsuranceRestTypeList.value = res.data
   })
 }
 
@@ -904,6 +908,10 @@ const onPolicySelect = (data) => {
   insuranceAreaList.value = masterInsuranceAreaList.value.filter(
     (item) => item?.insurancePolicy?._id === data
   )
+}
+const onAreaSelect = (data)=>{
+  formData.value.insuranceRestType = null
+  insuranceRestTypeList.value = masterInsuranceRestTypeList.value.filter((item)=> item?.insuranceArea?._id === data)
 }
 
 onBeforeMount(async () => {

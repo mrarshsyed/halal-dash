@@ -861,18 +861,18 @@ export const navLinks = [
         permissions: [permissions.insuranceMasterData]
       },
       {
-        icon: 'card-account-details',
-        title: 'Traveller Type',
-        to: '/insurance/traveller',
-        value: 'insurance-traveller',
-        role: ['super-admin', 'admin', 'employee'],
-        permissions: [permissions.insuranceMasterData]
-      },
-      {
         icon: 'cards',
         title: 'Rest Type',
         to: '/insurance/insurance',
         value: 'insurance-insurance',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.insuranceMasterData]
+      },
+      {
+        icon: 'card-account-details',
+        title: 'Traveller Type',
+        to: '/insurance/traveller',
+        value: 'insurance-traveller',
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.insuranceMasterData]
       },
