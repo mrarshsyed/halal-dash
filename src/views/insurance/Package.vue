@@ -262,7 +262,7 @@
           required
           item-title="title"
           item-value="value"
-          :rules="[(v) => !!v || 'Terrorism Extension is required']"
+          :rules="[(v) => v !== undefined && v !== null || 'Terrorism Extension is required']"
         />
       </v-col>
       <v-col
