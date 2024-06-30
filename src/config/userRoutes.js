@@ -59,7 +59,10 @@ export const permissions = {
   insuranceAll: 'insurance-all', //
   insuranceMasterData: 'insurance-master_data',
   insurancePackage: 'insurance-package',
-  insuranceOrder: 'insurance_order-all'
+  insuranceOrder: 'insurance_order-all',
+
+  // transfer
+  transferOrder: 'transfer_order-all'
 }
 
 export const routes = [
@@ -503,6 +506,26 @@ export const routes = [
     ]
   },
   {
+    path: '/transfer',
+    name: 'transfer',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee'],
+      permissions: [permissions.transferOrder]
+    },
+    children: [
+      {
+        path: 'order',
+        component: () => import('@/views/transfer/Order.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.transferOrder]
+        }
+      }
+    ]
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -895,6 +918,23 @@ export const navLinks = [
     ]
   },
   {
+    title: 'Transfers',
+    value: 'transfers',
+    icon: 'car',
+    role: ['super-admin', 'admin', 'employee'],
+    permissions: [permissions.transferOrder],
+    children: [
+      {
+        icon: 'file-document-multiple',
+        title: 'Orders',
+        to: '/transfer/order',
+        value: 'transfer-order',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.transferOrder]
+      }
+    ]
+  },
+  {
     title: 'Settings',
     value: 'settings',
     icon: 'cog',
@@ -1067,6 +1107,16 @@ export const userCreatePermissions = [
       {
         title: 'Orders',
         value: permissions.insuranceOrder
+      }
+    ]
+  },
+  {
+    title: 'Transfers',
+    value: permissions.transferOrder,
+    children: [
+      {
+        title: 'Orders',
+        value: permissions.transferOrder
       }
     ]
   }
