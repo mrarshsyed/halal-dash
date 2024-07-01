@@ -1,26 +1,14 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="4"
-      >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
-          + Add New
-        </v-btn>
+      <v-col cols="12" md="4">
+        <v-btn @click="showDialog" block color="primary"> + Add New </v-btn>
       </v-col>
     </v-row>
     <v-data-table
@@ -36,18 +24,6 @@
     >
       <template #item.name="{ item }">
         {{ item?.name }}
-      </template>
-      <template #item.insurance_name="{ item }">
-        {{ item?.insuranceName?.name }}
-      </template>
-      <template #item.insurance_type="{ item }">
-        {{ item?.insuranceType?.name }}
-      </template>
-      <template #item.policy_type="{ item }">
-        {{ item?.insurancePolicy?.name }}
-      </template>
-      <template #item.area="{ item }">
-        {{ item?.insuranceArea?.name }}
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
@@ -66,65 +42,14 @@
     </v-data-table>
     <!-- @update:options="loadItems" -->
   </div>
-  <v-dialog
-    v-model="isModalOpen"
-    max-width="970"
-    persistent
-    scrollable
-  >
+  <v-dialog v-model="isModalOpen" max-width="970" persistent scrollable>
     <v-card :title="Form?.id ? 'Update Action' : 'Add New'">
       <v-card-text>
-        <v-form
-          ref="form"
-          class="d-flex flex-column ga-2"
-        >
+        <v-form ref="form" class="d-flex flex-column ga-2">
           <v-text-field
             label="Name"
             v-model="name"
             :rules="[(v) => !!v || `Name is required`]"
-          />
-          <v-autocomplete
-            label="Select Type"
-            :items="typeList"
-            item-title="name"
-            item-value="_id"
-            v-model="insuranceType"
-            required
-            :rules="[(v) => !!v || `Type is required`]"
-            @update:model-value="onTypeSelect"
-          />
-          <v-autocomplete
-            label="Select Name"
-            :items="nameList"
-            item-title="name"
-            item-value="_id"
-            v-model="insuranceName"
-            required
-            :rules="[(v) => !!v || `Name is required`]"
-            :disabled="!insuranceType"
-            @update:model-value="onNameSelect"
-          />
-          <v-autocomplete
-            label="Select Policy Type"
-            :items="policyTypeList"
-            item-title="name"
-            item-value="_id"
-            v-model="insurancePolicy"
-            required
-            :rules="[(v) => !!v || `Policy Type is required`]"
-            :disabled="!insuranceName"
-            @update:model-value="onPolicySelect"
-          />
-
-          <v-autocomplete
-            label="Select Area"
-            :items="areaList"
-            item-title="name"
-            item-value="_id"
-            v-model="insuranceArea"
-            required
-            :rules="[(v) => !!v || `Area is required`]"
-            :disabled="!insurancePolicy"
           />
         </v-form>
       </v-card-text>
@@ -169,18 +94,6 @@ const isModalOpen = ref(false)
 const form = ref()
 
 const name = ref('')
-const insuranceType = ref(null)
-const insuranceName = ref(null)
-const insurancePolicy = ref(null)
-const insuranceArea = ref(null)
-
-const typeList = ref([])
-const masterNameList = ref()
-const nameList = ref([])
-const masterPolicyTypeList = ref([])
-const policyTypeList = ref([])
-const areaList = ref([])
-const masterAreaList = ref([])
 
 const showDialog = () => {
   isModalOpen.value = true
@@ -189,41 +102,6 @@ const closeModal = () => {
   isModalOpen.value = false
   form.value.reset()
   Form.value.id = null
-}
-const onTypeSelect = (data) => {
-  insuranceName.value = null
-  insurancePolicy.value = null
-  insuranceArea.value = null
-  nameList.value = masterNameList.value.filter(
-    (item) => item?.insuranceType?._id === data
-  )
-}
-const onNameSelect = (data) => {
-  insurancePolicy.value = null
-  insuranceArea.value = null
-  policyTypeList.value = masterPolicyTypeList.value.filter(
-    (item) => item?.insuranceName?._id === data
-  )
-}
-const onPolicySelect  = (data)=>{
-  insuranceArea.value = null
-  areaList.value = masterAreaList.value.filter((item)=> item?.insurancePolicy?._id === data)
-}
-const getTypeList = async () => {
-  await axios.get('admin/insurance/types').then((res) => {
-    typeList.value = res?.data
-  })
-  await axios.get('admin/insurance/names').then((res) => {
-    nameList.value = res?.data
-    masterNameList.value = res?.data
-  })
-  await axios.get('admin/insurance/policies').then((res) => {
-    policyTypeList.value = res?.data
-    masterPolicyTypeList.value = res?.data
-  })
-  await axios.get('admin/insurance/areas').then((res) => {
-    masterAreaList.value = res?.data
-  })
 }
 
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
@@ -250,10 +128,6 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Insurance Type', key: 'insurance_type', align: 'start' },
-    { title: 'Insurance Name', key: 'insurance_name', align: 'start' },
-    { title: 'Policy Type', key: 'policy_type', align: 'start' },
-    { title: 'Area', key: 'area', align: 'start' },
     { title: 'Action', key: 'action', align: 'start' }
   ],
   itemsPerPageOption: [
@@ -266,11 +140,7 @@ const saveRating = async () => {
   form.value.validate()
   if (!form?.value?.isValid) return
   const payload = {
-    name: name.value,
-    insuranceName: insuranceName.value,
-    insuranceType: insuranceType.value,
-    insurancePolicy: insurancePolicy.value,
-    insuranceArea: insuranceArea.value
+    name: name.value
   }
   const response = !Form?.value?.id
     ? await axios.post(baseUrl, payload)
@@ -288,17 +158,7 @@ const saveRating = async () => {
 const onEdit = async (item) => {
   Form.value.id = item?._id
   name.value = item?.name
-  insuranceType.value = item?.insuranceType?._id
-  insuranceName.value = item?.insuranceName?._id
-  insurancePolicy.value = item?.insurancePolicy?._id
-  insuranceArea.value = item?.insuranceArea?._id
-  nameList.value = masterNameList.value.filter(
-    (data) => data?.insuranceType?._id === insuranceType.value
-  )
-  policyTypeList.value = masterPolicyTypeList.value.filter(
-    (data) => data?.insuranceName?._id === insuranceName.value
-  )
-  areaList.value = masterAreaList.value.filter((data)=> data?.insurancePolicy?._id === insurancePolicy.value)
+
   showDialog()
 }
 const deleteRating = async () => {
@@ -331,7 +191,6 @@ const onDelete = async (item) => {
   store.showDialog(dialogModal)
 }
 onMounted(async () => {
-  await getTypeList()
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,

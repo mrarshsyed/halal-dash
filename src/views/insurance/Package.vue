@@ -1,21 +1,12 @@
 <template>
-  <v-row
-    class="mb-4"
-    v-if="!formMode && !detailsMode"
-  >
-    <v-col
-      cols="12"
-      md="8"
-    >
+  <v-row class="mb-4" v-if="!formMode && !detailsMode">
+    <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col
-      cols="12"
-      md="4"
-    >
+    <v-col cols="12" md="4">
       <v-btn
         v-if="!store.isRoleManager()"
         @click="onCreate"
@@ -93,10 +84,7 @@
               @click="onEdit(item)"
               icon="mdi-pencil-box"
             />
-            <v-icon
-              @click="onDelete(item)"
-              class="cursor-pointer"
-            >
+            <v-icon @click="onDelete(item)" class="cursor-pointer">
               mdi-delete
             </v-icon>
           </div>
@@ -104,11 +92,7 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form
-    v-model="formValue"
-    ref="form"
-    v-else-if="formMode && !detailsMode"
-  >
+  <v-form v-model="formValue" ref="form" v-else-if="formMode && !detailsMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -130,10 +114,7 @@
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Type"
@@ -144,13 +125,9 @@
           chips
           item-title="name"
           item-value="_id"
-          @update:model-value="onTypeSelect"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Insurance Name"
@@ -161,14 +138,10 @@
           chips
           item-title="name"
           item-value="_id"
-          @update:model-value="onNameSelect"
           :disabled="!formData.insuranceType"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Insurance Policy"
@@ -179,14 +152,10 @@
           chips
           item-title="name"
           item-value="_id"
-          @update:model-value="onPolicySelect"
           :disabled="!formData.insuranceName"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Insurance Area"
@@ -198,13 +167,9 @@
           item-title="name"
           item-value="_id"
           :disabled="!formData.insurancePolicy"
-          @update:model-value="onAreaSelect"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Rest Type"
@@ -218,10 +183,7 @@
           :disabled="!formData.insuranceArea"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Traveler Type"
@@ -236,22 +198,20 @@
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-select
           v-model="formData.tripType"
           label="Trip Type"
-          :items="[{title:'Single',value: 'single'}, {title:'Double',value:'double'}, {title:'Multiple',value: 'multiple'}]"
+          :items="[
+            { title: 'Single', value: 'single' },
+            { title: 'Double', value: 'double' },
+            { title: 'Multiple', value: 'multiple' }
+          ]"
           required
           :rules="[(v) => !!v || 'Trip Type is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-select
           v-model="formData.terrorismExtension"
           label="Terrorism Extension"
@@ -262,13 +222,14 @@
           required
           item-title="title"
           item-value="value"
-          :rules="[(v) => v !== undefined && v !== null || 'Terrorism Extension is required']"
+          :rules="[
+            (v) =>
+              (v !== undefined && v !== null) ||
+              'Terrorism Extension is required'
+          ]"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.maximumMedicalExpense"
           label="Maximum Medical Expense"
@@ -276,10 +237,7 @@
           :rules="[(v) => !!v || 'Maximum Medical Expense is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.lossOfBaggage"
           label="Loss of Baggage"
@@ -287,10 +245,7 @@
           :rules="[(v) => !!v || 'Loss of Baggage is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.personalLiability"
           label="Personal Liability"
@@ -298,10 +253,7 @@
           :rules="[(v) => !!v || 'Personal Liability is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.covid19Coverage"
           label="Covid-19 Coverage"
@@ -321,10 +273,7 @@
           accept="application/pdf"
           v-model:model-value="formData.uploads"
         />
-        <div
-          v-else
-          class="d-flex flex-wrap ga-4 align-center"
-        >
+        <div v-else class="d-flex flex-wrap ga-4 align-center">
           <p>Full Policy Details :</p>
           <a
             :href="formData.files?.[0]"
@@ -349,10 +298,7 @@
         <v-card title="Prices">
           <v-card-text>
             <div class="text-right mb-6">
-              <v-btn
-                @click="addMorePrice"
-                color="primary"
-              >
+              <v-btn @click="addMorePrice" color="primary">
                 + Add more price
               </v-btn>
             </div>
@@ -373,10 +319,7 @@
                   size="x-small"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.ageStart"
                   label="Start Age"
@@ -385,10 +328,7 @@
                   :rules="[(v) => !!v || 'Start Age is required']"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.ageEnd"
                   label="End Age"
@@ -397,10 +337,7 @@
                   :rules="[(v) => !!v || 'End Age is required']"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.durationStart"
                   label="Start Duration"
@@ -409,10 +346,7 @@
                   :rules="[(v) => !!v || 'Start Duration is required']"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.durationEnd"
                   label="End Duration"
@@ -421,10 +355,7 @@
                   :rules="[(v) => !!v || 'End Duration is required']"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.price"
                   label="Price"
@@ -434,10 +365,7 @@
                   @update:model-value="(data) => updateVatAndTotal(data, index)"
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.vat"
                   label="VAT"
@@ -445,10 +373,7 @@
                   readonly
                 />
               </v-col>
-              <v-col
-                cols="12"
-                md="6"
-              >
+              <v-col cols="12" md="6">
                 <v-text-field
                   v-model="price.total"
                   label="Total"
@@ -463,18 +388,8 @@
 
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn
-            color="error"
-            @click="router.back()"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            @click="save"
-          >
-            Save
-          </v-btn>
+          <v-btn color="error" @click="router.back()"> Cancel </v-btn>
+          <v-btn color="primary" @click="save"> Save </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -487,63 +402,32 @@
       icon="mdi-arrow-left"
       @click="router.back()"
     />
-    <p class="mb-4">
-      Name : {{ detailsData?.name }}
-    </p>
-    <p class="mb-4">
-      Contact Number : {{ detailsData?.contactNumber }}
-    </p>
-    <p class="mb-4">
-      Address : {{ detailsData?.address }}
-    </p>
-    <p class="mb-4">
-      Website : {{ detailsData?.website }}
-    </p>
-    <p class="mb-4">
-      Rating : {{ detailsData?.rating }}
-    </p>
-    <p class="mb-4">
-      Start Price : {{ detailsData?.startPrice }}
-    </p>
-    <p class="mb-4">
-      End Price : {{ detailsData?.endPrice }}
-    </p>
-    <p class="mb-2">
-      Description :
-    </p>
-    <div
-      class="mb-4"
-      v-html="detailsData?.description"
-    />
+    <p class="mb-4">Name : {{ detailsData?.name }}</p>
+    <p class="mb-4">Contact Number : {{ detailsData?.contactNumber }}</p>
+    <p class="mb-4">Address : {{ detailsData?.address }}</p>
+    <p class="mb-4">Website : {{ detailsData?.website }}</p>
+    <p class="mb-4">Rating : {{ detailsData?.rating }}</p>
+    <p class="mb-4">Start Price : {{ detailsData?.startPrice }}</p>
+    <p class="mb-4">End Price : {{ detailsData?.endPrice }}</p>
+    <p class="mb-2">Description :</p>
+    <div class="mb-4" v-html="detailsData?.description" />
     <div class="mb-4">
-      <p class="mb-2">
-        Cuisines:
-      </p>
+      <p class="mb-2">Cuisines:</p>
       <div class="d-flex flex-wrap ga-4">
-        <v-chip
-          v-for="(c, index) in detailsData?.cuisines"
-          :key="index"
-        >
+        <v-chip v-for="(c, index) in detailsData?.cuisines" :key="index">
           {{ c?.name }}
         </v-chip>
       </div>
     </div>
     <div class="mb-4">
-      <p class="mb-2">
-        Special Diets:
-      </p>
+      <p class="mb-2">Special Diets:</p>
       <div class="d-flex flex-wrap ga-4">
-        <v-chip
-          v-for="(s, index) in detailsData?.specialDiets"
-          :key="index"
-        >
+        <v-chip v-for="(s, index) in detailsData?.specialDiets" :key="index">
           {{ s?.name }}
         </v-chip>
       </div>
     </div>
-    <p class="mb-4">
-      Images :
-    </p>
+    <p class="mb-4">Images :</p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -555,54 +439,31 @@
         v-for="(i, index) in detailsData?.images"
         :key="index"
       >
-        <v-img
-          cover
-          :src="i"
-          height="150"
-          class="rounded"
-        />
+        <v-img cover :src="i" height="150" class="rounded" />
       </v-col>
     </v-row>
-    <p class="mb-4">
-      Menu :
-    </p>
+    <p class="mb-4">Menu :</p>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        v-for="(i, index) in detailsData?.menu"
-        :key="index"
-      >
-        <a
-          :href="i"
-          target="_blank"
-          :download="getFileName(i)"
-        >
+      <v-col cols="12" v-for="(i, index) in detailsData?.menu" :key="index">
+        <a :href="i" target="_blank" :download="getFileName(i)">
           <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
         </a>
       </v-col>
     </v-row>
-    <p class="mb-4">
-      Halal Certificates :
-    </p>
+    <p class="mb-4">Halal Certificates :</p>
     <v-row class="mb-4">
       <v-col
         cols="12"
         v-for="(i, index) in detailsData?.halalCertificates"
         :key="index"
       >
-        <a
-          :href="i"
-          target="_blank"
-          :download="getFileName(i)"
-        >
+        <a :href="i" target="_blank" :download="getFileName(i)">
           <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
         </a>
       </v-col>
     </v-row>
 
-    <p class="mb-4">
-      Working Hours :
-    </p>
+    <p class="mb-4">Working Hours :</p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -888,32 +749,6 @@ const removePrice = (index) => {
   formData.value.prices.splice(index, 1)
 }
 
- const onTypeSelect = (data) => {
-  formData.value.insuranceName = null
-  formData.value.insurancePolicy = null
-  formData.value.insuranceArea = null
-  insuranceNameList.value = masterInsuranceNameList.value.filter(
-    (item) => item?.insuranceType?._id === data
-  )
-}
-const onNameSelect = (data) => {
-  formData.value.insurancePolicy = null
-  formData.value.insuranceArea = null
-  insurancePolicyList.value = masterInsurancePolicyList.value.filter(
-    (item) => item?.insuranceName?._id === data
-  )
-}
-const onPolicySelect = (data) => {
-  formData.value.insuranceArea = null
-  insuranceAreaList.value = masterInsuranceAreaList.value.filter(
-    (item) => item?.insurancePolicy?._id === data
-  )
-}
-const onAreaSelect = (data)=>{
-  formData.value.insuranceRestType = null
-  insuranceRestTypeList.value = masterInsuranceRestTypeList.value.filter((item)=> item?.insuranceArea?._id === data)
-}
-
 onBeforeMount(async () => {
   await getInsuranceTypeList()
   await getInsuranceNameList()
@@ -933,7 +768,7 @@ onBeforeMount(async () => {
         formData.value.insurancePolicy = formData.value.insurancePolicy?._id
         formData.value.insuranceArea = formData.value.insuranceArea?._id
         formData.value.insuranceRestType = formData.value.insuranceRestType?._id
-       } else if (detailsMode.value) {
+      } else if (detailsMode.value) {
         detailsData.value = { ...details?.data }
       }
     }

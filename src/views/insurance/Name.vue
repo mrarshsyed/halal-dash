@@ -25,9 +25,6 @@
       <template #item.name="{ item }">
         {{ item?.name }}
       </template>
-      <template #item.type="{ item }">
-        {{ item?.insuranceType?.name }}
-      </template>
       <template #item.logo="{ item }">
         <v-img
           height="50"
@@ -65,16 +62,6 @@ const Form = ref({
   id: null,
   fields: [
     { type: 'text', key: 'name', label: 'Name', isRequired: true, value: null },
-    {
-      type: 'select',
-      key: 'insuranceType',
-      label: 'Type',
-      isRequired: true,
-      value: null,
-      itemTitle: 'name',
-      options: [],
-      itemValue: '_id'
-    },
     {
       cols: 12,
       md: 12,
@@ -129,7 +116,6 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Type', key: 'type', align: 'start' },
     { title: 'Logo', key: 'logo', align: 'start' },
     { title: 'Action', key: 'action', align: 'start' }
   ],
@@ -143,7 +129,6 @@ const table_data = ref({
 const saveRating = async () => {
   const payload = {
     name: store.getFieldValue('name'),
-    insuranceType: store.getFieldValue('insuranceType'),
     image: store.getFieldValue('image-list'),
     uploads: store.getFieldValue('uploads')
   }
@@ -154,9 +139,7 @@ const saveRating = async () => {
   const formData = new FormData()
   formData.append('data', JSON.stringify(data))
   if (payload.uploads?.[0]) {
-   
-  formData.append('logo', payload.uploads?.[0])
- 
+    formData.append('logo', payload.uploads?.[0])
   }
   const response = !Form?.value?.id
     ? await axios.post(baseUrl, formData)
@@ -174,7 +157,7 @@ const saveRating = async () => {
 }
 const showDialog = () => {
   resetForm()
-  getTypeList()
+
   const dialogModal = {
     title: 'Add New',
     content: '',
@@ -187,12 +170,10 @@ const showDialog = () => {
 const onEdit = async (item) => {
   resetForm()
   store.setRatingDetails(item)
-  getTypeList()
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  Form.value.fields[1].value = item?.insuranceType?._id
-  Form.value.fields[2].value = [item?.logo]
-  
+  Form.value.fields[1].value = [item?.logo]
+
   const dialogModal = {
     title: 'Update',
     content: '',
@@ -230,12 +211,6 @@ const onDelete = async (item) => {
     confirmFunction: deleteRating
   }
   store.showDialog(dialogModal)
-}
-
-const getTypeList = async () => {
-  await axios.get('admin/insurance/types').then((res) => {
-    Form.value.fields[1].options = res?.data
-  })
 }
 
 onMounted(async () => {
