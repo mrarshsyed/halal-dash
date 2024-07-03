@@ -1,21 +1,12 @@
 <template>
-  <v-row
-    class="mb-4"
-    v-if="!formMode && !detailsMode"
-  >
-    <v-col
-      cols="12"
-      md="8"
-    >
+  <v-row class="mb-4" v-if="!formMode && !detailsMode">
+    <v-col cols="12" md="8">
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col
-      cols="12"
-      md="4"
-    >
+    <v-col cols="12" md="4">
       <v-btn
         v-if="!store.isRoleManager()"
         @click="onCreate"
@@ -123,11 +114,7 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form
-    v-model="formValue"
-    ref="form"
-    v-else-if="formMode && !detailsMode"
-  >
+  <v-form v-model="formValue" ref="form" v-else-if="formMode && !detailsMode">
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -140,10 +127,7 @@
           {{ id ? 'Update Ship' : 'Create New Ship' }}
         </h3>
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -151,10 +135,7 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
+      <v-col cols="12" md="6">
         <v-autocomplete
           clearable
           label="Select Line"
@@ -169,10 +150,7 @@
 
       <v-col cols="12">
         <p>Ship Info</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.description"
-        />
+        <DocumentEditor height="200px" v-model="formData.description" />
       </v-col>
       <v-col cols="12">
         <ImageUploader
@@ -212,14 +190,8 @@
           <v-expansion-panel title="Rooms">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('rooms')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('rooms')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -229,10 +201,7 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
-                  <div
-                    class="text-right mb-4"
-                    v-if="formData.rooms.length > 1"
-                  >
+                  <div class="text-right mb-4" v-if="formData.rooms.length > 1">
                     <v-btn
                       icon="mdi-delete"
                       color="error"
@@ -285,14 +254,8 @@
           <v-expansion-panel title="What's Included?">
             <v-expansion-panel-text>
               <v-row>
-                <v-col
-                  cols="12"
-                  class="text-right"
-                >
-                  <v-btn
-                    color="primary"
-                    @click="addMore('highlights')"
-                  >
+                <v-col cols="12" class="text-right">
+                  <v-btn color="primary" @click="addMore('highlights')">
                     + Add More
                   </v-btn>
                 </v-col>
@@ -342,18 +305,10 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn
-            color="error"
-            @click="router.push('/cruise/ship')"
-          >
+          <v-btn color="error" @click="router.push('/cruise/ship')">
             Cancel
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="saveShip"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="saveShip"> Save </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -366,22 +321,11 @@
       icon="mdi-arrow-left"
       @click="router.push('/cruise/ship')"
     />
-    <p class="mb-4">
-      Ship Name : {{ detailsData?.name }}
-    </p>
-    <p class="mb-4">
-      Ship Line : {{ detailsData?.shipLine?.name }}
-    </p>
-    <p class="mb-2">
-      Description :
-    </p>
-    <div
-      class="mb-4"
-      v-html="detailsData?.description"
-    />
-    <p class="mb-2">
-      Images :
-    </p>
+    <p class="mb-4">Ship Name : {{ detailsData?.name }}</p>
+    <p class="mb-4">Ship Line : {{ detailsData?.shipLine?.name }}</p>
+    <p class="mb-2">Description :</p>
+    <div class="mb-4" v-html="detailsData?.description" />
+    <p class="mb-2">Images :</p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -393,17 +337,10 @@
         v-for="(i, index) in detailsData?.images"
         :key="index"
       >
-        <v-img
-          cover
-          :src="i"
-          height="150"
-          class="rounded"
-        />
+        <v-img cover :src="i" height="150" class="rounded" />
       </v-col>
     </v-row>
-    <p class="mb-2">
-      Ship Facts :
-    </p>
+    <p class="mb-2">Ship Facts :</p>
     <v-row class="mb-4">
       <v-col
         v-for="(value, key) in detailsData?.facts"
@@ -415,9 +352,7 @@
         <p>{{ formatLabel(key) }} : {{ detailsData.facts[key] }}</p>
       </v-col>
     </v-row>
-    <p class="mb-2">
-      Rooms :
-    </p>
+    <p class="mb-2">Rooms :</p>
     <v-row class="mb-4">
       <v-col
         v-for="(room, key) in detailsData?.rooms"
@@ -428,16 +363,9 @@
         <v-card>
           <v-card-text>
             <p>Room Group : {{ room?.roomGroup?.name }}</p>
-            <p class="mb-4">
-              Name : {{ room?.name }}
-            </p>
-            <p class="mb-2">
-              Description :
-            </p>
-            <div
-              class="mb-4"
-              v-html="room?.description"
-            />
+            <p class="mb-4">Name : {{ room?.name }}</p>
+            <p class="mb-2">Description :</p>
+            <div class="mb-4" v-html="room?.description" />
             <v-row>
               <v-col
                 cols="12"
@@ -445,12 +373,7 @@
                 v-for="(i, index) in room?.images"
                 :key="index"
               >
-                <v-img
-                  cover
-                  :src="i"
-                  height="150"
-                  class="rounded"
-                />
+                <v-img cover :src="i" height="150" class="rounded" />
               </v-col>
             </v-row>
           </v-card-text>
@@ -458,9 +381,7 @@
       </v-col>
     </v-row>
 
-    <p class="mb-2">
-      What's included? :
-    </p>
+    <p class="mb-2">What's included? :</p>
     <v-row class="mb-4">
       <v-col
         v-for="(room, key) in detailsData?.highlights"
@@ -470,16 +391,9 @@
       >
         <v-card>
           <v-card-text>
-            <p class="mb-4">
-              Name : {{ room?.name }}
-            </p>
-            <p class="mb-2">
-              Description :
-            </p>
-            <div
-              class="mb-4"
-              v-html="room?.description"
-            />
+            <p class="mb-4">Name : {{ room?.name }}</p>
+            <p class="mb-2">Description :</p>
+            <div class="mb-4" v-html="room?.description" />
             <v-row>
               <v-col
                 cols="12"
@@ -487,12 +401,7 @@
                 v-for="(i, index) in room?.images"
                 :key="index"
               >
-                <v-img
-                  cover
-                  :src="i"
-                  height="150"
-                  class="rounded"
-                />
+                <v-img cover :src="i" height="150" class="rounded" />
               </v-col>
             </v-row>
           </v-card-text>
@@ -505,15 +414,8 @@
       <v-card-title>Select Rating</v-card-title>
       <v-card-text>
         <v-row no-gutters>
-          <v-col
-            cols="12"
-            v-for="(r, index) in ratings"
-            :key="index"
-          >
-            <v-checkbox
-              v-model="selectedRatings"
-              :value="r"
-            >
+          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+            <v-checkbox v-model="selectedRatings" :value="r">
               <template #label>
                 {{ r?.name }}
                 <v-chip class="ms-2">
@@ -541,12 +443,7 @@
         >
           Close
         </v-btn>
-        <v-btn
-          color="primary"
-          @click="onAssignRating"
-        >
-          Save
-        </v-btn>
+        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -586,12 +483,7 @@
         >
           Close
         </v-btn>
-        <v-btn
-          color="primary"
-          @click="onAssignManager"
-        >
-          Assign Manager
-        </v-btn>
+        <v-btn color="primary" @click="onAssignManager"> Assign Manager </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -756,6 +648,13 @@ const getRoomGroups = async () => {
   })
 }
 const formatLabel = (key) => {
+  if (key === 'barsLounges') {
+    return 'Bar/Lounge'
+  }
+  if (key === 'stateroomsSuites') {
+    return 'No. of Suits'
+  }
+
   return (
     key &&
     key.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) {
@@ -763,6 +662,7 @@ const formatLabel = (key) => {
     })
   )
 }
+
 const addMore = async (name) => {
   formData.value[name].unshift({
     name: '',
