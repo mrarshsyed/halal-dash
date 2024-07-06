@@ -799,13 +799,11 @@ const save = async () => {
 const onUploadsUpdate = (images, key) => {
   formData.value[key] = images
 }
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async ({ page, itemsPerPage }) => {
   await axios
     .post('admin/restaurant/restaurants-list', {
-      params: {
-        page: page,
-        perPage: itemsPerPage
-      }
+      page: page,
+      perPage: itemsPerPage
     })
     .then((res) => {
       table_data.value.serverItems = res?.data?.data
