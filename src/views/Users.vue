@@ -1,10 +1,7 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
@@ -15,11 +12,7 @@
         cols="12"
         md="4"
       >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
+        <v-btn @click="showDialog" block color="primary">
           + Add New User
         </v-btn>
       </v-col>
@@ -37,10 +30,7 @@
     >
       <template #item.role="{ item }">
         <v-chip>
-          <div
-            style="min-width: 50px"
-            class="text-center"
-          >
+          <div style="min-width: 50px" class="text-center">
             {{ item?.role }}
           </div>
         </v-chip>
@@ -51,11 +41,7 @@
           color="success"
           icon="mdi-check-circle"
         />
-        <v-icon
-          v-else
-          color="error"
-          icon="mdi-close-circle"
-        />
+        <v-icon v-else color="error" icon="mdi-close-circle" />
       </template>
       <template #item.action="{ item }">
         <v-icon
@@ -131,7 +117,7 @@ const userForm = ref({
       value: [],
       cols: '12',
       md: '12',
-      show: store.user.data?.role === 'employee' ? false : true,
+      show: true,
       key: 'permission'
     }
   ]
@@ -332,20 +318,6 @@ const onDelete = (item) => {
   }
   store.showDialog(dialogModal)
 }
-watch(
-  () => store.getFieldValue('role'),
-  () => {
-    console.log(store.getFieldValue('role'))
-    if (
-      store.getFieldValue('role') === 'admin' ||
-      store.getFieldValue('role') === 'employee'
-    ) {
-      store.dialog.formComponents.fields[2].show = true
-    } else {
-      store.dialog.formComponents.fields[2].show = false
-    }
-  }
-)
 </script>
 
 <style lang="scss" scoped></style>

@@ -912,6 +912,11 @@ const onManagerCreate = async () => {
               sortBy: 'ascending'
             })
             store.showSnackbar('Invitation sent Successfully')
+            await store.updateUserRoleAndPermissions(
+              selectedManager.value._id,
+              'manager',
+              [permissions.cruiseShip]
+            )
           }
         })
     } else {

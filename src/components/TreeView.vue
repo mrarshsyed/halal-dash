@@ -1,7 +1,5 @@
 <template>
-  <p class="mt-3 mb-1">
-    Assign Permission
-  </p>
+  <p class="mt-3 mb-1">Assign Permission</p>
   <v-list
     density="compact"
     :opened="['user']"
@@ -12,29 +10,21 @@
       <v-col
         cols="12"
         md="6"
-        v-for="(item, index) in userCreatePermissions"
+        v-for="(item, index) in selectedRole === 'manager'
+          ? managerCreatePermissions
+          : userCreatePermissions"
         :key="index"
       >
         <div v-if="!item.children?.length">
-          <v-list-item
-            :title="item?.title"
-            :value="item?.value"
-          >
+          <v-list-item :title="item?.title" :value="item?.value">
             <template #prepend="">
               <v-list-item-action start>
-                <v-checkbox-btn
-                  :value="item.value"
-                  v-model="selectedItems"
-                />
+                <v-checkbox-btn :value="item.value" v-model="selectedItems" />
               </v-list-item-action>
             </template>
           </v-list-item>
         </div>
-        <v-list-group
-          v-else
-          :value="item.value"
-          class="lp-3 shadow border"
-        >
+        <v-list-group v-else :value="item.value" class="lp-3 shadow border">
           <template #activator="{ props }">
             <v-list-item
               v-bind="props"
@@ -49,10 +39,7 @@
           >
             <template #prepend="">
               <v-list-item-action start>
-                <v-checkbox-btn
-                  :value="child.value"
-                  v-model="selectedItems"
-                />
+                <v-checkbox-btn :value="child.value" v-model="selectedItems" />
               </v-list-item-action>
             </template>
           </v-list-item>
@@ -64,11 +51,16 @@
 
 <script setup>
 import { useAppStore } from '@/store/app'
-import {  computed } from 'vue'
-import { userCreatePermissions } from '@/config/userRoutes'
+import { computed } from 'vue'
+import {
+  userCreatePermissions,
+  managerCreatePermissions
+} from '@/config/userRoutes'
 
 const store = useAppStore()
-
+const selectedRole = computed(() => {
+  return store.getFieldValue('role')
+})
 
 const selectedItems = computed({
   get: () => {

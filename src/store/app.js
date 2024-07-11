@@ -51,7 +51,7 @@ export const useAppStore = defineStore('app', {
     managers: [],
     countries: [],
     details: {},
-    cruiseMasterData : {},
+    cruiseMasterData: {},
     sideBarLinks: JSON.parse(localStorage.getItem('navLinks')) || []
   }),
   getters: {
@@ -111,51 +111,55 @@ export const useAppStore = defineStore('app', {
     },
     getNavbarList(user) {
       if (!user) return []
-    
+
       const userRole = user?.data?.role
-      const userPermissions = user?.data?.permissions 
+      const userPermissions = user?.data?.permissions
       // Define a recursive function to filter the links and their children
       function filterLinks(links) {
-        return links.map((link) => {
-          // Create a shallow copy of the link
-          const newLink = { ...link }
-    
-          // If the user is super-admin, return the link with all children
-          if (userRole === 'super-admin') {
-            if (newLink.children && newLink.children.length > 0) {
-              newLink.children = filterLinks(newLink.children) // Recursive call to include all children
+        return links
+          .map((link) => {
+            // Create a shallow copy of the link
+            const newLink = { ...link }
+
+            // If the user is super-admin, return the link with all children
+            if (userRole === 'super-admin') {
+              if (newLink.children && newLink.children.length > 0) {
+                newLink.children = filterLinks(newLink.children) // Recursive call to include all children
+              }
+              return newLink
             }
-            return newLink
-          }
-    
-          // If the link doesn't have permissions, allow it
-          if (newLink.permissions.length === 0) {
-            if (newLink.children && newLink.children.length > 0) {
-              newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+
+            // If the link doesn't have permissions, allow it
+            if (newLink.permissions.length === 0) {
+              if (newLink.children && newLink.children.length > 0) {
+                newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+              }
+              return newLink
             }
-            return newLink
-          }
-    
-          // Check if any of the user's permissions match the link's permissions
-          if (newLink.permissions.some((permission) =>
-            userPermissions.includes(permission)
-          )) {
-            if (newLink.children && newLink.children.length > 0) {
-              newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+
+            // Check if any of the user's permissions match the link's permissions
+            if (
+              newLink.permissions.some((permission) =>
+                userPermissions.includes(permission)
+              )
+            ) {
+              if (newLink.children && newLink.children.length > 0) {
+                newLink.children = filterLinks(newLink.children) // Recursive call to filter children
+              }
+              return newLink
             }
-            return newLink
-          }
-    
-          return null
-        }).filter(link => link !== null) // Filter out null links
+
+            return null
+          })
+          .filter((link) => link !== null) // Filter out null links
       }
-    
+
       // Filter the top-level navigation links
       const filteredNavLinks = filterLinks(navLinks)
-    
+
       return filteredNavLinks
     },
-    
+
     setUser(user) {
       this.user = user
       localStorage.setItem('user', JSON.stringify(this.user))
@@ -163,10 +167,10 @@ export const useAppStore = defineStore('app', {
       this.sideBarLinks = [...links]
       localStorage.setItem('navLinks', JSON.stringify(this.sideBarLinks))
     },
-    setAuthToken(token){
+    setAuthToken(token) {
       localStorage.setItem('authToken', token)
     },
-    getAuthToken(){
+    getAuthToken() {
       localStorage.getItem('authToken')
     },
     setTokens(tokens) {
@@ -234,25 +238,25 @@ export const useAppStore = defineStore('app', {
         role: roleData,
         permissions: permissionsData
       }
-      if (payload.role === 'manager') {
-        payload.permissions = [
-          // hotel
-          permissions.hotelList,
-          permissions.hotelUpdateHalalRatings,
+      // if (payload.role === 'manager') {
+      //   payload.permissions = [
+      //     // hotel
+      //     permissions.hotelList,
+      //     permissions.hotelUpdateHalalRatings,
 
-          // activity
-          permissions.activityList,
-          permissions.activityUpdateHalalRatings,
+      //     // activity
+      //     permissions.activityList,
+      //     permissions.activityUpdateHalalRatings,
 
-          // ship
-          permissions.cruiseShip,
-          permissions.cruiseUpdateHalalRatings,
+      //     // ship
+      //     permissions.cruiseShip,
+      //     permissions.cruiseUpdateHalalRatings,
 
-          // restaurant
-          permissions.restaurantRestaurant,
-          permissions.restaurantUpdateHalalRatings,
-        ]
-      }
+      //     // restaurant
+      //     permissions.restaurantRestaurant,
+      //     permissions.restaurantUpdateHalalRatings,
+      //   ]
+      // }
 
       return await axios.patch(
         `admin/users/${id}/update-role-permissions`,
@@ -279,11 +283,10 @@ export const useAppStore = defineStore('app', {
         this.dialog.formComponents.fields[fieldIndex].value = value
       }
     },
-    isRoleManager(){
+    isRoleManager() {
       if (this.user?.data?.role === 'manager') {
         return true
-      }
-      else return false
+      } else return false
     }
   }
 })

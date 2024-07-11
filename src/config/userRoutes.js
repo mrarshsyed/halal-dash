@@ -1121,3 +1121,10 @@ export const userCreatePermissions = [
     ]
   }
 ]
+
+export const managerCreatePermissions = [
+  { title: 'Hotel', value: permissions.hotelList },
+  { title: 'Activity', value: permissions.activityList },
+  { title: 'Cruise', value: permissions.cruiseShip },
+  { title: 'Restaurant', value: permissions.restaurantRestaurant }
+]

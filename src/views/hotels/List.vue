@@ -38,10 +38,7 @@
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
-          <v-tooltip
-            text="Details"
-            location="top"
-          >
+          <v-tooltip text="Details" location="top">
             <template #activator="{ props }">
               <v-icon
                 v-bind="props"
@@ -171,10 +168,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignManager"
-          >
+          <v-btn color="primary" @click="onAssignManager">
             Assign Manager
           </v-btn>
         </v-card-actions>
@@ -185,15 +179,8 @@
         <v-card-title>Select Rating</v-card-title>
         <v-card-text>
           <v-row no-gutters>
-            <v-col
-              cols="12"
-              v-for="(r, index) in ratings"
-              :key="index"
-            >
-              <v-checkbox
-                v-model="selectedRatings"
-                :value="r"
-              >
+            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
+              <v-checkbox v-model="selectedRatings" :value="r">
                 <template #label>
                   {{ r?.name }}
                   <v-chip class="ms-2">
@@ -221,12 +208,7 @@
           >
             Close
           </v-btn>
-          <v-btn
-            color="primary"
-            @click="onAssignRating"
-          >
-            Save
-          </v-btn>
+          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -484,12 +466,18 @@ const onManagerCreate = async () => {
         .then(async (res) => {
           if (res?.status === 200) {
             selectedManager.value = res?.data
+
             await loadItems({
               page: table_data.value.page,
               itemsPerPage: table_data.value.itemsPerPage,
               sortBy: 'ascending'
             })
             store.showSnackbar('Invitation sent Successfully')
+            await store.updateUserRoleAndPermissions(
+              selectedManager.value._id,
+              'manager',
+              [permissions.hotelList]
+            )
           }
         })
     } else {
