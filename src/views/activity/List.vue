@@ -316,10 +316,9 @@ const onExport = async () => {
       }
     })
 }
-
 const filteredCities = computed(() => {
   const country = store.countries.find(
-    (c) => c.country?.code === formStore.getFieldValue('country')
+    (c) => c?.code === formStore.getFieldValue('country')
   )
   return country ? country.destinations : []
 })
@@ -386,6 +385,7 @@ const searchForm = ref({
   isSearched: false,
   exportFunction: onExport
 })
+
 const sumOfSelectedRatings = computed(() => {
   return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
 })
