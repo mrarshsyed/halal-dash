@@ -143,6 +143,20 @@
         />
       </v-col>
       <v-col cols="12">
+        <v-autocomplete
+          clearable
+          label="Categories"
+          :items="categoriesList"
+          required
+          :rules="[(v) => (v && v.length > 0) || 'This field is required']"
+          v-model="formData.categories"
+          multiple
+          chips
+          item-title="title"
+          item-value="value"
+        />
+      </v-col>
+      <v-col cols="12">
         <v-textarea
           v-model="formData.address"
           label="Address"
@@ -640,6 +654,7 @@ const initialFormData = {
   startPrice: null,
   endPrice: null,
   description: '',
+  categories: [],
   workingHours: [],
   cuisines: [],
   specialDiets: [],
@@ -706,6 +721,13 @@ const managerSearch = ref('')
 const detailsData = ref({})
 const cuisinesList = ref([])
 const specialDietsList = ref([])
+
+const categoriesList = [
+  { title: 'Breakfast', value: 'breakfast' },
+  { title: 'Brunch', value: 'brunch' },
+  { title: 'Lunch', value: 'lunch' },
+  { title: 'Dinner', value: 'dinner' }
+]
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
