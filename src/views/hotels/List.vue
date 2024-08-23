@@ -279,6 +279,7 @@ const onSearch = async () => {
   ).some((value) => value !== null && value !== undefined)
   if (!hasNonNullValue) return
   formStore.formComponents.isSearched = true
+  table_data.value.page = 1
   await loadItems({
     page: table_data.value.page,
     itemsPerPage: table_data.value.itemsPerPage,
