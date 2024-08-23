@@ -1,43 +1,25 @@
 <template>
   <v-layout>
-    <v-app-bar
-      density="comfortable"
-      class="py-1"
-    >
+    <v-app-bar density="comfortable" class="py-1">
       <!-- <v-app-bar-nav-icon
         v-if="store?.user?.data._id"
         variant="text"
         @click.stop="drawer != drawer"
       /> -->
 
-      <v-app-bar-title
-        class="cursor-pointer"
-        @click="$router.push('/')"
-      >
-        <v-img
-          src="@/assets/logo.svg"
-          height="80px"
-          width="220px"
-        />
+      <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">
+        <v-img src="@/assets/logo.svg" height="80px" width="220px" />
       </v-app-bar-title>
 
       <v-spacer />
 
-      <v-btn
-        variant="text"
-        icon="mdi-theme-light-dark"
-        @click="toggleTheme"
-      />
+      <v-btn variant="text" icon="mdi-theme-light-dark" @click="toggleTheme" />
       <v-btn
         v-if="!store.getUser"
         text="Login"
         to="/authentication?mode=Login"
       />
-      <v-btn
-        v-if="store.getUser"
-        variant="text"
-        icon="mdi-account-circle"
-      />
+      <v-btn v-if="store.getUser" variant="text" icon="mdi-account-circle" />
       <v-btn
         v-if="store.getUser"
         variant="text"
@@ -55,10 +37,7 @@
       :key="navKey"
     >
       <v-list nav>
-        <div
-          v-for="(item, index) in links"
-          :key="index"
-        >
+        <div v-for="(item, index) in links" :key="index">
           <v-list-item
             :value="item?.value"
             color="primary"
@@ -69,10 +48,7 @@
             exact
             link
           />
-          <v-list-group
-            v-else
-            :value="item?.value"
-          >
+          <v-list-group v-else :value="item?.value">
             <template #activator="{ props }">
               <v-list-item
                 color="primary"
@@ -100,14 +76,11 @@
 
     <v-main>
       <v-container style="max-width: 1000px">
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          color="primary"
-        />
+        <v-progress-linear v-if="loading" indeterminate color="primary" />
         <v-card class="pa-4 overflow-scroll">
           <slot />
         </v-card>
+        <v-progress-linear v-if="loading" indeterminate color="primary" />
       </v-container>
     </v-main>
   </v-layout>

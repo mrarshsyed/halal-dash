@@ -99,13 +99,13 @@
           <v-btn
             size="x-small"
             icon="mdi-chevron-left"
-            :disabled="table_data.page === 1"
+            :disabled="table_data.page === 1 || store.isLoading"
             @click="onPreviousPage"
           />
           <p>{{ table_data.page }}</p>
           <v-btn
             @click="onNextPage"
-            :disabled="!table_data.hasNextPage"
+            :disabled="!table_data.hasNextPage || store.isLoading"
             size="x-small"
             icon="mdi-chevron-right"
           />
@@ -288,7 +288,7 @@ const onSearch = async () => {
 const onReset = async () => {
   formStore.formComponents.selectedExportOption = null
   await loadItems({
-    page: table_data.value.page,
+    page: 1,
     itemsPerPage: table_data.value.itemsPerPage,
     sortBy: 'ascending'
   })
