@@ -19,11 +19,11 @@
     <v-col cols="12">
       <v-data-table-server
         density="compact"
-        :items-per-page="table_data.itemsPerPage"
+        v-model:items-per-page="table_data.itemsPerPage"
         :headers="table_data.headers"
         :items-length="table_data.totalItems"
         :items="table_data.serverItems"
-        :search="table_data.search"
+        v-model:search="table_data.search"
         :items-per-page-options="table_data.itemsPerPageOption"
         :page="table_data.page"
         show-current-page
@@ -688,7 +688,7 @@ const id = computed(() => {
 const table_data = ref({
   loading: true,
   search: '',
-  itemsPerPage: 10,
+  itemsPerPage: 20,
   totalItems: 0,
   page: 1,
   serverItems: [],
@@ -700,9 +700,9 @@ const table_data = ref({
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
-    { value: 10, title: '10' },
     { value: 20, title: '20' },
-    { value: 50, title: '50' }
+    { value: 50, title: '50' },
+    { value: 80, title: '80' }
   ]
 })
 
@@ -821,11 +821,15 @@ const save = async () => {
 const onUploadsUpdate = (images, key) => {
   formData.value[key] = images
 }
-const loadItems = async ({ page, itemsPerPage }) => {
+const loadItems = async () => {
+  const payload = {
+    page: table_data.value.page,
+    perPage: table_data.value.itemsPerPage,
+    search: table_data.value.search
+  }
   await axios
     .post('admin/restaurant/restaurants-list', {
-      page: page,
-      perPage: itemsPerPage
+      ...payload
     })
     .then((res) => {
       table_data.value.serverItems = res?.data?.data
@@ -840,11 +844,7 @@ const confirmDelete = async () => {
     .delete(`admin/restaurant/restaurants/${store.details?._id}`)
     .then(async () => {
       store.showSnackbar('Successfully Deleted')
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
+      await loadItems()
       store.closeDialog()
     })
 }
@@ -885,11 +885,7 @@ const onAssignRating = async () => {
     .then(async (res) => {
       store.showSnackbar('Ratings updated successfully')
       store.setDetails({})
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
+      await loadItems()
       assignRatingDialogShow.value = false
       selectedRatings.value = []
     })
@@ -913,11 +909,7 @@ const onManagerCreate = async () => {
         .then(async (res) => {
           if (res?.status === 200) {
             selectedManager.value = res?.data
-            await loadItems({
-              page: table_data.value.page,
-              itemsPerPage: table_data.value.itemsPerPage,
-              sortBy: 'ascending'
-            })
+            await loadItems()
             store.showSnackbar('Invitation sent Successfully')
             await store.updateUserRoleAndPermissions(
               selectedManager.value._id,
@@ -944,11 +936,7 @@ const onAssignManager = async () => {
     .then(async (res) => {
       if (res?.status === 200) {
         store.showSnackbar('Manager assigned successfully')
-        await loadItems({
-          page: table_data.value.page,
-          itemsPerPage: table_data.value.itemsPerPage,
-          sortBy: 'ascending'
-        })
+        await loadItems()
         selectedManager.value = ''
         assignManagerDialogShow.value = false
       }
@@ -972,11 +960,7 @@ const removeManager = async () => {
     .then(async (res) => {
       if (res?.status === 200) {
         store.showSnackbar('Manager removed successfully')
-        await loadItems({
-          page: table_data.value.page,
-          itemsPerPage: table_data.value.itemsPerPage,
-          sortBy: 'ascending'
-        })
+        await loadItems()
         store.closeDialog()
       }
     })

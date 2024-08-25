@@ -10,6 +10,7 @@
   "dependencies": {
     "@fontsource/poppins": "^5.0.14",
     "@mdi/font": "7.0.96",
+    "@vueuse/core": "^11.0.3",
     "axios": "^1.6.2",
     "date-fns": "^3.6.0",
     "pinia": "^2.0.23",

@@ -2,7 +2,7 @@
   <v-row class="mb-4" v-if="!formMode && !detailsMode">
     <v-col cols="12" md="8">
       <v-text-field
-        v-model="table_data.search"
+        v-model="searchKeyword"
         placeholder="Enter search here ..."
       />
     </v-col>
@@ -19,15 +19,16 @@
     <v-col cols="12">
       <v-data-table-server
         density="compact"
-        :items-per-page="table_data.itemsPerPage"
+        v-model:search="searchKeyword"
+        v-model:items-per-page="table_data.itemsPerPage"
         :headers="table_data.headers"
         :items-length="table_data.totalItems"
         :items="table_data.serverItems"
-        :search="table_data.search"
         :items-per-page-options="table_data.itemsPerPageOption"
-        :page="table_data.page"
+        v-model:page="table_data.page"
         show-current-page
         @update:options="loadItems"
+        item-value="name"
       >
         <template #item.name="{ item }">
           {{ item?.name }}
@@ -521,7 +522,7 @@ const id = computed(() => {
 const table_data = ref({
   loading: true,
   search: '',
-  itemsPerPage: 10,
+  itemsPerPage: 20,
   totalItems: 0,
   page: 1,
   serverItems: [],
@@ -534,9 +535,9 @@ const table_data = ref({
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
-    { value: 10, title: '10' },
     { value: 20, title: '20' },
-    { value: 'all', title: 'All' }
+    { value: 50, title: '50' },
+    { value: 80, title: '80' }
   ]
 })
 
@@ -618,6 +619,7 @@ const assignRatingDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
 const managerSearch = ref('')
 const detailsData = ref({})
+const searchKeyword = ref('')
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
@@ -782,12 +784,16 @@ const onRoomImageUpdate = (images, index) => {
 const onHighlightsImageUpdate = (images, index) => {
   formData.value.highlights[index].uploads = images
 }
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async () => {
+  let payload = {
+    page: table_data.value.page,
+    perPage: table_data.value.itemsPerPage,
+    name: searchKeyword.value
+  }
   await axios
     .get('admin/cruise/ships', {
       params: {
-        page: page,
-        perPage: itemsPerPage
+        ...payload
       }
     })
     .then((res) => {
@@ -818,40 +824,7 @@ const onDelete = (item) => {
   }
   store.showDialog(dialogModal)
 }
-onBeforeMount(async () => {
-  if (store.hasPermission(permissions.userList)) {
-    await axios.get('admin/users').then((res) => {
-      if (res?.data?.length) {
-        const managerList = res?.data?.filter((x) => x?.role === 'manager')
-        store.setManager(managerList)
-      }
-    })
-  }
-  if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
-    await axios.get('admin/cruise-halal-ratings').then((res) => {
-      if (res?.data?.length) {
-        ratings.value = res?.data
-      }
-    })
-  }
-  await getLines()
-  await getRoomGroups()
-  if (id.value) {
-    const details = await axios.get(`admin/cruise/ships/${id.value}`)
-    if (details?.data?._id) {
-      if (formMode.value) {
-        formData.value = { ...details?.data }
-        formData.value.shipLine = formData.value.shipLine._id
-        formData.value.rooms.forEach((element) => {
-          element.roomGroup = element.roomGroup._id
-        })
-      } else if (detailsMode.value) {
-        detailsData.value = { ...details?.data }
-      }
-    }
-  }
-  showForm.value = true
-})
+
 const onUpdateImageLink = (data) => {
   formData.value.images = [...data]
 }
@@ -981,6 +954,41 @@ const handelRemoveManagerIconClick = (item) => {
   }
   store.showDialog(dialogModal)
 }
+
+onBeforeMount(async () => {
+  if (store.hasPermission(permissions.userList)) {
+    await axios.get('admin/users').then((res) => {
+      if (res?.data?.length) {
+        const managerList = res?.data?.filter((x) => x?.role === 'manager')
+        store.setManager(managerList)
+      }
+    })
+  }
+  if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
+    await axios.get('admin/cruise-halal-ratings').then((res) => {
+      if (res?.data?.length) {
+        ratings.value = res?.data
+      }
+    })
+  }
+  await getLines()
+  await getRoomGroups()
+  if (id.value) {
+    const details = await axios.get(`admin/cruise/ships/${id.value}`)
+    if (details?.data?._id) {
+      if (formMode.value) {
+        formData.value = { ...details?.data }
+        formData.value.shipLine = formData.value.shipLine._id
+        formData.value.rooms.forEach((element) => {
+          element.roomGroup = element.roomGroup._id
+        })
+      } else if (detailsMode.value) {
+        detailsData.value = { ...details?.data }
+      }
+    }
+  }
+  showForm.value = true
+})
 </script>
 
 <style scoped>

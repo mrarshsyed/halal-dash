@@ -19,13 +19,13 @@
     <v-col cols="12">
       <v-data-table-server
         density="compact"
-        :items-per-page="table_data.itemsPerPage"
+        v-model:items-per-page="table_data.itemsPerPage"
         :headers="table_data.headers"
         :items-length="table_data.totalItems"
         :items="table_data.serverItems"
-        :search="table_data.search"
+        v-model:search="table_data.search"
         :items-per-page-options="table_data.itemsPerPageOption"
-        :page="table_data.page"
+        v-model:page="table_data.page"
         show-current-page
         @update:options="loadItems"
       >
@@ -549,8 +549,8 @@ const id = computed(() => {
 
 const table_data = ref({
   loading: true,
-  search: '',
-  itemsPerPage: 10,
+  search: null,
+  itemsPerPage: 20,
   totalItems: 0,
   page: 1,
   serverItems: [],
@@ -571,9 +571,9 @@ const table_data = ref({
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
-    { value: 10, title: '10' },
     { value: 20, title: '20' },
-    { value: 'all', title: 'All' }
+    { value: 50, title: '50' },
+    { value: 80, title: '80' }
   ]
 })
 
@@ -641,17 +641,19 @@ const save = async () => {
     }
   }
 }
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async () => {
+  const payload = {
+    page: table_data.value.page,
+    perPage: table_data.value.itemsPerPage,
+    search: table_data.value.search
+  }
   await axios
     .post('admin/insurance/packages-list', {
-      params: {
-        page: page,
-        perPage: itemsPerPage
-      }
+      ...payload
     })
     .then((res) => {
       table_data.value.serverItems = res?.data?.data
-      table_data.value.totalItems = res?.data?.data.length
+      table_data.value.totalItems = res?.data?.total
     })
 }
 const confirmDelete = async () => {
@@ -659,11 +661,7 @@ const confirmDelete = async () => {
     .delete(`admin/insurance/packages/${store.details?._id}`)
     .then(async () => {
       store.showSnackbar('Successfully Deleted')
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
+      await loadItems()
       store.closeDialog()
     })
 }
