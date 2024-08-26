@@ -145,7 +145,7 @@
       <v-col cols="12">
         <v-autocomplete
           clearable
-          label="Categories"
+          label="Meal Options"
           :items="categoriesList"
           required
           :rules="[(v) => (v && v.length > 0) || 'This field is required']"
