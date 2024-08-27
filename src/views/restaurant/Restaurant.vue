@@ -25,7 +25,7 @@
         :items="table_data.serverItems"
         v-model:search="table_data.search"
         :items-per-page-options="table_data.itemsPerPageOption"
-        :page="table_data.page"
+        v-model:page="table_data.page"
         show-current-page
         @update:options="loadItems"
       >
