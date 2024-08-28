@@ -1,23 +1,18 @@
 <template>
   <div>
     <FormComponent />
-    <v-data-table-server
+    <v-data-table
       class="mt-4 hotels-data-table"
       density="compact"
-      v-model:items-per-page="table_data.itemsPerPage"
+      :items-per-page="20"
       :items-length="table_data.totalItems"
       :headers="table_data.headers"
       :items="table_data.serverItems"
-      :search="table_data.search"
-      :items-per-page-options="table_data.itemsPerPageOption"
-      :page="table_data.page"
-      @update:options="loadItems"
-      :show-current-page="true"
       show-select
       v-model="selected"
       item-value="code"
     >
-      <template v-slot:top>
+      <template #top>
         <div
           v-if="table_data.serverItems?.length"
           class="d-flex justify-end align-center ga-4 pb-4"
@@ -27,11 +22,12 @@
             prepend-icon="mdi-plus"
             color="primary"
             variant="outlined"
-            >Add To system</v-btn
           >
+            Add To system
+          </v-btn>
         </div>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template #item.action="{ item }">
         <div class="d-flex ga-2 cursor-pointer">
           <!-- <v-icon
             icon="mdi-eye"
@@ -50,32 +46,35 @@
             "
             @click="handleAdd(item)"
             icon="mdi-plus"
-          ></v-icon>
+          />
         </div>
       </template>
-      <template v-slot:bottom>
-        <div class="d-flex justify-end align-center ga-4 pt-4">
+      <template #bottom>
+        <div
+          v-if="table_data.serverItems?.length"
+          class="d-flex justify-end align-center ga-4 pt-4"
+        >
           <v-btn
             size="x-small"
             icon="mdi-chevron-left"
             :disabled="table_data.page === 1"
             @click="onPreviousPage"
-          ></v-btn>
+          />
           <p>{{ table_data.page }}</p>
           <v-btn
             @click="onNextPage"
             :disabled="!table_data.hasNextPage"
             size="x-small"
             icon="mdi-chevron-right"
-          ></v-btn>
+          />
         </div>
       </template>
-    </v-data-table-server>
+    </v-data-table>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { useAppStore } from '@/store/app'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
@@ -114,11 +113,7 @@ const onSearch = async () => {
   ).some((value) => value !== null && value !== undefined)
   if (!hasNonNullValue) return
   // formStore.formComponents.isSearched = true
-  await loadItems({
-    page: table_data.value.page,
-    itemsPerPage: table_data.value.itemsPerPage,
-    sortBy: 'ascending'
-  })
+  await loadItems()
 }
 const onReset = async () => {
   // formStore.formComponents.selectedExportOption = null
@@ -171,7 +166,7 @@ const searchForm = ref({
       key: 'country',
       type: 'select',
       label: 'Country',
-      isRequired: false,
+      isRequired: true,
       options: store.countries,
       value: null,
       itemTitle: 'name',
@@ -182,7 +177,7 @@ const searchForm = ref({
       key: 'destination',
       type: 'select',
       label: 'Destinations',
-      isRequired: false,
+      isRequired: true,
       options: filteredCities,
       value: null,
       itemTitle: 'name',
@@ -196,17 +191,16 @@ const searchForm = ref({
   isSearched: false,
   exportFunction: onExport
 })
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
+const loadItems = async () => {
   const hasNonNullValue = Object.values(
     formStore.getFilteredSearchFields()
   ).some((value) => value !== null && value !== undefined)
   if (!hasNonNullValue) return
-  table_data.value.page = page
   await axiosInstance
     .get(`admin/activities/search-to-add`, {
       params: {
-        page: page,
-        perPage: itemsPerPage,
+        page: table_data.value.page,
+        perPage: table_data.value.itemsPerPage,
         ...formStore.getFilteredSearchFields()
       }
     })
@@ -232,9 +226,11 @@ const handleAdd = async () => {
 }
 const onNextPage = async () => {
   table_data.value.page = table_data.value.page + 1
+  await loadItems()
 }
 const onPreviousPage = async () => {
   table_data.value.page = table_data.value.page - 1
+  await loadItems()
 }
 onMounted(async () => {
   const countries = await axios.get('/admin/activities/get-countries')
@@ -248,6 +244,9 @@ watch(
     formStore.updateField('destination', null)
   }
 )
+onBeforeUnmount(() => {
+  formStore.formComponents.fields = []
+})
 // watch(
 //   () => formStore.formComponents.selectedExportOption,
 //   (newValue, oldValue) => {

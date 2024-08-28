@@ -8,9 +8,8 @@
       :items-length="table_data.totalItems"
       :headers="table_data.headers"
       :items="table_data.serverItems"
-      :search="table_data.search"
       :items-per-page-options="table_data.itemsPerPageOption"
-      :page="table_data.page"
+      v-model:page="table_data.page"
       @update:options="loadItems"
       :show-current-page="true"
     >
