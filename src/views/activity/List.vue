@@ -218,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { useAppStore } from '@/store/app'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
@@ -561,6 +561,10 @@ onMounted(async () => {
       ratings.value = res?.data
     }
   })
+})
+
+onBeforeUnmount(() => {
+  formStore.formComponents.fields = []
 })
 watch(
   () => formStore.getFieldValue('country'),
