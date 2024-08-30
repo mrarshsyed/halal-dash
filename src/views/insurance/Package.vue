@@ -871,20 +871,32 @@ const getInsuranceRestTypeList = async () => {
   })
 }
 
-const updateTotal = (data, index) => {
-  // Convert the VAT (data) and price to numbers
-  const vat = Number(data);
+const updateTotal = (vatPercentage, index) => {
+  // Convert the price to a number
   const price = Number(formData.value.prices[index].price);
 
-  // If VAT or price is not a valid number, set total to null and return
-  if (isNaN(vat) || isNaN(price)) {
+  // If price is not a valid number, set total to null and return
+  if (isNaN(price) || price <= 0) {
     formData.value.prices[index].total = null;
     return;
   }
 
-  // Calculate the total by adding VAT and price
-  formData.value.prices[index].total = vat + price;
+  // Convert VAT percentage to a number
+  const vat = Number(vatPercentage);
+
+  // If VAT is not a valid number or less than 0, set total to null and return
+  if (isNaN(vat) || vat < 0) {
+    formData.value.prices[index].total = null;
+    return;
+  }
+
+  // Calculate the VAT amount
+  const vatAmount = (vat / 100) * price;
+
+  // Calculate the total by adding VAT amount and price
+  formData.value.prices[index].total = price + vatAmount;
 };
+
 
 const addMorePrice = () => {
   formData.value.prices.unshift({
