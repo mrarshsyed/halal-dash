@@ -32,6 +32,12 @@
       <template #item.amount="{ item }">
         AED {{ item?.hotelbedsBookingResponse?.totalNet }}
       </template>
+      <template #item.pickup="{ item }">
+        {{ item?.customObjects?.pickup }}
+      </template>
+      <template #item.dropOff="{ item }">
+        {{ item?.customObjects?.dropOff }}
+      </template>
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -166,7 +172,9 @@ const table_data = ref({
     { title: 'Status', key: 'status', align: 'start' },
     { title: 'Booking Id', key: 'bookingId', align: 'start' },
     { title: 'Booked On', key: 'bookedOn', align: 'start' },
-    { title: 'Amount', key: 'amount', align: 'start' }
+    { title: 'Amount', key: 'amount', align: 'start' },
+    { title: 'Pick Up', key: 'pickup', align: 'start' },
+    { title: 'Drop Off', key: 'dropOff', align: 'start' }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },
