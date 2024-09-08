@@ -33,10 +33,10 @@
         AED {{ item?.hotelbedsBookingResponse?.totalNet }}
       </template>
       <template #item.pickup="{ item }">
-        {{ item?.customObjects?.pickup }}
+        {{ item?.bookingPayload?.customObjects?.pickup }}
       </template>
       <template #item.dropOff="{ item }">
-        {{ item?.customObjects?.dropOff }}
+        {{ item?.bookingPayload?.customObjects?.dropOff }}
       </template>
     </v-data-table-server>
     <v-dialog
