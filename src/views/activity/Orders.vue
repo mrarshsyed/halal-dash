@@ -38,6 +38,9 @@
       <template #item.dropOff="{ item }">
         {{ item?.bookingPayload?.customObjects?.dropOff }}
       </template>
+      <template #item.preference="{ item }">
+        {{ item?.bookingPayload?.customObjects?.note }}
+      </template>
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -174,7 +177,12 @@ const table_data = ref({
     { title: 'Booked On', key: 'bookedOn', align: 'start' },
     { title: 'Amount', key: 'amount', align: 'start' },
     { title: 'Pick Up', key: 'pickup', align: 'start' },
-    { title: 'Drop Off', key: 'dropOff', align: 'start' }
+    { title: 'Drop Off', key: 'dropOff', align: 'start' },
+    {
+      title: 'Preference',
+      key: 'preference',
+      align: 'start'
+    }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },

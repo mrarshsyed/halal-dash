@@ -47,6 +47,9 @@
           {{ item?.emergingOrderBookingFormPayload?.checkin }}
         </p>
       </template>
+      <template #item.preference="{ item }">
+        {{ item?.customObjects?.note }}
+      </template>
     </v-data-table-server>
     <v-dialog
       max-width="100%"
@@ -210,6 +213,11 @@ const table_data = ref({
     {
       title: 'Room Info',
       key: 'room_info',
+      align: 'start'
+    },
+    {
+      title: 'Preference',
+      key: 'preference',
       align: 'start'
     }
   ],
