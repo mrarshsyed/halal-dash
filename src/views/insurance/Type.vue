@@ -1,26 +1,14 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="4"
-      >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
-          + Add New
-        </v-btn>
+      <v-col cols="12" md="4">
+        <v-btn @click="showDialog" block color="primary"> + Add New </v-btn>
       </v-col>
     </v-row>
     <v-data-table

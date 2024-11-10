@@ -433,26 +433,26 @@ export const routes = [
           permissions: [permissions.insuranceMasterData]
         }
       },
-      {
-        path: 'name',
-        name: 'insurance-name',
-        component: () => import('@/views/insurance/Name.vue'),
-        meta: {
-          requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee'],
-          permissions: [permissions.insuranceMasterData]
-        }
-      },
-      {
-        path: 'policy',
-        name: 'insurance-policy',
-        component: () => import('@/views/insurance/Policy.vue'),
-        meta: {
-          requiresAuth: true,
-          role: ['super-admin', 'admin', 'employee'],
-          permissions: [permissions.insuranceMasterData]
-        }
-      },
+      // {
+      //   path: 'name',
+      //   name: 'insurance-name',
+      //   component: () => import('@/views/insurance/Name.vue'),
+      //   meta: {
+      //     requiresAuth: true,
+      //     role: ['super-admin', 'admin', 'employee'],
+      //     permissions: [permissions.insuranceMasterData]
+      //   }
+      // },
+      // {
+      //   path: 'policy',
+      //   name: 'insurance-policy',
+      //   component: () => import('@/views/insurance/Policy.vue'),
+      //   meta: {
+      //     requiresAuth: true,
+      //     role: ['super-admin', 'admin', 'employee'],
+      //     permissions: [permissions.insuranceMasterData]
+      //   }
+      // },
       {
         path: 'area',
         name: 'insurance-area',
@@ -859,22 +859,22 @@ export const navLinks = [
         role: ['super-admin', 'admin', 'employee'],
         permissions: [permissions.insuranceMasterData]
       },
-      {
-        icon: 'text-box-plus-outline',
-        title: 'Name',
-        to: '/insurance/name',
-        value: 'insurance-name',
-        role: ['super-admin', 'admin', 'employee'],
-        permissions: [permissions.insuranceMasterData]
-      },
-      {
-        icon: 'list-box-outline',
-        title: 'Policy Type',
-        to: '/insurance/policy',
-        value: 'insurance-policy',
-        role: ['super-admin', 'admin', 'employee'],
-        permissions: [permissions.insuranceMasterData]
-      },
+      // {
+      //   icon: 'text-box-plus-outline',
+      //   title: 'Name',
+      //   to: '/insurance/name',
+      //   value: 'insurance-name',
+      //   role: ['super-admin', 'admin', 'employee'],
+      //   permissions: [permissions.insuranceMasterData]
+      // },
+      // {
+      //   icon: 'list-box-outline',
+      //   title: 'Policy Type',
+      //   to: '/insurance/policy',
+      //   value: 'insurance-policy',
+      //   role: ['super-admin', 'admin', 'employee'],
+      //   permissions: [permissions.insuranceMasterData]
+      // },
       {
         icon: 'map-marker-radius',
         title: 'Area',

@@ -25,6 +25,9 @@
       <template #item.name="{ item }">
         {{ item?.name }}
       </template>
+      <template #item.type="{ item }">
+        {{ item?.insuranceType?.name }}
+      </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
           <v-icon
@@ -46,6 +49,16 @@
     <v-card :title="Form?.id ? 'Update Action' : 'Add New'">
       <v-card-text>
         <v-form ref="form" class="d-flex flex-column ga-2">
+          <v-autocomplete
+            clearable
+            label="Type"
+            :items="insuranceTypeList"
+            required
+            :rules="[(v) => !!v || 'Type is required']"
+            v-model="type"
+            item-title="name"
+            item-value="_id"
+          />
           <v-text-field
             label="Name"
             v-model="name"
@@ -122,14 +135,8 @@ const Form = ref({
 const isModalOpen = ref(false)
 const form = ref()
 const name = ref('')
-const insuranceType = ref(null)
-const insuranceName = ref(null)
-const insurancePolicy = ref(null)
-const typeList = ref([])
-const masterNameList = ref()
-const nameList = ref([])
-const masterPolicyTypeList = ref([])
-const policyTypeList = ref([])
+const type = ref('')
+const insuranceTypeList = ref([])
 
 const showDialog = () => {
   isModalOpen.value = true
@@ -165,6 +172,7 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
+    { title: 'Type', key: 'type', align: 'start' },
     { title: 'Action', key: 'action', align: 'start' }
   ],
   itemsPerPageOption: [
@@ -178,7 +186,8 @@ const saveRating = async () => {
   form.value.validate()
   if (!form?.value?.isValid) return
   const payload = {
-    name: name.value
+    name: name.value,
+    insuranceType: type?.value
   }
 
   const response = !Form?.value?.id
@@ -199,6 +208,7 @@ const onEdit = async (item) => {
   Form.value.id = item?._id
   name.value = item?.name
 
+  type.value = item?.insuranceType?._id
   showDialog()
 }
 const deleteRating = async () => {
@@ -230,6 +240,11 @@ const onDelete = async (item) => {
   }
   store.showDialog(dialogModal)
 }
+const getInsuranceTypeList = async () => {
+  await axios.get('admin/insurance/types').then((res) => {
+    insuranceTypeList.value = res.data
+  })
+}
 
 onMounted(async () => {
   await loadItems({
@@ -237,6 +252,7 @@ onMounted(async () => {
     itemsPerPage: table_data.value.itemsPerPage,
     sortBy: 'ascending'
   })
+  await getInsuranceTypeList()
 })
 </script>
 
