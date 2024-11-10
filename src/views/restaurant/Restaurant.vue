@@ -353,7 +353,7 @@
                     readonly
                     :clearable="false"
                   />
-                  <div class="d-flex ga-4 flex-wrap">
+                  <div class="">
                     <v-text-field
                       v-model="workingHour.startTime"
                       :active="workingHour.startTimeMenu"
@@ -396,6 +396,53 @@
                         <v-time-picker
                           v-if="workingHour.endTimeMenu"
                           v-model="workingHour.endTime"
+                          full-width
+                          format="24hr"
+                        />
+                      </v-menu>
+                    </v-text-field>
+
+                    <v-text-field
+                      v-model="workingHour.breakStartTime"
+                      :active="workingHour.breakStartTimeMenu"
+                      :focus="workingHour.breakStartTimeMenu"
+                      label="Break Start Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                      required
+                    >
+                      <v-menu
+                        v-model="workingHour.breakStartTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="workingHour.breakStartTimeMenu"
+                          v-model="workingHour.breakStartTime"
+                          full-width
+                          format="24hr"
+                        />
+                      </v-menu>
+                    </v-text-field>
+                    <v-text-field
+                      v-model="workingHour.breakEndTime"
+                      :active="workingHour.breakEndTimeMenu"
+                      :focus="workingHour.breakEndTimeMenu"
+                      label="Break End Time"
+                      prepend-inner-icon="mdi-clock-time-four-outline"
+                      readonly
+                    
+                    >
+                      <v-menu
+                        v-model="workingHour.breakEndTimeMenu"
+                        :close-on-content-click="false"
+                        activator="parent"
+                        transition="scale-transition"
+                      >
+                        <v-time-picker
+                          v-if="workingHour.breakEndTimeMenu"
+                          v-model="workingHour.breakEndTime"
                           full-width
                           format="24hr"
                         />
@@ -599,49 +646,77 @@ const workingDaysList = [
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Tuesday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Wednesday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Thursday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Friday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Saturday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   },
   {
     day: 'Sunday',
     startTime: '',
     endTime: '',
     startTimeMenu: false,
-    endTimeMenu: false
+    endTimeMenu: false,
+    breakStartTime: '',
+    breakEndTime: '',
+    breakStartTimeMenu: false,
+    breakEndTimeMenu: false
   }
 ]
 
