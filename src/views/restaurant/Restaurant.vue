@@ -1,12 +1,21 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode && !detailsMode">
-    <v-col cols="12" md="8">
+  <v-row
+    class="mb-4"
+    v-if="!formMode && !detailsMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
       <v-text-field
         v-model="table_data.search"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col cols="12" md="4">
+    <v-col
+      cols="12"
+      md="4"
+    >
       <v-btn
         v-if="!store.isRoleManager()"
         @click="onCreate"
@@ -113,7 +122,11 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode && !detailsMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode && !detailsMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -126,7 +139,10 @@
           {{ id ? `Update ${moduleName}` : `Create New ${moduleName}` }}
         </h3>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -134,7 +150,10 @@
           :rules="[(v) => !!v || 'Name is required']"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.contactNumber"
           label="Contact Number"
@@ -164,10 +183,19 @@
           :rules="[(v) => !!v || 'Address is required']"
         />
       </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field v-model="formData.website" label="Web Site" />
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-text-field
+          v-model="formData.website"
+          label="Web Site"
+        />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           type="number"
           v-model="formData.rating"
@@ -185,7 +213,10 @@
         />
       </v-col>
 
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           type="number"
           v-model.number="formData.startPrice"
@@ -198,7 +229,10 @@
           ]"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           type="number"
           v-model.number="formData.endPrice"
@@ -213,9 +247,15 @@
       </v-col>
       <v-col cols="12">
         <p>Description</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Cuisines"
@@ -230,7 +270,10 @@
           return-object
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Special Diets"
@@ -267,7 +310,10 @@
           accept="application/pdf"
           v-model:model-value="formData.menuUploads"
         />
-        <div v-else class="d-flex flex-wrap ga-4 align-center">
+        <div
+          v-else
+          class="d-flex flex-wrap ga-4 align-center"
+        >
           <p>Menu :</p>
           <a
             :href="formData.menu?.[0]"
@@ -299,7 +345,10 @@
           accept="application/pdf"
           v-model:model-value="formData.halalCertificatesUploads"
         />
-        <div v-else class="d-flex flex-wrap ga-4 align-center">
+        <div
+          v-else
+          class="d-flex flex-wrap ga-4 align-center"
+        >
           <p>Halal Certificate :</p>
           <a
             :href="formData.halalCertificates?.[0]"
@@ -353,102 +402,178 @@
                     readonly
                     :clearable="false"
                   />
-                  <div class="">
-                    <v-text-field
-                      v-model="workingHour.startTime"
-                      :active="workingHour.startTimeMenu"
-                      :focus="workingHour.startTimeMenu"
-                      label="Opening Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                      required
-                      :rules="[(v) => !!v || 'Start time is required']"
+                  <v-text-field
+                    v-model="workingHour.startTime"
+                    label="Opening Time"
+                    prepend-inner-icon="mdi-clock-time-four-outline"
+                    readonly
+                    required
+                    :rules="[(v) => !!v || 'Start time is required']"
+                    @click="workingHour.startTimeMenu = true" 
+                  >
+                    <v-dialog
+                      v-model="workingHour.startTimeMenu"
+                      activator="parent"
+                      width="auto"
                     >
-                      <v-menu
-                        v-model="workingHour.startTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
+                      <v-card>
                         <v-time-picker
                           v-if="workingHour.startTimeMenu"
                           v-model="workingHour.startTime"
                           full-width
                           format="24hr"
                         />
-                      </v-menu>
-                    </v-text-field>
-                    <v-text-field
-                      v-model="workingHour.endTime"
-                      :active="workingHour.endTimeMenu"
-                      :focus="workingHour.endTimeMenu"
-                      label="Closing Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                      :rules="[(v) => !!v || 'Closing time is required']"
+                        <v-card-actions>
+                          <v-spacer />
+                          <v-btn
+                            variant="outlined"
+                            color="primary"
+                            @click="workingHour.startTimeMenu = false"
+                          >
+                            Save & Close
+                          </v-btn>
+                          <v-btn
+                            variant="outlined"
+                            color="error"
+                            @click="
+                              workingHour.startTime = '';
+                              workingHour.startTimeMenu = false;  
+                            "
+                          >
+                            Reset
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </v-text-field>
+                  <v-text-field
+                    v-model="workingHour.endTime"
+                    label="Closing Time"
+                    prepend-inner-icon="mdi-clock-time-four-outline"
+                    readonly
+                    :rules="[(v) => !!v || 'Closing time is required']"
+                    @click="workingHour.endTimeMenu = true"
+                  >
+                    <v-dialog
+                      v-model="workingHour.endTimeMenu"
+                      activator="parent"
+                      width="auto"
                     >
-                      <v-menu
-                        v-model="workingHour.endTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
+                      <v-card>
                         <v-time-picker
                           v-if="workingHour.endTimeMenu"
                           v-model="workingHour.endTime"
                           full-width
                           format="24hr"
                         />
-                      </v-menu>
-                    </v-text-field>
-
-                    <v-text-field
-                      v-model="workingHour.breakStartTime"
-                      :active="workingHour.breakStartTimeMenu"
-                      :focus="workingHour.breakStartTimeMenu"
-                      label="Break Start Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                      required
+                        <v-card-actions>
+                          <v-spacer />
+                          <v-btn
+                            variant="outlined"
+                            color="primary"
+                            @click="workingHour.endTimeMenu = false"
+                          >
+                            Save & Close
+                          </v-btn>
+                          <v-btn
+                            variant="outlined"
+                            color="error"
+                            @click="
+                              workingHour.endTime = '';
+                              workingHour.endTimeMenu = false;
+                            "
+                          >
+                            Reset
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </v-text-field>
+                  <v-text-field
+                    v-model="workingHour.breakStartTime"
+                    label="Break Start Time"
+                    prepend-inner-icon="mdi-clock-time-four-outline"
+                    readonly
+                    required
+                    @click="workingHour.breakStartTimeMenu = true"
+                  >
+                    <v-dialog
+                      v-model="workingHour.breakStartTimeMenu"
+                      activator="parent"
+                      width="auto"
                     >
-                      <v-menu
-                        v-model="workingHour.breakStartTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
+                      <v-card>
                         <v-time-picker
                           v-if="workingHour.breakStartTimeMenu"
                           v-model="workingHour.breakStartTime"
                           full-width
                           format="24hr"
                         />
-                      </v-menu>
-                    </v-text-field>
-                    <v-text-field
-                      v-model="workingHour.breakEndTime"
-                      :active="workingHour.breakEndTimeMenu"
-                      :focus="workingHour.breakEndTimeMenu"
-                      label="Break End Time"
-                      prepend-inner-icon="mdi-clock-time-four-outline"
-                      readonly
-                    
+                        <v-card-actions>
+                          <v-spacer />
+                          <v-btn
+                            variant="outlined"
+                            color="primary"
+                            @click="workingHour.breakStartTimeMenu = false"
+                          >
+                            Save & Close
+                          </v-btn>
+                          <v-btn
+                            variant="outlined"
+                            color="error"
+                            @click="
+                              workingHour.breakStartTime = '';
+                              workingHour.breakStartTimeMenu = false;
+                            "
+                          >
+                            Reset
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </v-text-field>
+                  <v-text-field
+                    v-model="workingHour.breakEndTime"
+                    label="Break End Time"
+                    prepend-inner-icon="mdi-clock-time-four-outline"
+                    readonly
+                    @click="workingHour.breakEndTimeMenu = true"
+                  >
+                    <v-dialog
+                      v-model="workingHour.breakEndTimeMenu"
+                      activator="parent"
+                      width="auto"
                     >
-                      <v-menu
-                        v-model="workingHour.breakEndTimeMenu"
-                        :close-on-content-click="false"
-                        activator="parent"
-                        transition="scale-transition"
-                      >
+                      <v-card>
                         <v-time-picker
                           v-if="workingHour.breakEndTimeMenu"
                           v-model="workingHour.breakEndTime"
                           full-width
                           format="24hr"
                         />
-                      </v-menu>
-                    </v-text-field>
-                  </div>
+                        <v-card-actions>
+                          <v-spacer />
+                          <v-btn
+                            variant="outlined"
+                            color="primary"
+                            @click="workingHour.breakEndTimeMenu = false"
+                          >
+                            Save & Close
+                          </v-btn>
+                          <v-btn
+                            variant="outlined"
+                            color="error"
+                            @click="
+                              workingHour.breakEndTime = '';
+                              workingHour.breakEndTimeMenu = false;
+                            "
+                          >
+                            Reset
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </v-text-field>
                 </v-col>
               </v-row>
             </v-expansion-panel-text>
@@ -457,8 +582,18 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.back()"> Cancel </v-btn>
-          <v-btn color="primary" @click="save"> Save </v-btn>
+          <v-btn
+            color="error"
+            @click="router.back()"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="save"
+          >
+            Save
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -471,32 +606,63 @@
       icon="mdi-arrow-left"
       @click="router.back()"
     />
-    <p class="mb-4">Name : {{ detailsData?.name }}</p>
-    <p class="mb-4">Contact Number : {{ detailsData?.contactNumber }}</p>
-    <p class="mb-4">Address : {{ detailsData?.address }}</p>
-    <p class="mb-4">Website : {{ detailsData?.website }}</p>
-    <p class="mb-4">Rating : {{ detailsData?.rating }}</p>
-    <p class="mb-4">Start Price : {{ detailsData?.startPrice }}</p>
-    <p class="mb-4">End Price : {{ detailsData?.endPrice }}</p>
-    <p class="mb-2">Description :</p>
-    <div class="mb-4" v-html="detailsData?.description" />
+    <p class="mb-4">
+      Name : {{ detailsData?.name }}
+    </p>
+    <p class="mb-4">
+      Contact Number : {{ detailsData?.contactNumber }}
+    </p>
+    <p class="mb-4">
+      Address : {{ detailsData?.address }}
+    </p>
+    <p class="mb-4">
+      Website : {{ detailsData?.website }}
+    </p>
+    <p class="mb-4">
+      Rating : {{ detailsData?.rating }}
+    </p>
+    <p class="mb-4">
+      Start Price : {{ detailsData?.startPrice }}
+    </p>
+    <p class="mb-4">
+      End Price : {{ detailsData?.endPrice }}
+    </p>
+    <p class="mb-2">
+      Description :
+    </p>
+    <div
+      class="mb-4"
+      v-html="detailsData?.description"
+    />
     <div class="mb-4">
-      <p class="mb-2">Cuisines:</p>
+      <p class="mb-2">
+        Cuisines:
+      </p>
       <div class="d-flex flex-wrap ga-4">
-        <v-chip v-for="(c, index) in detailsData?.cuisines" :key="index">
+        <v-chip
+          v-for="(c, index) in detailsData?.cuisines"
+          :key="index"
+        >
           {{ c?.name }}
         </v-chip>
       </div>
     </div>
     <div class="mb-4">
-      <p class="mb-2">Special Diets:</p>
+      <p class="mb-2">
+        Special Diets:
+      </p>
       <div class="d-flex flex-wrap ga-4">
-        <v-chip v-for="(s, index) in detailsData?.specialDiets" :key="index">
+        <v-chip
+          v-for="(s, index) in detailsData?.specialDiets"
+          :key="index"
+        >
           {{ s?.name }}
         </v-chip>
       </div>
     </div>
-    <p class="mb-4">Images :</p>
+    <p class="mb-4">
+      Images :
+    </p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -508,31 +674,54 @@
         v-for="(i, index) in detailsData?.images"
         :key="index"
       >
-        <v-img cover :src="i" height="150" class="rounded" />
+        <v-img
+          cover
+          :src="i"
+          height="150"
+          class="rounded"
+        />
       </v-col>
     </v-row>
-    <p class="mb-4">Menu :</p>
+    <p class="mb-4">
+      Menu :
+    </p>
     <v-row class="mb-4">
-      <v-col cols="12" v-for="(i, index) in detailsData?.menu" :key="index">
-        <a :href="i" target="_blank" :download="getFileName(i)">
+      <v-col
+        cols="12"
+        v-for="(i, index) in detailsData?.menu"
+        :key="index"
+      >
+        <a
+          :href="i"
+          target="_blank"
+          :download="getFileName(i)"
+        >
           <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
         </a>
       </v-col>
     </v-row>
-    <p class="mb-4">Halal Certificates :</p>
+    <p class="mb-4">
+      Halal Certificates :
+    </p>
     <v-row class="mb-4">
       <v-col
         cols="12"
         v-for="(i, index) in detailsData?.halalCertificates"
         :key="index"
       >
-        <a :href="i" target="_blank" :download="getFileName(i)">
+        <a
+          :href="i"
+          target="_blank"
+          :download="getFileName(i)"
+        >
           <v-chip append-icon="mdi-open-in-new">{{ getFileName(i) }}</v-chip>
         </a>
       </v-col>
     </v-row>
 
-    <p class="mb-4">Working Hours :</p>
+    <p class="mb-4">
+      Working Hours :
+    </p>
     <v-row class="mb-4">
       <v-col
         cols="12"
@@ -556,8 +745,15 @@
       <v-card-title>Select Rating</v-card-title>
       <v-card-text>
         <v-row no-gutters>
-          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-            <v-checkbox v-model="selectedRatings" :value="r">
+          <v-col
+            cols="12"
+            v-for="(r, index) in ratings"
+            :key="index"
+          >
+            <v-checkbox
+              v-model="selectedRatings"
+              :value="r"
+            >
               <template #label>
                 {{ r?.name }}
                 <v-chip class="ms-2">
@@ -585,7 +781,12 @@
         >
           Close
         </v-btn>
-        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignRating"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -625,7 +826,12 @@
         >
           Close
         </v-btn>
-        <v-btn color="primary" @click="onAssignManager"> Assign Manager </v-btn>
+        <v-btn
+          color="primary"
+          @click="onAssignManager"
+        >
+          Assign Manager
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1067,6 +1273,7 @@ const getFileName = (url) => {
   if (!url) return 'File'
   return url.split('/').pop()
 }
+
 
 onBeforeMount(async () => {
   if (store.hasPermission(permissions.userList)) {
