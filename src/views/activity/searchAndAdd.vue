@@ -183,7 +183,14 @@ const searchForm = ref({
       itemTitle: 'name',
       itemValue: 'code',
       multiple: false
-    }
+    },
+    {
+      key: 'name',
+      type: 'text',
+      label: 'Activity Name',
+      isRequired: false,
+      value: null
+    },
   ],
   confirmFunction: onSearch,
   reset: onReset,
