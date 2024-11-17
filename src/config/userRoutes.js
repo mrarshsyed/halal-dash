@@ -62,7 +62,10 @@ export const permissions = {
   insuranceOrder: 'insurance_order-all',
 
   // transfer
-  transferOrder: 'transfer_order-all'
+  transferOrder: 'transfer_order-all',
+
+  // custom holiday
+  customHoliday: 'full_holiday_package-all'
 }
 
 export const routes = [
@@ -526,6 +529,16 @@ export const routes = [
     ]
   },
   {
+    path: '/custom-holiday',
+    name: 'custom-holiday',
+    component: () => import('@/views/CustomHoliday.vue'),
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin',],
+      permissions: [permissions.customHoliday]
+    }
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {
@@ -933,6 +946,15 @@ export const navLinks = [
         permissions: [permissions.transferOrder]
       }
     ]
+  },
+  {
+    title: 'Custom Holiday',
+    value: 'custom-holiday',
+    icon: 'oil-temperature',
+    to: '/custom-holiday',
+    role: ['super-admin'],
+    children: [],
+    permissions: [permissions.customHoliday,]
   },
   {
     title: 'Settings',
