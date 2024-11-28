@@ -65,7 +65,10 @@
           v-model="formData.name"
           label="Name"
           required
-          :rules="[(v) => !!v || 'Name is required']"
+          :rules="[
+            (v) => !!v || 'Name is required',
+            (v) => (v && v.length <= 25) || 'Name must be 25 characters or less'
+          ]"
         />
       </v-col>
       <v-col cols="12" md="6">

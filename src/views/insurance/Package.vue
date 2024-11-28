@@ -32,12 +32,6 @@
         <template #item.name="{ item }">
           {{ item?.name }}
         </template>
-        <template #item.insuranceName="{ item }">
-          {{ item?.insuranceName?.name }}
-        </template>
-        <template #item.insurancePolicy="{ item }">
-          {{ item?.insurancePolicy?.name }}
-        </template>
         <template #item.insuranceType="{ item }">
           {{ item?.insuranceType?.name }}
         </template>
@@ -63,8 +57,16 @@
           {{ item?.terrorismExtension ? 'Yes' : 'No' }}
         </template>
         <template #item.price="{ item }">
-          {{ item?.prices[0]?.priceIncludingVat }}
+          <div class="d-flex ga-4">
+            <v-chip v-for="(p, index) in item?.prices.slice(0, 3)" :key="index">
+              {{ p?.priceIncludingVat }}
+            </v-chip>
+            <v-chip v-if="item?.prices.length > 3" variant="tonal">
+              +{{ item.prices.length - 3 }} more
+            </v-chip>
+          </div>
         </template>
+
         <template #item.createdAt="{ item }">
           {{
             item?.createdAt
@@ -74,11 +76,6 @@
         </template>
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
-            <!-- <v-icon
-              class="cursor-pointer"
-              @click="onDetails(item)"
-              icon="mdi-eye"
-            /> -->
             <v-icon
               class="cursor-pointer"
               @click="onEdit(item)"
@@ -125,34 +122,7 @@
           chips
           item-title="name"
           item-value="_id"
-        />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-autocomplete
-          clearable
-          label="Insurance Name"
-          :items="insuranceNameList"
-          required
-          :rules="[(v) => !!v || 'Insurance Name is required']"
-          v-model="formData.insuranceName"
-          chips
-          item-title="name"
-          item-value="_id"
-          :disabled="!formData.insuranceType"
-        />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-autocomplete
-          clearable
-          label="Insurance Policy"
-          :items="insurancePolicyList"
-          required
-          :rules="[(v) => !!v || 'Insurance Policy is required']"
-          v-model="formData.insurancePolicy"
-          chips
-          item-title="name"
-          item-value="_id"
-          :disabled="!formData.insuranceName"
+          @update:model-value="onTypeSelect"
         />
       </v-col>
       <v-col cols="12" md="6">
@@ -166,7 +136,7 @@
           chips
           item-title="name"
           item-value="_id"
-          :disabled="!formData.insurancePolicy"
+          :disabled="!formData.insuranceType"
         />
       </v-col>
       <v-col cols="12" md="6">
@@ -180,7 +150,6 @@
           chips
           item-title="name"
           item-value="_id"
-          :disabled="!formData.insuranceArea"
         />
       </v-col>
       <v-col cols="12" md="6">
@@ -543,16 +512,6 @@ const store = useAppStore()
 const route = useRoute()
 const router = useRouter()
 const moduleName = 'Package'
-const formMode = computed(() => {
-  return route?.query?.mode === 'form'
-})
-const detailsMode = computed(() => {
-  return route?.query?.mode === 'details'
-})
-
-const id = computed(() => {
-  return route?.query?.id
-})
 
 const table_data = ref({
   loading: true,
@@ -563,8 +522,6 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Name Of The product', key: 'insuranceName', align: 'start' },
-    { title: 'Policy Type', key: 'insurancePolicy', align: 'start' },
     { title: 'Type', key: 'insuranceType', align: 'start' },
     { title: 'Area', key: 'insuranceArea', align: 'start' },
     { title: 'Traveler Type', key: 'travelerType', align: 'start' },
@@ -584,20 +541,27 @@ const table_data = ref({
   ]
 })
 
-const onCreate = () => {
-  router.push({ name: 'insurance-package', query: { mode: 'form' } })
-}
+const formMode = computed(() => {
+  return route?.query?.mode === 'form'
+})
+const detailsMode = computed(() => {
+  return route?.query?.mode === 'details'
+})
+
+const id = computed(() => {
+  return route?.query?.id
+})
+
 const formData = ref(initialFormData)
 const form = ref()
 const formValue = ref(false)
 const showForm = ref(false)
 const detailsData = ref({})
-
+const onCreate = () => {
+  router.push({ name: 'insurance-package', query: { mode: 'form' } })
+}
 const onEdit = (item) => {
   router.push(`/insurance/package?mode=form&id=${item?._id}`)
-}
-const onDetails = (item) => {
-  router.push(`/restaurant/restaurant?mode=details&id=${item?._id}`)
 }
 const removeUploads = (obj) => {
   let newObject = { ...obj }
@@ -654,7 +618,6 @@ const priceHasDuplicates = () => {
 
   return false // No duplicates found
 }
-
 const save = async () => {
   form.value.validate()
   if (form.value.isValid) {
@@ -707,7 +670,6 @@ const onDelete = (item) => {
   }
   store.showDialog(dialogModal)
 }
-
 const getFileName = (url) => {
   if (!url) return 'File'
   return url.split('/').pop()
@@ -717,41 +679,35 @@ const getInsuranceTypeList = async () => {
     insuranceTypeList.value = res.data
   })
 }
-
 const getInsuranceNameList = async () => {
   await axios.get('admin/insurance/names').then((res) => {
     insuranceNameList.value = res.data
     masterInsuranceNameList.value = res.data
   })
 }
-
 const getInsurancePolicyList = async () => {
   await axios.get('admin/insurance/policies').then((res) => {
     insurancePolicyList.value = res.data
     masterInsurancePolicyList.value = res.data
   })
 }
-
 const getInsuranceAreaList = async () => {
   await axios.get('admin/insurance/areas').then((res) => {
     insuranceAreaList.value = res.data
     masterInsuranceAreaList.value = res.data
   })
 }
-
 const getTravelerTypeList = async () => {
   await axios.get('admin/insurance/traveler-types').then((res) => {
     travelerTypeList.value = res.data
   })
 }
-
 const getInsuranceRestTypeList = async () => {
   await axios.get('admin/insurance/rest-types').then((res) => {
     insuranceRestTypeList.value = res.data
     masterInsuranceRestTypeList.value = res.data
   })
 }
-
 const updateTotal = (vatPercentage, index) => {
   // Convert the price to a number
   const price = Number(formData.value.prices[index].price)
@@ -777,7 +733,6 @@ const updateTotal = (vatPercentage, index) => {
   // Calculate the total by adding VAT amount and price
   formData.value.prices[index].total = price + vatAmount
 }
-
 const addMorePrice = () => {
   formData.value.prices.unshift({
     ageStart: null,
@@ -791,6 +746,12 @@ const addMorePrice = () => {
 }
 const removePrice = (index) => {
   formData.value.prices.splice(index, 1)
+}
+const onTypeSelect = (data) => {
+  formData.value.insuranceArea = null
+  insuranceAreaList.value = masterInsuranceAreaList.value.filter(
+    (i) => i?.insuranceType?._id === data
+  )
 }
 
 onBeforeMount(async () => {
@@ -808,13 +769,14 @@ onBeforeMount(async () => {
       if (formMode.value) {
         formData.value = { ...details?.data }
         formData.value.insuranceType = formData.value.insuranceType?._id
-        formData.value.insuranceName = formData.value.insuranceName?._id
-        formData.value.insurancePolicy = formData.value.insurancePolicy?._id
         formData.value.insuranceArea = formData.value.insuranceArea?._id
         formData.value.insuranceRestType = formData.value.insuranceRestType?._id
         formData.value.prices?.forEach((element) => {
           element.total = element?.priceIncludingVat
         })
+        insuranceAreaList.value = masterInsuranceAreaList.value.filter(
+          (i) => i?.insuranceType?._id === formData.value.insuranceType
+        )
       } else if (detailsMode.value) {
         detailsData.value = { ...details?.data }
       }
