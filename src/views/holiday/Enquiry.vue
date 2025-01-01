@@ -13,6 +13,12 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
+      <template #item.id="{ item }">
+        {{ item?.bookingId }}
+      </template>
+      <template #item.bookingDate="{ item }">
+        {{ formateDate(item?.createdAt) }}
+      </template>
       <template #item.package="{ item }">
         {{ item?.package?.name }}
       </template>
@@ -25,16 +31,13 @@
       <template #item.contactNumber="{ item }">
         {{ item?.contactNumber }}
       </template>
-      <!-- <template #item.sailingDate="{ item }">
-        {{ format(new Date(item?.preferredSailingDate), 'dd MMM yyyy') ?? '-' }}
-      </template> -->
       <template #item.note="{ item }">
         {{ item?.note }}
       </template>
       <template #item.guests="{ item }">
         <div class="d-block" style="width: max-content">
           <p>Adults : {{ item?.guests?.adults }}</p>
-          <p>Children :  {{ item?.guests?.children?.toString() }}</p>
+          <p>Children : {{ item?.guests?.children?.toString() }}</p>
           <p>Infants : {{ item?.guests?.infants?.toString() }}</p>
         </div>
       </template>
@@ -45,7 +48,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axiosInstance from '@/plugins/axios'
-import { format } from 'date-fns'
+import { formateDate } from '@/utils/date'
 
 const table_data = ref({
   loading: true,
@@ -55,6 +58,8 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Booking ID', key: 'id', align: 'start' },
+    { title: 'Booking Date', key: 'bookingDate', align: 'start' },
     { title: 'Status', key: 'status', align: 'start' },
     { title: 'Residency', key: 'residency', align: 'start' },
     { title: 'Package', key: 'package', align: 'start' },
@@ -62,7 +67,7 @@ const table_data = ref({
     { title: 'User Email', key: 'user', align: 'start' },
     { title: 'Contact Number', key: 'contactNumber', align: 'start' },
     { title: 'Preference', key: 'note', align: 'start' },
-    { title: 'Guests', key: 'guests', align: 'start' },
+    { title: 'Guests', key: 'guests', align: 'start' }
   ],
   itemsPerPageOption: [
     { value: 20, title: '20' },

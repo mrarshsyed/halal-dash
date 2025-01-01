@@ -17,7 +17,7 @@ import { createVuetify } from 'vuetify'
 export default createVuetify({
   components: {
     ...components,
-    ...labsComponents,
+    ...labsComponents
   },
   theme: {
     themes: {
@@ -55,7 +55,7 @@ export default createVuetify({
       hideDetails: 'auto'
     },
     VCard: {
-      class: 'py-5',
+      class: 'py-5'
     },
     VChip: {
       label: true,
@@ -74,7 +74,7 @@ export default createVuetify({
       hideDetails: 'auto',
       color: 'primary'
     },
-    VFileInput: { 
+    VFileInput: {
       variant: 'outlined',
       clearable: true,
       density: 'compact',
@@ -90,5 +90,10 @@ export default createVuetify({
       color: 'primary',
       hideDetails: 'auto'
     },
+    VDataTableServer: {
+      height: '650px',
+      fixedHeader: true,
+      density: 'comfortable'
+    }
   }
 })

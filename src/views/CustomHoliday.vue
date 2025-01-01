@@ -16,10 +16,11 @@
       height="800px"
       fixed-header
     >
-      <template #item.createdAt="{ item }">
-        {{
-          item?.createdAt ? format(new Date(item?.createdAt), 'MM/dd/yyyy') : ''
-        }}
+      <template #item.id="{ item }">
+        {{ item?.bookingId }}
+      </template>
+      <template #item.bookingDate="{ item }">
+        {{ formateDate(item?.createdAt) }}
       </template>
       <template #item.user="{ item }">
         <div class="d-flex flex-column ga-4">
@@ -137,7 +138,7 @@
 import { ref } from 'vue'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
-import { format } from 'date-fns'
+import { formateDate } from '@/utils/date'
 
 const formStore = userFormStore()
 
@@ -149,11 +150,12 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Booking ID', key: 'id', align: 'start' },
+    { title: 'Booking Date', key: 'bookingDate', align: 'start' },
     { title: 'Hotel', key: 'hotel', align: 'start' },
     { title: 'Activities', key: 'activities', align: 'start' },
     { title: 'Transfers', key: 'transfers', align: 'start' },
     { title: 'Insurance', key: 'insurance', align: 'start' },
-    { title: 'Created At', key: 'createdAt', align: 'start' },
     { title: 'User', key: 'user', align: 'start' },
     { title: 'Total', key: 'total', align: 'start' }
   ],
@@ -181,8 +183,8 @@ const loadItems = async ({ page, itemsPerPage }) => {
 }
 </script>
 
-<style  scoped>
-.nowrap{
-    white-space: nowrap !important;
+<style scoped>
+.nowrap {
+  white-space: nowrap !important;
 }
 </style>
