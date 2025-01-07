@@ -342,7 +342,9 @@
                   label="VAT"
                   type="number"
                   :rules="[
-                    (v) => !!v || 'VAT is required',
+                    (v) =>
+                      (v !== null && v !== undefined && v !== '') ||
+                      'Vat is required',
                     (v) => v >= 0 || 'Vat must be a positive number'
                   ]"
                   @update:model-value="(data) => updateTotal(data, index)"
