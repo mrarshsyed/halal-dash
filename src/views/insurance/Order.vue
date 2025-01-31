@@ -23,22 +23,37 @@
         {{ item?.mainContact?.name }}
       </template>
       <template #item.user="{ item }">
-        {{ item?.mainContact.email }}
+        {{ item?.mainContact?.email }}
       </template>
       <template #item.contactNumber="{ item }">
         {{ item?.mainContact?.phone }}
       </template>
       <template #item.dates="{ item }">
         <div class="d-block" style="width: max-content">
-          <p>Start Date: {{ formateDate(item?.travelingDate?.start) }}</p>
-          <p>End Date: {{ formateDate(item?.travelingDate?.end) }}</p>
+          <p>
+            Start Date:
+            {{ formateDate(item?.bookingPayload?.travelingDate?.start) }}
+          </p>
+          <p>
+            End Date:
+            {{ formateDate(item?.bookingPayload?.travelingDate?.end) }}
+          </p>
         </div>
       </template>
       <template #item.guests="{ item }">
         <div class="d-block" style="width: max-content">
-          <p>Adults : {{ item?.travelerInformation?.adults?.count }}</p>
-          <p>Children : {{ item?.travelerInformation?.children?.count }}</p>
-          <p>Senior: {{ item?.travelerInformation?.seniors?.count }}</p>
+          <p>
+            Adults :
+            {{ item?.bookingPayload?.travelerInformation?.adults?.count }}
+          </p>
+          <p>
+            Children :
+            {{ item?.bookingPayload?.travelerInformation?.children?.count }}
+          </p>
+          <p>
+            Senior:
+            {{ item?.bookingPayload?.travelerInformation?.seniors?.count }}
+          </p>
         </div>
       </template>
       <template #item.price="{ item }"> AED {{ item?.quotedPrice }} </template>
@@ -68,9 +83,9 @@ const table_data = ref({
     { title: 'Booking ID', key: 'id', align: 'start' },
     { title: 'Booking Date', key: 'enquiry_on', align: 'start' },
     { title: 'Package', key: 'package', align: 'start' },
-    { title: 'User Name', key: 'user_name', align: 'start' },
-    { title: 'User Email', key: 'user', align: 'start' },
-    { title: 'Contact Number', key: 'contactNumber', align: 'start' },
+    // { title: 'User Name', key: 'user_name', align: 'start' },
+    // { title: 'User Email', key: 'user', align: 'start' },
+    // { title: 'Contact Number', key: 'contactNumber', align: 'start' },
     { title: 'Dates', key: 'dates', align: 'start' },
     { title: 'Travellers', key: 'guests', align: 'start' },
     { title: 'Price', key: 'price', align: 'start' }
@@ -83,7 +98,7 @@ const table_data = ref({
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance
-    .get(`admin/insurance/orders`, {
+    .get(`admin/insurance/bookings`, {
       params: {
         page: page,
         perPage: itemsPerPage
