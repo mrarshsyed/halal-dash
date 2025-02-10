@@ -447,7 +447,7 @@ const onManagerCreate = async () => {
             await store.updateUserRoleAndPermissions(
               selectedManager.value._id,
               'manager',
-              [permissions.activityList]
+              [permissions.activityList,permissions.activityUpdateHalalRatings]
             )
           }
         })

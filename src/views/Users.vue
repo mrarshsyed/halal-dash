@@ -149,6 +149,7 @@ const onEdit = (item) => {
   userForm.value.fields[0].value = item?.email
   userForm.value.fields[1].value = item?.role
   userForm.value.fields[2].value = item?.permissions
+  
   const dialogModal = {
     title: 'Update User',
     content: '',

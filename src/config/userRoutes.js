@@ -1146,7 +1146,14 @@ export const userCreatePermissions = [
 
 export const managerCreatePermissions = [
   { title: 'Hotel', value: permissions.hotelList },
+  { title: 'Hotel Halal Rating Update', value: permissions.hotelUpdateHalalRatings },
+
   { title: 'Activity', value: permissions.activityList },
+  { title: 'Activity Halal Rating Update', value: permissions.activityUpdateHalalRatings },
+  
   { title: 'Cruise', value: permissions.cruiseShip },
-  { title: 'Restaurant', value: permissions.restaurantRestaurant }
+  { title: 'Cruise Halal Rating Update', value: permissions.cruiseUpdateHalalRatings },
+  
+  { title: 'Restaurant', value: permissions.restaurantRestaurant },
+  { title: 'Restaurant Halal Rating Update', value: permissions.restaurantUpdateHalalRatings }
 ]
