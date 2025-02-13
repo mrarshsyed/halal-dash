@@ -1,6 +1,151 @@
 <template>
   <div>
+    <div v-if="orderDetails">
+      <v-card-text>
+        <v-btn
+          class="mb-4"
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="orderDetails = null"
+        />
+        <v-row>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Booking ID
+            </p>
+            <p>{{ orderDetails?.bookingId }}</p>
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Status
+            </p>
+            <p>{{ orderDetails?.status }}</p>
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Booking Date
+            </p>
+            <p>{{ formateDate(orderDetails?.createdAt) }}</p>
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Payment Status
+            </p>
+            <p>{{ orderDetails?.paymentStatus }}</p>
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Price
+            </p>
+            <p>AED {{ orderDetails?.bookingPayload?.quotedPrice }}</p>
+          </v-col>
+          <v-col
+            cols="12"
+          >
+            <p class="text-h6 font-weight-bold">
+              Package Details
+            </p>
+            <p class="">
+              Insurance Type : {{ orderDetails?.insurancePackage?.insuranceType?.name }}
+            </p>
+            <p class="">
+              Insurance Area : {{ orderDetails?.insurancePackage?.insuranceArea?.name }}
+            </p>
+            <p class="">
+              Trip Type : {{ orderDetails?.insurancePackage?.tripType }}
+            </p>
+            <p class="">
+              Rest Type : {{ orderDetails?.insurancePackage?.insuranceRestType?.name }}
+            </p>
+            <p class="">
+              Terrorism Extension : {{ orderDetails?.insurancePackage?.terrorismExtension ? 'YES' : 'NO' }}
+            </p>
+          </v-col>
+          <v-col
+            cols="12"
+          >
+            <p class="text-h6 font-weight-bold">
+              Travellers Details
+            </p>
+            <p class="font-weight-bold">
+              Main Contact
+            </p>
+            <p>Name : {{ orderDetails?.bookingPayload?.mainContact?.name }}</p>
+            <p>Email : {{ orderDetails?.bookingPayload?.mainContact?.email }}</p>
+            <p>Phone : {{ orderDetails?.bookingPayload?.mainContact?.phone }}</p>
+            <p class="font-weight-bold mt-2">
+              Traveling Dates
+            </p>
+            <p>Start : {{ formateDate(orderDetails?.bookingPayload?.travelingDate?.start) }}</p>
+            <p>End : {{ formateDate(orderDetails?.bookingPayload?.travelingDate?.end) }}</p>
+            <div class="border pa-2  mt-4 pt-4">
+              <p class="font-weight-bold">
+                Adults
+              </p>
+              <div
+                class="mb-4"  
+                v-for="(adult,indexAdult) in orderDetails?.bookingPayload?.travelerInformation?.adults?.info "
+                :key="indexAdult"
+              >
+              
+                <p>Name : {{ adult?.title }}  {{ adult?.firstName }} {{ adult?.lastName }}</p>
+                <p>Date Of Birth : {{ formateDate(adult?.dob) }} </p>
+                <p>Country: {{ adult?.country }}</p>
+                <p>Passport : {{ adult?.passportNumber || adult?.passport }}</p>
+              </div>
+            </div>
+            <div class="border pa-2  mt-4 pt-4">
+              <p class="font-weight-bold">
+                Children
+              </p>
+              <div
+                class="mb-4"  
+                v-for="(children,indexChildren) in orderDetails?.bookingPayload?.travelerInformation?.children?.info "
+                :key="indexChildren"
+              >
+                <p>Name : {{ children?.title }}  {{ children?.firstName }} {{ children?.lastName }}</p>
+                <p>Date Of Birth : {{ formateDate(children?.dob) }} </p>
+                <p>Country: {{ children?.country }}</p>
+                <p>Passport : {{ children?.passportNumber || children?.passport }}</p>
+              </div>
+            </div>
+            <div class="border pa-2  mt-4 pt-4">
+              <p class="font-weight-bold">
+                Seniors
+              </p>
+              <div
+                class="mb-4"  
+                v-for="(seniors,indexSeniors) in orderDetails?.bookingPayload?.travelerInformation?.seniors?.info "
+                :key="indexSeniors"
+              >
+                <p>Name : {{ seniors?.title }}  {{ seniors?.firstName }} {{ seniors?.lastName }}</p>
+                <p>Date Of Birth : {{ formateDate(seniors?.dob) }} </p>
+                <p>Country: {{ seniors?.country }}</p>
+                <p>Passport : {{ seniors?.passportNumber || seniors?.passport }}</p>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </div>
     <v-data-table-server
+      v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -13,6 +158,15 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
+      <template #item.action="{ item }">
+        <v-btn
+          icon="mdi-eye"
+          size="x-small"
+          variant="text"
+          color="primary"
+          @click="onDetails(item)"
+        />
+      </template>
       <template #item.id="{ item }">
         {{ item?.bookingId }}
       </template>
@@ -29,7 +183,10 @@
         {{ item?.mainContact?.phone }}
       </template>
       <template #item.dates="{ item }">
-        <div class="d-block" style="width: max-content">
+        <div
+          class="d-block"
+          style="width: max-content"
+        >
           <p>
             Start Date:
             {{ formateDate(item?.bookingPayload?.travelingDate?.start) }}
@@ -41,7 +198,10 @@
         </div>
       </template>
       <template #item.guests="{ item }">
-        <div class="d-block" style="width: max-content">
+        <div
+          class="d-block"
+          style="width: max-content"
+        >
           <p>
             Adults :
             {{ item?.bookingPayload?.travelerInformation?.adults?.count }}
@@ -56,7 +216,9 @@
           </p>
         </div>
       </template>
-      <template #item.price="{ item }"> AED {{ item?.quotedPrice }} </template>
+      <template #item.price="{ item }">
+        AED {{ item?.quotedPrice }}
+      </template>
       <template #item.port="{ item }">
         {{ item?.preferredDeparturePort?.name }}
       </template>
@@ -80,6 +242,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Action', key: 'action', align: 'start' },
     { title: 'Booking ID', key: 'id', align: 'start' },
     { title: 'Booking Date', key: 'enquiry_on', align: 'start' },
     { title: 'Package', key: 'package', align: 'start' },
@@ -95,6 +258,8 @@ const table_data = ref({
     { value: 40, title: '40' }
   ]
 })
+const orderDetails = ref(null)
+
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance
@@ -109,5 +274,10 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
       table_data.value.serverItems = res?.data?.data
       table_data.value.totalItems = res?.data?.total
     })
+}
+const onDetails = (data) => {
+  orderDetails.value = data
+  console.log(orderDetails.value);
+  
 }
 </script>

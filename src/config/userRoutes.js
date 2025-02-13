@@ -534,7 +534,7 @@ export const routes = [
     component: () => import('@/views/CustomHoliday.vue'),
     meta: {
       requiresAuth: true,
-      role: ['super-admin',],
+      role: ['super-admin','admin','employee'],
       permissions: [permissions.customHoliday]
     }
   },
@@ -952,7 +952,7 @@ export const navLinks = [
     value: 'custom-holiday',
     icon: 'oil-temperature',
     to: '/custom-holiday',
-    role: ['super-admin'],
+    role: ['super-admin','admin','employee'],
     children: [],
     permissions: [permissions.customHoliday,]
   },
@@ -1111,7 +1111,9 @@ export const userCreatePermissions = [
       {
         title: 'Enquiry',
         value: permissions.holidayEnquiry
-      }
+      },
+      {title: 'Custom Holiday Order',value: permissions.customHoliday}
+
     ]
   },
   {
