@@ -1,7 +1,105 @@
 <template>
   <div>
-    <!-- <FormComponent /> -->
+    <div v-if="orderDetails">
+      <v-card-text>
+        <v-btn
+          class="mb-4"
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="orderDetails = null"
+        />
+        <v-row>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">User Details</p>
+            <p class="font-weight-bold">User Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.name }}
+            </p>
+            <p class="font-weight-bold">User Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.email }}
+            </p>
+            <p class="font-weight-bold">User Phone</p>
+            <p>{{ orderDetails?.user?.contactNumber }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">Contact Details</p>
+            <p class="font-weight-bold">Contact Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.holder?.title }}
+              {{ orderDetails?.bookingPayload?.holder?.name }}
+              {{ orderDetails?.bookingPayload?.holder?.surname }}
+            </p>
+            <p class="font-weight-bold">Contact Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.holder?.email }}
+            </p>
+            <p class="font-weight-bold">Contact Phone</p>
+            <p>
+              {{ orderDetails?.bookingPayload?.holder?.telephones[0] }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Booking Date</p>
+            <p>{{ formateDate(orderDetails?.createdAt) }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">HEx Booking ID</p>
+            <p>{{ orderDetails?.bookingId }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Supplier Booking ID</p>
+            <p>
+              {{ orderDetails?.hotelbedsBookingResponse?.reference }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Activity Name</p>
+            <p>
+              {{ orderDetails?.activity?.name }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">No of Guests</p>
+            <p>
+              {{ orderDetails?.bookingPayload?.activities[0]?.paxes?.length }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Lead Guest Name</p>
+            <p>
+              {{
+                orderDetails?.bookingPayload?.activities[0]?.paxes[0]?.surname
+              }}
+              {{ orderDetails?.bookingPayload?.activities[0]?.paxes[0]?.name }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Pick Up Place</p>
+            <p>{{ orderDetails?.bookingPayload?.customObjects.pickup }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Pick Up Place</p>
+            <p>{{ orderDetails?.bookingPayload?.customObjects?.dropOff }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Preference</p>
+            <p>{{ orderDetails?.bookingPayload?.customObjects?.note }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Status</p>
+            <p>{{ orderDetails?.status }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Total Amount</p>
+            <p>AED {{ orderDetails?.price }}</p>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </div>
     <v-data-table-server
+      v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -14,6 +112,15 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
+      <template #item.action="{ item }">
+        <v-btn
+          icon="mdi-eye"
+          size="x-small"
+          variant="text"
+          color="primary"
+          @click="onDetails(item)"
+        />
+      </template>
       <template #item.activity_name="{ item }">
         {{ item?.activity?.name }}
       </template>
@@ -58,6 +165,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Action', key: 'action', align: 'start' },
     { title: 'Booking Id', key: 'bookingId', align: 'start' },
     { title: 'Booking Date', key: 'bookedOn', align: 'start' },
     { title: 'Activity Name', key: 'activity_name', align: 'start' },
@@ -77,7 +185,10 @@ const table_data = ref({
     { value: 40, title: '40' }
   ]
 })
-
+const orderDetails = ref(null)
+const onDetails = (data) => {
+  orderDetails.value = data
+}
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance

@@ -106,16 +106,12 @@
           <v-col cols="12" md="6">
             <p class="font-weight-bold">Lead Guest Name</p>
             {{
-              orderDetails?.emergingOrderBookingFinishPayload?.supplier_data
-                ?.title
+              orderDetails?.emergingOrderBookingFinishPayload?.rooms?.[0]
+                ?.guests[0]?.first_name
             }}
             {{
-              orderDetails?.emergingOrderBookingFinishPayload?.supplier_data
-                ?.first_name_original
-            }}
-            {{
-              orderDetails?.emergingOrderBookingFinishPayload?.supplier_data
-                ?.last_name_original
+              orderDetails?.emergingOrderBookingFinishPayload?.rooms?.[0]
+                ?.guests[0]?.last_name
             }}
           </v-col>
           <v-col cols="12" md="6">
@@ -288,7 +284,6 @@ const table_data = ref({
 const orderDetails = ref(null)
 const onDetails = (data) => {
   orderDetails.value = data
-  console.log(orderDetails.value)
 }
 const getGuestCount = (data, guestType) => {
   if (!data || !Array.isArray(data)) return 0
