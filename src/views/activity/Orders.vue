@@ -37,7 +37,7 @@
             </p>
             <p class="font-weight-bold">Contact Phone</p>
             <p>
-              {{ orderDetails?.bookingPayload?.holder?.telephones[0] }}
+              {{ orderDetails?.bookingPayload?.holder?.telephones?.[0] }}
             </p>
           </v-col>
           <v-col cols="12" md="6">

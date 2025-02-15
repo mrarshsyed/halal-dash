@@ -1,6 +1,115 @@
 <template>
   <div>
+    <div v-if="orderDetails">
+      <v-card-text>
+        <v-btn
+          class="mb-4"
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="orderDetails = null"
+        />
+        <v-row>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">User Details</p>
+            <p class="font-weight-bold">User Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.name }}
+            </p>
+            <p class="font-weight-bold">User Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.email }}
+            </p>
+            <p class="font-weight-bold">User Phone</p>
+            <p>{{ orderDetails?.user?.contactNumber }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">Contact Details</p>
+            <p class="font-weight-bold">Contact Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.holder?.title }}
+              {{ orderDetails?.bookingPayload?.holder?.name }}
+              {{ orderDetails?.bookingPayload?.holder?.surname }}
+            </p>
+            <p class="font-weight-bold">Contact Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.holder?.email }}
+            </p>
+            <p class="font-weight-bold">Contact Phone</p>
+            <p>
+              {{ orderDetails?.bookingPayload?.holder?.phone }}
+            </p>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Booking Date</p>
+            <p>{{ formateDate(orderDetails?.createdAt) }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">HEx Booking ID</p>
+            <p>
+              {{ orderDetails?.bookingInfo?.bookings?.[0]?.clientReference }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Supplier Booking ID</p>
+            <p>{{ orderDetails?.bookingInfo?.bookings?.[0]?.reference }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Transfer Type</p>
+            <p>{{ orderDetails?.service?.transferType }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Pick Up Place</p>
+            <p>{{ orderDetails?.search?.from?.description }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Drop Off Place</p>
+            <p>{{ orderDetails?.search?.to?.description }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Filght Code</p>
+            <p>
+              {{
+                orderDetails?.bookingPayload?.transfers?.[0]
+                  ?.transferDetails?.[0]?.code
+              }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Filght Time</p>
+            <p>
+              Direction :
+              {{
+                orderDetails?.bookingPayload?.transfers?.[0]
+                  ?.transferDetails?.[0]?.direction
+              }}
+            </p>
+            <p>
+              Time :
+              {{
+                orderDetails?.bookingPayload?.transfers?.[0]
+                  ?.transferDetails?.[0]?.time
+              }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Preferences</p>
+            <p>{{ orderDetails?.bookingPayload?.remark }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Status</p>
+            <p>{{ orderDetails?.status }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Total Amount</p>
+            <p>EUR {{ orderDetails?.price }}</p>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </div>
     <v-data-table-server
+      v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -13,8 +122,17 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
+      <template #item.action="{ item }">
+        <v-btn
+          icon="mdi-eye"
+          size="x-small"
+          variant="text"
+          color="primary"
+          @click="onDetails(item)"
+        />
+      </template>
       <template #item.id="{ item }">
-        {{ item?.bookingId }}
+        {{ item?.bookingInfo?.bookings?.[0]?.clientReference }}
       </template>
       <template #item.user_name="{ item }">
         {{ item?.user?.name }}
@@ -64,6 +182,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Action', key: 'action', align: 'start' },
     { title: 'Booking ID', key: 'id', align: 'start' },
     { title: 'Booking Date', key: 'enquiry_on', align: 'start' },
     { title: 'Reference', key: 'clientReference', align: 'start' },
@@ -81,6 +200,10 @@ const table_data = ref({
     { value: 40, title: '40' }
   ]
 })
+const orderDetails = ref(null)
+const onDetails = (data) => {
+  orderDetails.value = data
+}
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance
