@@ -10,134 +10,153 @@
           @click="orderDetails = null"
         />
         <v-row>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <p class="font-weight-bold">
-              Booking ID
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">User Details</p>
+            <p class="font-weight-bold">User Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.name }}
             </p>
-            <p>{{ orderDetails?.bookingId }}</p>
+            <p class="font-weight-bold">User Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.email }}
+            </p>
+            <p class="font-weight-bold">User Phone</p>
+            <p>{{ orderDetails?.user?.contactNumber }}</p>
           </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <p class="font-weight-bold">
-              Status
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">Contact Details</p>
+            <p class="font-weight-bold">Contact Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.mainContact?.name }}
             </p>
-            <p>{{ orderDetails?.status }}</p>
+            <p class="font-weight-bold">Contact Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.bookingPayload?.mainContact?.email }}
+            </p>
+            <p class="font-weight-bold">Contact Phone</p>
+            <p>
+              {{ orderDetails?.bookingPayload?.mainContact?.phone }}
+            </p>
           </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <p class="font-weight-bold">
-              Booking Date
-            </p>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Booking Date</p>
             <p>{{ formateDate(orderDetails?.createdAt) }}</p>
           </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <p class="font-weight-bold">
-              Payment Status
-            </p>
-            <p>{{ orderDetails?.paymentStatus }}</p>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">HEx Booking ID</p>
+            <p>{{ orderDetails?.bookingId }}</p>
           </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <p class="font-weight-bold">
-              Price
-            </p>
-            <p>AED {{ orderDetails?.bookingPayload?.quotedPrice }}</p>
-          </v-col>
-          <v-col
-            cols="12"
-          >
-            <p class="text-h6 font-weight-bold">
-              Package Details
+          <v-col cols="12">
+            <p class="text-h6 font-weight-bold">Package Details</p>
+            <p class="">
+              Insurance Type :
+              {{ orderDetails?.insurancePackage?.insuranceType?.name }}
             </p>
             <p class="">
-              Insurance Type : {{ orderDetails?.insurancePackage?.insuranceType?.name }}
-            </p>
-            <p class="">
-              Insurance Area : {{ orderDetails?.insurancePackage?.insuranceArea?.name }}
+              Insurance Area :
+              {{ orderDetails?.insurancePackage?.insuranceArea?.name }}
             </p>
             <p class="">
               Trip Type : {{ orderDetails?.insurancePackage?.tripType }}
             </p>
             <p class="">
-              Rest Type : {{ orderDetails?.insurancePackage?.insuranceRestType?.name }}
+              Rest Type :
+              {{ orderDetails?.insurancePackage?.insuranceRestType?.name }}
             </p>
             <p class="">
-              Terrorism Extension : {{ orderDetails?.insurancePackage?.terrorismExtension ? 'YES' : 'NO' }}
+              Terrorism Extension :
+              {{
+                orderDetails?.insurancePackage?.terrorismExtension
+                  ? 'YES'
+                  : 'NO'
+              }}
             </p>
           </v-col>
-          <v-col
-            cols="12"
-          >
-            <p class="text-h6 font-weight-bold">
-              Travellers Details
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Dates</p>
+            <p>
+              Start :
+              {{
+                formateDate(orderDetails?.bookingPayload?.travelingDate?.start)
+              }}
             </p>
-            <p class="font-weight-bold">
-              Main Contact
+            <p>
+              End :
+              {{
+                formateDate(orderDetails?.bookingPayload?.travelingDate?.end)
+              }}
             </p>
-            <p>Name : {{ orderDetails?.bookingPayload?.mainContact?.name }}</p>
-            <p>Email : {{ orderDetails?.bookingPayload?.mainContact?.email }}</p>
-            <p>Phone : {{ orderDetails?.bookingPayload?.mainContact?.phone }}</p>
-            <p class="font-weight-bold mt-2">
-              Traveling Dates
-            </p>
-            <p>Start : {{ formateDate(orderDetails?.bookingPayload?.travelingDate?.start) }}</p>
-            <p>End : {{ formateDate(orderDetails?.bookingPayload?.travelingDate?.end) }}</p>
-            <div class="border pa-2  mt-4 pt-4">
-              <p class="font-weight-bold">
-                Adults
-              </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Status</p>
+            <p>{{ orderDetails?.status }}</p>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Payment Status</p>
+            <p>{{ orderDetails?.paymentStatus }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Price</p>
+            <p>AED {{ orderDetails?.bookingPayload?.quotedPrice }}</p>
+          </v-col>
+
+          <v-col cols="12">
+            <p class="text-h6 font-weight-bold">Guest Details</p>
+            <div class="border pa-2 mt-4 pt-4">
+              <p class="font-weight-bold">Adults</p>
               <div
-                class="mb-4"  
-                v-for="(adult,indexAdult) in orderDetails?.bookingPayload?.travelerInformation?.adults?.info "
+                class="mb-4"
+                v-for="(adult, indexAdult) in orderDetails?.bookingPayload
+                  ?.travelerInformation?.adults?.info"
                 :key="indexAdult"
               >
-              
-                <p>Name : {{ adult?.title }}  {{ adult?.firstName }} {{ adult?.lastName }}</p>
-                <p>Date Of Birth : {{ formateDate(adult?.dob) }} </p>
+                <p>
+                  Name : {{ adult?.title }} {{ adult?.firstName }}
+                  {{ adult?.lastName }}
+                </p>
+                <p>Date Of Birth : {{ formateDate(adult?.dob) }}</p>
                 <p>Country: {{ adult?.country }}</p>
                 <p>Passport : {{ adult?.passportNumber || adult?.passport }}</p>
               </div>
             </div>
-            <div class="border pa-2  mt-4 pt-4">
-              <p class="font-weight-bold">
-                Children
-              </p>
+            <div class="border pa-2 mt-4 pt-4">
+              <p class="font-weight-bold">Children</p>
               <div
-                class="mb-4"  
-                v-for="(children,indexChildren) in orderDetails?.bookingPayload?.travelerInformation?.children?.info "
+                class="mb-4"
+                v-for="(children, indexChildren) in orderDetails?.bookingPayload
+                  ?.travelerInformation?.children?.info"
                 :key="indexChildren"
               >
-                <p>Name : {{ children?.title }}  {{ children?.firstName }} {{ children?.lastName }}</p>
-                <p>Date Of Birth : {{ formateDate(children?.dob) }} </p>
+                <p>
+                  Name : {{ children?.title }} {{ children?.firstName }}
+                  {{ children?.lastName }}
+                </p>
+                <p>Date Of Birth : {{ formateDate(children?.dob) }}</p>
                 <p>Country: {{ children?.country }}</p>
-                <p>Passport : {{ children?.passportNumber || children?.passport }}</p>
+                <p>
+                  Passport :
+                  {{ children?.passportNumber || children?.passport }}
+                </p>
               </div>
             </div>
-            <div class="border pa-2  mt-4 pt-4">
-              <p class="font-weight-bold">
-                Seniors
-              </p>
+            <div class="border pa-2 mt-4 pt-4">
+              <p class="font-weight-bold">Seniors</p>
               <div
-                class="mb-4"  
-                v-for="(seniors,indexSeniors) in orderDetails?.bookingPayload?.travelerInformation?.seniors?.info "
+                class="mb-4"
+                v-for="(seniors, indexSeniors) in orderDetails?.bookingPayload
+                  ?.travelerInformation?.seniors?.info"
                 :key="indexSeniors"
               >
-                <p>Name : {{ seniors?.title }}  {{ seniors?.firstName }} {{ seniors?.lastName }}</p>
-                <p>Date Of Birth : {{ formateDate(seniors?.dob) }} </p>
+                <p>
+                  Name : {{ seniors?.title }} {{ seniors?.firstName }}
+                  {{ seniors?.lastName }}
+                </p>
+                <p>Date Of Birth : {{ formateDate(seniors?.dob) }}</p>
                 <p>Country: {{ seniors?.country }}</p>
-                <p>Passport : {{ seniors?.passportNumber || seniors?.passport }}</p>
+                <p>
+                  Passport : {{ seniors?.passportNumber || seniors?.passport }}
+                </p>
               </div>
             </div>
           </v-col>
@@ -183,10 +202,7 @@
         {{ item?.mainContact?.phone }}
       </template>
       <template #item.dates="{ item }">
-        <div
-          class="d-block"
-          style="width: max-content"
-        >
+        <div class="d-block" style="width: max-content">
           <p>
             Start Date:
             {{ formateDate(item?.bookingPayload?.travelingDate?.start) }}
@@ -198,10 +214,7 @@
         </div>
       </template>
       <template #item.guests="{ item }">
-        <div
-          class="d-block"
-          style="width: max-content"
-        >
+        <div class="d-block" style="width: max-content">
           <p>
             Adults :
             {{ item?.bookingPayload?.travelerInformation?.adults?.count }}
@@ -216,9 +229,7 @@
           </p>
         </div>
       </template>
-      <template #item.price="{ item }">
-        AED {{ item?.quotedPrice }}
-      </template>
+      <template #item.price="{ item }"> AED {{ item?.quotedPrice }} </template>
       <template #item.port="{ item }">
         {{ item?.preferredDeparturePort?.name }}
       </template>
@@ -277,7 +288,6 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
 }
 const onDetails = (data) => {
   orderDetails.value = data
-  console.log(orderDetails.value);
-  
+  console.log(orderDetails.value)
 }
 </script>

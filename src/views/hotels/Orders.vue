@@ -23,7 +23,6 @@
             <p class="font-weight-bold">User Phone</p>
             <p>{{ orderDetails?.user?.contactNumber }}</p>
           </v-col>
-
           <v-col cols="12" md="6">
             <p class="text-h6 font-weight-bold">Contact Details</p>
             <p class="font-weight-bold">Contact Name</p>

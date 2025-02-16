@@ -1,6 +1,104 @@
 <template>
   <div>
+    <div v-if="orderDetails">
+      <v-card-text>
+        <v-btn
+          class="mb-4"
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="orderDetails = null"
+        />
+        <v-row>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">User Details</p>
+            <p class="font-weight-bold">User Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.name }}
+            </p>
+            <p class="font-weight-bold">User Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.email }}
+            </p>
+            <p class="font-weight-bold">User Phone</p>
+            <p>{{ orderDetails?.user?.contactNumber }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">Contact Details</p>
+            <p class="font-weight-bold">Contact Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.name }}
+            </p>
+            <p class="font-weight-bold">Contact Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.email }}
+            </p>
+            <p class="font-weight-bold">Contact Phone</p>
+            <p>
+              {{ orderDetails?.contactNumber }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Booking Date</p>
+            <p>{{ formateDate(orderDetails?.createdAt) }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">HEx Booking ID</p>
+            <p>{{ orderDetails?.bookingId }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Package Name</p>
+            <p>{{ orderDetails?.package?.name }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Sailing Date</p>
+            <p>{{ formateDate(orderDetails?.preferredSailingDate) }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">No of adults</p>
+            <p>{{ orderDetails?.guests?.adults }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">No of Children</p>
+            <p>{{ orderDetails?.guests?.children?.length }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">
+              At least one guest of my party will be over the age of 55 years
+            </p>
+            <p>{{ orderDetails?.oneGuestOver55 ? 'Yes' : 'No' }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Guest Residency</p>
+            <p>{{ orderDetails?.country }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Preferred Rooms</p>
+            <v-list>
+              <v-list-item
+                v-for="(r, index) in orderDetails?.preferredRooms"
+                :key="index"
+              >
+                <v-list-item-title>
+                  {{ r?.room?.name }}
+                </v-list-item-title>
+                <p class="text-sm">AED {{ r?.price }}</p>
+              </v-list-item>
+            </v-list>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Preferred Departure Port</p>
+            <p>{{ orderDetails?.preferredDeparturePort?.name }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Preference</p>
+            <p>{{ orderDetails?.note }}</p>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </div>
     <v-data-table-server
+      v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -13,6 +111,15 @@
       @update:options="loadItems"
       :show-current-page="true"
     >
+      <template #item.action="{ item }">
+        <v-btn
+          icon="mdi-eye"
+          size="x-small"
+          variant="text"
+          color="primary"
+          @click="onDetails(item)"
+        />
+      </template>
       <template #item.id="{ item }">
         {{ item?.bookingId }}
       </template>
@@ -66,9 +173,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
+
+const orderDetails = ref(null)
+
+const onDetails = (data) => {
+  orderDetails.value = data
+}
 
 const table_data = ref({
   loading: true,
@@ -78,6 +191,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Action', key: 'action', align: 'start' },
     { title: 'Booking ID', key: 'id', align: 'start' },
     { title: 'Booking Date', key: 'enquiry_on', align: 'start' },
     { title: 'Package', key: 'package', align: 'start' },
