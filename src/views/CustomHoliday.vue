@@ -1,7 +1,92 @@
 <template>
   <div>
-    <!-- <FormComponent /> -->
+    <div v-if="orderDetails">
+      <v-card-text>
+        <v-btn
+          class="mb-4"
+          size="x-small"
+          color="primary"
+          icon="mdi-arrow-left"
+          @click="orderDetails = null"
+        />
+        <v-row>
+          <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">User Details</p>
+            <p class="font-weight-bold">User Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.name }}
+            </p>
+            <p class="font-weight-bold">User Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.user?.email }}
+            </p>
+            <p class="font-weight-bold">User Phone</p>
+            <p>{{ orderDetails?.user?.contactNumber }}</p>
+          </v-col>
+          <!-- <v-col cols="12" md="6">
+            <p class="text-h6 font-weight-bold">Contact Details</p>
+            <p class="font-weight-bold">Contact Name</p>
+            <p class="mb-2">
+              {{ orderDetails?.name }}
+            </p>
+            <p class="font-weight-bold">Contact Email</p>
+            <p class="mb-2">
+              {{ orderDetails?.email }}
+            </p>
+            <p class="font-weight-bold">Contact Phone</p>
+            <p>
+              {{ orderDetails?.contactNumber }}
+            </p>
+          </v-col> -->
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Booking Date</p>
+            <p>{{ formateDate(orderDetails?.createdAt) }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">HEx Booking ID</p>
+            <p>{{ orderDetails?.bookingId }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="font-weight-bold">Total</p>
+            <p>{{ orderDetails?.amount }}</p>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h5 font-weight-bold">
+              Hotel
+            </p>
+            <div class="mb-4" v-for="(item,index) in hotelBookings" :key="index">
+            <Hotel v-if="item"  :order-details="item"/>
+            </div>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h5 font-weight-bold">
+              Activities
+            </p>
+            <div class="mb-4" v-for="(item,index) in activityBookings" :key="index">
+              {{ item }}
+            </div>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h5 font-weight-bold">
+              Insurance
+            </p>
+            <div class="mb-4" v-for="(item,index) in insuranceBookings" :key="index">
+              {{ item }}
+            </div>
+          </v-col>
+          <v-col cols="12" md="6">
+            <p class="text-h5 font-weight-bold">
+              Transfer
+            </p>
+            <div class="mb-4" v-for="(item,index) in transferBookings" :key="index">
+              {{ item }}
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </div>
     <v-data-table-server
+    v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -16,6 +101,15 @@
       height="800px"
       fixed-header
     >
+    <template #item.action="{ item }">
+        <v-btn
+          icon="mdi-eye"
+          size="x-small"
+          variant="text"
+          color="primary"
+          @click="onDetails(item)"
+        />
+      </template>
       <template #item.id="{ item }">
         {{ item?.bookingId }}
       </template>
@@ -135,12 +229,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref ,computed} from 'vue'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
 
+import Hotel from '@/components/Order/Hotel.vue'
 const formStore = userFormStore()
+
+const orderDetails = ref(null)
+
+const onDetails = (data) => {
+  orderDetails.value = data
+}
+
+const hotelBookings = computed(() => {
+  return orderDetails.value?.hotelBookings
+})
+const activityBookings = computed(() => {
+  return orderDetails.value?.activityBookings
+})
+const transferBookings = computed(() => {
+  return orderDetails.value?.transferBookings
+})
+const insuranceBookings = computed(() => {
+  return orderDetails.value?.insuranceBookings
+})
 
 const table_data = ref({
   loading: true,
@@ -150,6 +264,7 @@ const table_data = ref({
   page: 1,
   serverItems: [],
   headers: [
+    { title: 'Action', key: 'action', align: 'start' },
     { title: 'Booking ID', key: 'id', align: 'start' },
     { title: 'Booking Date', key: 'bookingDate', align: 'start' },
     { title: 'Hotel', key: 'hotel', align: 'start' },

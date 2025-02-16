@@ -63,103 +63,8 @@
             <p class="font-weight-bold">HEx Booking ID</p>
             <p>{{ orderDetails?.bookingId }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Supplier Booking ID</p>
-            <p>
-              {{
-                orderDetails?.emergingOrderBookingFormResponse?.data?.order_id
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Hotel Name</p>
-            <p>{{ orderDetails?.hotelId?.name }}</p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">No of Room</p>
-            <p>
-              {{
-                orderDetails?.emergingOrderBookingFormPayload?.guests?.length
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Number of Guests</p>
-            <p>
-              {{
-                getGuestCount(
-                  orderDetails?.emergingOrderBookingFinishPayload?.rooms,
-                  'adults'
-                )
-              }}
-              Adults,
-              {{
-                getGuestCount(
-                  orderDetails?.emergingOrderBookingFinishPayload?.rooms,
-                  'adults'
-                )
-              }}
-              Children
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Lead Guest Name</p>
-            {{
-              orderDetails?.emergingOrderBookingFinishPayload?.rooms?.[0]
-                ?.guests[0]?.first_name
-            }}
-            {{
-              orderDetails?.emergingOrderBookingFinishPayload?.rooms?.[0]
-                ?.guests[0]?.last_name
-            }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Room Type</p>
-            <p>
-              {{ orderDetails?.rateHash?.room_data_trans?.main_name }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Check-in</p>
-            <p>
-              {{
-                formateDate(
-                  orderDetails?.emergingOrderBookingFormPayload?.checkin
-                )
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Check-out Date</p>
-            <p>
-              {{
-                formateDate(
-                  orderDetails?.emergingOrderBookingFormPayload?.checkout
-                )
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Preference</p>
-            <p>
-              {{ orderDetails?.customData?.note }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Payment Status</p>
-            <p>{{ orderDetails?.paymentStatus }}</p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Booking Done</p>
-            {{ orderDetails?.emergingBookingDone ? 'Yes' : 'No' }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Booking Confirmed</p>
-            {{ orderDetails?.emergingBookingConfirmed ? 'Yes' : 'No' }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Price</p>
-            <p>AED {{ orderDetails?.price }}</p>
+          <v-col cols="12">
+            <Hotel :order-details="orderDetails" />
           </v-col>
         </v-row>
       </v-card-text>
@@ -236,6 +141,7 @@ import { ref } from 'vue'
 import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
+import Hotel from '@/components/Order/Hotel.vue'
 
 const formStore = userFormStore()
 
@@ -284,20 +190,7 @@ const orderDetails = ref(null)
 const onDetails = (data) => {
   orderDetails.value = data
 }
-const getGuestCount = (data, guestType) => {
-  if (!data || !Array.isArray(data)) return 0
 
-  return data.reduce((count, room) => {
-    if (!room.guests || !Array.isArray(room.guests)) return count
-
-    return (
-      count +
-      room.guests.filter((guest) =>
-        guestType === 'adults' ? !guest.is_child : guest.is_child
-      ).length
-    )
-  }, 0)
-}
 
 const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page
