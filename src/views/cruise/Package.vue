@@ -1,13 +1,28 @@
 <template>
-  <v-row class="mb-4" v-if="!formMode">
-    <v-col cols="12" md="8">
+  <v-row
+    class="mb-4"
+    v-if="!formMode"
+  >
+    <v-col
+      cols="12"
+      md="8"
+    >
       <v-text-field
         v-model="searchKeyword"
         placeholder="Enter search here ..."
       />
     </v-col>
-    <v-col cols="12" md="4">
-      <v-btn @click="onCreate" block color="primary"> + Add New Package </v-btn>
+    <v-col
+      cols="12"
+      md="4"
+    >
+      <v-btn
+        @click="onCreate"
+        block
+        color="primary"
+      >
+        + Add New Package
+      </v-btn>
     </v-col>
     <v-col cols="12">
       <v-data-table-server
@@ -38,9 +53,7 @@
         <template #item.endPrice="{ item }">
           {{ item?.endPrice }} {{ item?.currency?.code }}
         </template>
-        <template #item.isSoldOut="{ item }">
-          <v-chip :color="!item?.isSoldOut ? 'success': 'error'">{{ item?.isSoldOut ? 'Yes' : 'No' }}</v-chip>
-        </template>
+
 
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
@@ -61,7 +74,11 @@
       </v-data-table-server>
     </v-col>
   </v-row>
-  <v-form v-model="formValue" ref="form" v-else-if="formMode">
+  <v-form
+    v-model="formValue"
+    ref="form"
+    v-else-if="formMode"
+  >
     <v-row v-if="showForm">
       <v-col cols="12">
         <v-btn
@@ -75,11 +92,12 @@
         </h3>
       </v-col>
       <!-- name -->
-      <v-col cols="12">
-        <v-checkbox v-model="formData.isSoldOut" label="Is Sold Out" />
-      </v-col>
+
       <!-- name -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="formData.name"
           label="Name"
@@ -88,7 +106,10 @@
         />
       </v-col>
       <!-- currency -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Currency"
@@ -102,8 +123,14 @@
         />
       </v-col>
       <!-- start date -->
-      <v-col cols="12" md="6">
-        <v-menu v-model="startDateMenu" :close-on-content-click="false">
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <v-menu
+          v-model="startDateMenu"
+          :close-on-content-click="false"
+        >
           <template #activator="{ props }">
             <v-text-field
               label="Start Date"
@@ -122,7 +149,10 @@
         </v-menu>
       </v-col>
       <!-- end date -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-menu
           :disabled="!formData.startDate"
           v-model="endDateMenu"
@@ -148,7 +178,10 @@
         </v-menu>
       </v-col>
       <!-- destination -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Destinations"
@@ -166,7 +199,10 @@
         />
       </v-col>
       <!-- start location -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Start Location"
@@ -179,7 +215,10 @@
         />
       </v-col>
       <!-- end location -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select End Location"
@@ -192,7 +231,10 @@
         />
       </v-col>
       <!-- Ship -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
           clearable
           label="Select Ship"
@@ -208,7 +250,10 @@
       <!-- description -->
       <v-col cols="12">
         <p>Package Description</p>
-        <DocumentEditor height="200px" v-model="formData.description" />
+        <DocumentEditor
+          height="200px"
+          v-model="formData.description"
+        />
       </v-col>
       <!-- images  -->
       <v-col cols="12">
@@ -336,7 +381,9 @@
             <v-expansion-panel-text>
               <v-row>
                 <v-col v-if="!formData.prices?.length">
-                  <div class="text-center pa-4 border">Select ship first</div>
+                  <div class="text-center pa-4 border">
+                    Select ship first
+                  </div>
                 </v-col>
                 <v-col
                   v-else
@@ -345,6 +392,10 @@
                   cols="12"
                   class="border mb-4 rounded"
                 >
+                  <v-checkbox
+                    label="Sold out"
+                    v-model="price.isSoldOut "
+                  />
                   <div class="d-flex flex-wrap ga-4 mb-2">
                     <v-text-field
                       label="Room Name"
@@ -361,6 +412,7 @@
                       readonly
                     />
                   </div>
+                 
                   <v-text-field
                     label="Price"
                     :rules="[(v) => !!v || 'Price is required']"
@@ -374,8 +426,14 @@
           <v-expansion-panel title="What's Included?">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('highlights')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('highlights')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -425,8 +483,14 @@
           <v-expansion-panel title="Policies">
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" class="text-right">
-                  <v-btn color="primary" @click="addMore('policies')">
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <v-btn
+                    color="primary"
+                    @click="addMore('policies')"
+                  >
                     + Add More
                   </v-btn>
                 </v-col>
@@ -467,10 +531,18 @@
       </v-col>
       <v-col cols="12">
         <div class="text-right d-flex justify-end ga-4">
-          <v-btn color="error" @click="router.push('/cruise/package')">
+          <v-btn
+            color="error"
+            @click="router.push('/cruise/package')"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" @click="save"> Save </v-btn>
+          <v-btn
+            color="primary"
+            @click="save"
+          >
+            Save
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -508,7 +580,6 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Is sold out', key: 'isSoldOut', align: 'start' },
     { title: 'Ship', key: 'ship', align: 'start' },
     { title: 'Duration', key: 'duration', align: 'start' },
     { title: 'Start Price', key: 'startPrice', align: 'start' },
@@ -546,7 +617,6 @@ const initialFormData = {
   uploads: [],
   images: [],
   prices: [],
-  isSoldOut: false
 }
 
 const formData = ref(initialFormData)
@@ -697,7 +767,6 @@ const getDataPayload = () => {
     let { files, fileMapper } = getFilesPayload()
     let data = removeUploads({ ...formData.value })
     data.fileMapper = fileMapper
-    // console.log(data, JSON.stringify(data));
     let formdata = new FormData()
     formdata.append('data', JSON.stringify(data))
     files?.forEach((file) => {
