@@ -5,7 +5,7 @@
         {{ item.label }}
       </p>
       <p v-if="item?.isDate">
-        {{ getNestedValue(props?.orderDetails, item.key) }}
+        {{ formateDate(getNestedValue(props?.orderDetails, item.key)) }}
       </p>
       <p v-else-if="item.isBoolean">
         {{ getNestedValue(props.orderDetails, item.key) ? 'Yes' : 'No' }}

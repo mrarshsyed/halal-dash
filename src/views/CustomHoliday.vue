@@ -10,83 +10,135 @@
           @click="orderDetails = null"
         />
         <v-row>
-          <v-col cols="12" md="6">
-            <p class="text-h6 font-weight-bold">User Details</p>
-            <p class="font-weight-bold">User Name</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="text-h6 font-weight-bold">
+              User Details
+            </p>
+            <p class="font-weight-bold">
+              User Name
+            </p>
             <p class="mb-2">
               {{ orderDetails?.user?.name }}
             </p>
-            <p class="font-weight-bold">User Email</p>
+            <p class="font-weight-bold">
+              User Email
+            </p>
             <p class="mb-2">
               {{ orderDetails?.user?.email }}
             </p>
-            <p class="font-weight-bold">User Phone</p>
+            <p class="font-weight-bold">
+              User Phone
+            </p>
             <p>{{ orderDetails?.user?.contactNumber }}</p>
           </v-col>
-          <!-- <v-col cols="12" md="6">
-            <p class="text-h6 font-weight-bold">Contact Details</p>
-            <p class="font-weight-bold">Contact Name</p>
-            <p class="mb-2">
-              {{ orderDetails?.name }}
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Booking Date
             </p>
-            <p class="font-weight-bold">Contact Email</p>
-            <p class="mb-2">
-              {{ orderDetails?.email }}
-            </p>
-            <p class="font-weight-bold">Contact Phone</p>
-            <p>
-              {{ orderDetails?.contactNumber }}
-            </p>
-          </v-col> -->
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Booking Date</p>
             <p>{{ formateDate(orderDetails?.createdAt) }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">HEx Booking ID</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              HEx Booking ID
+            </p>
             <p>{{ orderDetails?.bookingId }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Total</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Total
+            </p>
             <p>{{ orderDetails?.amount }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="text-h5 font-weight-bold">
-              Hotel
-            </p>
-            <div class="mb-4" v-for="(item,index) in hotelBookings" :key="index">
-            <Hotel v-if="item"  :order-details="item"/>
-            </div>
+          <v-col
+            cols="12"
+          >
+            <v-card>
+              <v-card-title>
+                Hotel
+              </v-card-title>
+              <v-card-text>
+                <div
+                  class="mb-4"
+                  v-for="(item,index) in hotelBookings"
+                  :key="index"
+                >
+                  <Hotel
+                    v-if="item"
+                    :order-details="item"
+                  />
+                  <hr class="mt-2">
+                </div>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="text-h5 font-weight-bold">
-              Activities
-            </p>
-            <div class="mb-4" v-for="(item,index) in activityBookings" :key="index">
-              {{ item }}
-            </div>
+          <v-col
+            cols="12"
+          >
+            <v-card>
+              <v-card-title>
+                Activity  
+              </v-card-title>
+              <v-card-text>
+                <div
+                  class="mb-4"
+                  v-for="(item,index) in activityBookings"
+                  :key="index"
+                >
+                  <Activity :order-details="item" />
+                  <hr class="mt-2">
+                </div>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="text-h5 font-weight-bold">
-              Insurance
-            </p>
-            <div class="mb-4" v-for="(item,index) in insuranceBookings" :key="index">
-              {{ item }}
-            </div>
+          <v-col
+            cols="12"
+          >
+            <v-card title="Transfer">
+              <v-card-text>
+                <div
+                  class="mb-4"
+                  v-for="(item,index) in transferBookings"
+                  :key="index"
+                >
+                  <Transfer :order-details="item" />
+                  <hr class="mt-2">
+                </div>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="text-h5 font-weight-bold">
-              Transfer
-            </p>
-            <div class="mb-4" v-for="(item,index) in transferBookings" :key="index">
-              {{ item }}
-            </div>
+          <v-col
+            cols="12"
+          >
+            <v-card title="Insurance">
+              <v-card-text>
+                <div
+                  class="mb-4"
+                  v-for="(item,index) in insuranceBookings"
+                  :key="index"
+                >
+                  <Insurance :order-details="item" />
+                  <hr class="mt-2">
+                </div>
+              </v-card-text>
+            </v-card>
           </v-col>
         </v-row>
       </v-card-text>
     </div>
     <v-data-table-server
-    v-else
+      v-else
       class="mt-4"
       density="compact"
       v-model:items-per-page="table_data.itemsPerPage"
@@ -101,7 +153,7 @@
       height="800px"
       fixed-header
     >
-    <template #item.action="{ item }">
+      <template #item.action="{ item }">
         <v-btn
           icon="mdi-eye"
           size="x-small"
@@ -230,12 +282,13 @@
 
 <script setup>
 import { ref ,computed} from 'vue'
-import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
-
 import Hotel from '@/components/Order/Hotel.vue'
-const formStore = userFormStore()
+import Activity from '@/components/Order/Activity.vue'
+import Transfer from '@/components/Order/Transfer.vue'
+import Insurance from '@/components/Order/Insurance.vue'
+
 
 const orderDetails = ref(null)
 
@@ -287,7 +340,6 @@ const loadItems = async ({ page, itemsPerPage }) => {
       params: {
         page: page,
         perPage: itemsPerPage,
-        ...formStore.getFilteredSearchFields()
       }
     })
     .then((res) => {

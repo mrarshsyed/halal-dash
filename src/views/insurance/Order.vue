@@ -46,121 +46,8 @@
             <p class="font-weight-bold">HEx Booking ID</p>
             <p>{{ orderDetails?.bookingId }}</p>
           </v-col>
-          <v-col cols="12">
-            <p class="text-h6 font-weight-bold">Package Details</p>
-            <p class="">
-              Insurance Type :
-              {{ orderDetails?.insurancePackage?.insuranceType?.name }}
-            </p>
-            <p class="">
-              Insurance Area :
-              {{ orderDetails?.insurancePackage?.insuranceArea?.name }}
-            </p>
-            <p class="">
-              Trip Type : {{ orderDetails?.insurancePackage?.tripType }}
-            </p>
-            <p class="">
-              Rest Type :
-              {{ orderDetails?.insurancePackage?.insuranceRestType?.name }}
-            </p>
-            <p class="">
-              Terrorism Extension :
-              {{
-                orderDetails?.insurancePackage?.terrorismExtension
-                  ? 'YES'
-                  : 'NO'
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Dates</p>
-            <p>
-              Start :
-              {{
-                formateDate(orderDetails?.bookingPayload?.travelingDate?.start)
-              }}
-            </p>
-            <p>
-              End :
-              {{
-                formateDate(orderDetails?.bookingPayload?.travelingDate?.end)
-              }}
-            </p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Status</p>
-            <p>{{ orderDetails?.status }}</p>
-          </v-col>
-
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Payment Status</p>
-            <p>{{ orderDetails?.paymentStatus }}</p>
-          </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Price</p>
-            <p>AED {{ orderDetails?.bookingPayload?.quotedPrice }}</p>
-          </v-col>
-
-          <v-col cols="12">
-            <p class="text-h6 font-weight-bold">Guest Details</p>
-            <div class="border pa-2 mt-4 pt-4">
-              <p class="font-weight-bold">Adults</p>
-              <div
-                class="mb-4"
-                v-for="(adult, indexAdult) in orderDetails?.bookingPayload
-                  ?.travelerInformation?.adults?.info"
-                :key="indexAdult"
-              >
-                <p>
-                  Name : {{ adult?.title }} {{ adult?.firstName }}
-                  {{ adult?.lastName }}
-                </p>
-                <p>Date Of Birth : {{ formateDate(adult?.dob) }}</p>
-                <p>Country: {{ adult?.country }}</p>
-                <p>Passport : {{ adult?.passportNumber || adult?.passport }}</p>
-              </div>
-            </div>
-            <div class="border pa-2 mt-4 pt-4">
-              <p class="font-weight-bold">Children</p>
-              <div
-                class="mb-4"
-                v-for="(children, indexChildren) in orderDetails?.bookingPayload
-                  ?.travelerInformation?.children?.info"
-                :key="indexChildren"
-              >
-                <p>
-                  Name : {{ children?.title }} {{ children?.firstName }}
-                  {{ children?.lastName }}
-                </p>
-                <p>Date Of Birth : {{ formateDate(children?.dob) }}</p>
-                <p>Country: {{ children?.country }}</p>
-                <p>
-                  Passport :
-                  {{ children?.passportNumber || children?.passport }}
-                </p>
-              </div>
-            </div>
-            <div class="border pa-2 mt-4 pt-4">
-              <p class="font-weight-bold">Seniors</p>
-              <div
-                class="mb-4"
-                v-for="(seniors, indexSeniors) in orderDetails?.bookingPayload
-                  ?.travelerInformation?.seniors?.info"
-                :key="indexSeniors"
-              >
-                <p>
-                  Name : {{ seniors?.title }} {{ seniors?.firstName }}
-                  {{ seniors?.lastName }}
-                </p>
-                <p>Date Of Birth : {{ formateDate(seniors?.dob) }}</p>
-                <p>Country: {{ seniors?.country }}</p>
-                <p>
-                  Passport : {{ seniors?.passportNumber || seniors?.passport }}
-                </p>
-              </div>
-            </div>
-          </v-col>
         </v-row>
+        <Insurance :order-details="orderDetails" />
       </v-card-text>
     </div>
     <v-data-table-server
@@ -244,6 +131,7 @@
 import { ref } from 'vue'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
+import Insurance from '@/components/Order/Insurance.vue'
 
 const table_data = ref({
   loading: true,
