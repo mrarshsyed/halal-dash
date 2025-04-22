@@ -105,7 +105,7 @@
       <p class="font-weight-bold">
         Total Amount
       </p>
-      <p>EUR {{ orderDetails?.price }}</p>
+      <p>{{ orderDetails?.bookingInfo?.bookings?.[0]?.currency }} {{ orderDetails?.price }}</p>
     </v-col>
   </v-row>
 </template>
