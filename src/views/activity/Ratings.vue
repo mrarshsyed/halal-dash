@@ -72,6 +72,7 @@ import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
 
 const store = useAppStore()
+const selectedRating= ref(null)
 
 const baseurl = 'admin/activity-halal-ratings'
 const categoryList = ref([])
@@ -155,23 +156,26 @@ const current_percentage = computed(() => {
     0
   )
 })
-const maximum_percentage_reached = (rating, isUpdate = false) => {
+const maximum_percentage_reached = (newRating, isUpdate = false, oldRating = 0) => {
   const total = isUpdate
-    ? Number(current_percentage.value) - rating // Subtract the rating being updated
-    : Number(current_percentage.value) + Number(rating)
+    ? Number(current_percentage.value) - Number(oldRating) + Number(newRating)
+    : Number(current_percentage.value) + Number(newRating)
+
   return total > 100
 }
 const saveRating = async () => {
   const ratingField = store.dialog.formComponents?.fields[1]
-  const rating = ratingField?.value
+  const newRating = Number(ratingField?.value)
   const isUpdate = !!ratingForm?.value?.id
-  if (maximum_percentage_reached(rating, isUpdate)) {
+  const oldRating = isUpdate ? Number(selectedRating.value || 0) : 0
+  if (maximum_percentage_reached(newRating, isUpdate, oldRating)) {
     store.showSnackbar('Maximum rating can be up to 100%', 'error')
     return
   }
+
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
-    rating: store.dialog.formComponents?.fields[1]?.value,
+    rating: newRating,
     category: store.getFieldValue('category')
   }
   const response = !ratingForm?.value?.id
@@ -208,6 +212,7 @@ const onEdit = async (item) => {
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
   ratingForm.value.fields[2].value = item.category
+  selectedRating.value = item?.rating
   const dialogModal = {
     title: 'Update rating',
     content: '',

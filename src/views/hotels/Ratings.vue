@@ -1,13 +1,19 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col cols="12" md="4">
+      <v-col
+        cols="12"
+        md="4"
+      >
         <v-btn
           @click="showDialog"
           :disabled="current_percentage >= 100"
@@ -17,7 +23,10 @@
           + Add New Rating
         </v-btn>
       </v-col>
-      <v-col cols="12" class="d-flex justify-end">
+      <v-col
+        cols="12"
+        class="d-flex justify-end"
+      >
         <div class="d-flex flex-column ga-1">
           <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
           <p>
@@ -117,6 +126,7 @@ const resetForm = async () => {
 }
 
 const store = useAppStore()
+const selectedRating = ref(null)
 
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   await axios
@@ -161,29 +171,37 @@ const current_percentage = computed(() => {
   )
 })
 
-const maximum_percentage_reached = (rating, isUpdate = false) => {
+const maximum_percentage_reached = (newRating, isUpdate = false, oldRating = 0) => {
   const total = isUpdate
-    ? Number(current_percentage.value) - rating // Subtract the rating being updated
-    : Number(current_percentage.value) + Number(rating)
+    ? Number(current_percentage.value) - Number(oldRating) + Number(newRating)
+    : Number(current_percentage.value) + Number(newRating)
+
   return total > 100
 }
 
+
 const saveRating = async () => {
   const ratingField = store.dialog.formComponents?.fields[1]
-  const rating = ratingField?.value
+  const newRating = Number(ratingField?.value)
   const isUpdate = !!ratingForm?.value?.id
-  if (maximum_percentage_reached(rating, isUpdate)) {
+  // Make sure oldRating is correctly parsed
+  const oldRating = isUpdate ? Number(selectedRating.value || 0) : 0
+
+  if (maximum_percentage_reached(newRating, isUpdate, oldRating)) {
     store.showSnackbar('Maximum rating can be up to 100%', 'error')
     return
   }
+
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
-    rating: store.dialog.formComponents?.fields[1]?.value,
+    rating: newRating,
     category: store.getFieldValue('category')
   }
-  const response = !ratingForm?.value?.id
-    ? await axios.post(baseurl, payload)
-    : await axios.patch(`${baseurl}/${ratingForm?.value?.id}`, payload)
+
+  const response = isUpdate
+    ? await axios.patch(`${baseurl}/${ratingForm?.value?.id}`, payload)
+    : await axios.post(baseurl, payload)
+
   if (response?.status === 200) {
     store.showSnackbar('Rating saved successfully')
     await loadItems({
@@ -195,6 +213,7 @@ const saveRating = async () => {
     resetForm()
   }
 }
+
 
 const showDialog = () => {
   resetForm()
@@ -212,11 +231,15 @@ const showDialog = () => {
 const onEdit = async (item) => {
   resetForm()
   store.setRatingDetails(item)
+
+
   ratingForm.value.fields[2].options = categoryList.value
   ratingForm.value.id = item?._id
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
   ratingForm.value.fields[2].value = item.category
+  selectedRating.value = item?.rating
+
   const dialogModal = {
     title: 'Update rating',
     content: '',
