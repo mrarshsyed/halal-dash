@@ -574,7 +574,7 @@ export const routes = [
     },
     children: [
       {
-        path: '',
+        path: 'list',
         component: () => import('@/views/blogs/View.vue'),
         meta: {
           requiresAuth: true,
@@ -592,7 +592,7 @@ export const routes = [
         }
       },
       {
-        path: 'edit/:id',
+        path: 'edit',
         component: () => import('@/views/blogs/edit/View.vue'),
         meta: {
           requiresAuth: true,
@@ -1032,7 +1032,7 @@ export const navLinks = [
       {
         icon: 'view-list',
         title: 'List',
-        to: '/blogs',
+        to: '/blogs/list',
         value: 'blogs-list',
         role: ['super-admin', 'admin', 'employee', 'manager'],
         permissions: [permissions.blogAll]
