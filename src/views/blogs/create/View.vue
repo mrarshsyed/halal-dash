@@ -1,37 +1,32 @@
 <template>
-  <v-container class="max-w-xl mx-auto py-6">
-    <v-card elevation="4" class="pa-6">
-      <v-card-title class="text-h5 font-weight-bold">
-        Create New Blog
-      </v-card-title>
+  <div>
+    <v-card-title class="text-h5 font-weight-bold">Create New Blog</v-card-title>
 
-      <v-form @submit.prevent="handleSubmit" class="mt-4" validate-on="submit lazy">
-        <v-text-field v-model="form.title" label="Title" required outlined class="mb-4"></v-text-field>
+    <v-form @submit.prevent="handleSubmit" class="mt-4" validate-on="submit lazy">
+      <v-text-field v-model="form.title" label="Title" required outlined class="mb-4"></v-text-field>
 
-        <v-text-field v-model="form.slug" label="Slug" required outlined class="mb-4"
-          @input="onSlugInput"></v-text-field>
+      <v-text-field v-model="form.slug" label="Slug" required outlined class="mb-4" @input="onSlugInput"></v-text-field>
 
-        <div>
-          <editor-menu-bar v-if="editor" :editor="editor" />
-          <editor-content :editor="editor" />
-        </div>
+      <div>
+        <editor-menu-bar v-if="editor" :editor="editor" />
+        <editor-content :editor="editor" />
+      </div>
 
-        <!-- Image Upload Field -->
-        <v-file-input label="Upload Image" accept="image/png,image/jpeg,image/jpg,image/gif" show-size
-          @change="onImageChange" outlined prepend-icon="mdi-image" class="mb-4"></v-file-input>
+      <!-- Image Upload Field -->
+      <v-file-input label="Upload Image" accept="image/png,image/jpeg,image/jpg,image/gif" show-size
+        @change="onImageChange" outlined prepend-icon="mdi-image" class="mb-4"></v-file-input>
 
-        <!-- Preview Image -->
-        <div v-if="form.imagePreview" class="mb-4">
-          <v-img :src="form.imagePreview" height="200px" class="preview"></v-img>
-        </div>
+      <!-- Preview Image -->
+      <div v-if="form.imagePreview" class="mb-4">
+        <v-img :src="form.imagePreview" height="200px" class="preview"></v-img>
+      </div>
 
-        <v-btn type="submit" color="primary" variant="flat" class="mt-2" :loading="loading"
-          :disabled="loading || !form.title || !form.slug || !form.content">
-          Publish
-        </v-btn>
-      </v-form>
-    </v-card>
-  </v-container>
+      <v-btn type="submit" color="primary" variant="flat" class="mt-2" :loading="loading"
+        :disabled="loading || !form.title || !form.slug || !form.content">
+        Publish
+      </v-btn>
+    </v-form>
+  </div>
 </template>
 
 <script setup>
@@ -120,9 +115,7 @@ async function handleSubmit() {
 
   try {
     const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/admin/blog`, payload, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
 
     if (response.status === 200) {
@@ -151,7 +144,8 @@ async function handleSubmit() {
   width: 100%;
   min-height: 160px;
 }
-.preview{
+
+.preview {
   aspect-ratio: 16/9;
 }
 </style>
