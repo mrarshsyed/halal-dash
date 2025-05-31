@@ -1,46 +1,44 @@
 <template>
-  <v-container class="max-w-xl mx-auto py-6">
-    <v-card elevation="4" class="pa-6">
-      <v-card-title class="text-h5 font-weight-bold">
-        Create New Blog
-      </v-card-title>
+  <div>
+    <v-card-title class="text-h5 font-weight-bold">Update Blog</v-card-title>
 
-      <v-form @submit.prevent="handleSubmit" class="mt-4" validate-on="submit lazy">
-        <v-text-field v-model="form.title" label="Title" required outlined class="mb-4"></v-text-field>
+    <v-form @submit.prevent="handleSubmit" class="mt-4" validate-on="submit lazy">
+      <v-text-field v-model="form.title" label="Title" required outlined class="mb-4"></v-text-field>
 
-        <v-text-field v-model="form.slug" label="Slug" required outlined class="mb-4"
-          @input="onSlugInput"></v-text-field>
+      <v-text-field v-model="form.slug" label="Slug" required outlined class="mb-4" @input="onSlugInput"></v-text-field>
 
-        <div>
-          <editor-menu-bar v-if="editor" :editor="editor" />
-          <editor-content :editor="editor" />
-        </div>
+      <div>
+        <editor-menu-bar v-if="editor" :editor="editor" />
+        <editor-content :editor="editor" />
+      </div>
 
-        <!-- Image Upload Field -->
-        <v-file-input label="Upload Image" accept="image/png,image/jpeg,image/jpg,image/gif" show-size
-          @change="onImageChange" outlined prepend-icon="mdi-image" class="mb-4"></v-file-input>
+      <!-- Image Upload Field -->
+      <v-file-input label="Upload New Image" accept="image/png,image/jpeg,image/jpg,image/gif" show-size
+        @change="onImageChange" outlined prepend-icon="mdi-image" class="mb-4"></v-file-input>
 
-        <!-- Preview Image -->
-        <div v-if="form.imagePreview" class="mb-4">
-          <v-img :src="form.imagePreview" max-width="100%" height="200px" cover></v-img>
-        </div>
+      <!-- Preview Image -->
+      <div v-if="form.imagePreview" class="mb-4">
+        <v-img :src="form.imagePreview" height="200px" class="preview"></v-img>
+      </div>
 
-        <v-btn type="submit" color="primary" variant="flat" class="mt-2" :loading="loading"
-          :disabled="loading || !form.title || !form.slug || !form.content">
-          Publish
-        </v-btn>
-      </v-form>
-    </v-card>
-  </v-container>
+      <v-btn type="submit" color="primary" variant="flat" class="mt-2" :loading="loading"
+        :disabled="loading || !form.title || !form.slug || !form.content">
+        Update
+      </v-btn>
+    </v-form>
+  </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, watchEffect } from 'vue'
 import axios from '@/plugins/axios'
-import { useRoute } from 'vue-router'
-
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
 
 // Reactive form data
 const form = reactive({
@@ -50,6 +48,22 @@ const form = reactive({
   content: '',
   image: null,
   imagePreview: null,
+})
+
+watchEffect(() => {
+  fetch(`${process.env.VUE_APP_API_BASE_URL}user/blog/${route.params.id}`)
+    .then(res => res.json()).then(res => {
+      if (res) {
+        form.title = res.title;
+        form.slug = res.slug;
+        form.content = res.content;
+        form.imagePreview = res.image
+        // Make sure editor is initialized before setting content
+        if (editor.value) {
+          editor.value.commands.setContent(res.content)
+        }
+      }
+    })
 })
 
 // Loading state for submit button
@@ -65,18 +79,15 @@ const editor = useEditor({
 })
 
 // Auto-generate slug when title changes (unless manually edited)
-watch(
-  () => form.title,
-  (newTitle) => {
-    if (!form.slugEdited) {
-      form.slug = newTitle
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '') // Remove invalid chars
-        .trim()
-        .replace(/\s+/g, '-') // Replace spaces with hyphens
-    }
+watch(() => form.title, (newTitle) => {
+  if (!form.slugEdited) {
+    form.slug = newTitle
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove invalid chars
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
   }
-)
+})
 
 // Mark slug as manually edited to stop auto generation
 function onSlugInput() {
@@ -84,28 +95,20 @@ function onSlugInput() {
 }
 
 // Handle image input change and generate preview
-function onImageChange(file) {
-  form.image = file
+function onImageChange(event) {
+  const file = event?.target?.files?.[0] || event?.[0]
   if (file && file instanceof File) {
+    form.image = file
+
     const reader = new FileReader()
     reader.onload = (e) => {
       form.imagePreview = e.target.result
     }
     reader.readAsDataURL(file)
   } else {
+    form.image = null
     form.imagePreview = null
   }
-}
-
-// Reset form after successful submission
-function resetForm() {
-  form.title = ''
-  form.slug = ''
-  form.slugEdited = false
-  form.content = ''
-  form.image = null
-  form.imagePreview = null
-  editor.commands.setContent('<p></p>')
 }
 
 // Submit form data to API
@@ -126,15 +129,14 @@ async function handleSubmit() {
   }
 
   try {
-    const response = await axios.post('/blogs', payload, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await axios.patch(`${process.env.VUE_APP_API_BASE_URL}admin/blog/${route.params.id}`, payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
 
     if (response.status === 200) {
-      alert('Blog submitted successfully!')
-      resetForm()
+      // alert('Blog submitted successfully!')
+      // resetForm()
+      router.push('/blogs/list')
     } else {
       alert('Failed to submit blog. Please try again.')
       console.error('Failed to submit blog:', response)
@@ -156,5 +158,9 @@ async function handleSubmit() {
   margin-bottom: 20px;
   width: 100%;
   min-height: 160px;
+}
+
+.preview {
+  aspect-ratio: 16/9;
 }
 </style>

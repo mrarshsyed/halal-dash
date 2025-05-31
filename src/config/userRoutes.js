@@ -592,7 +592,7 @@ export const routes = [
         }
       },
       {
-        path: 'edit',
+        path: ':id/edit',
         component: () => import('@/views/blogs/edit/View.vue'),
         meta: {
           requiresAuth: true,
