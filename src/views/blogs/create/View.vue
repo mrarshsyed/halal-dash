@@ -22,7 +22,7 @@
 
         <!-- Preview Image -->
         <div v-if="form.imagePreview" class="mb-4">
-          <v-img :src="form.imagePreview" max-width="100%" height="200px" cover></v-img>
+          <v-img :src="form.imagePreview" height="200px" class="preview"></v-img>
         </div>
 
         <v-btn type="submit" color="primary" variant="flat" class="mt-2" :loading="loading"
@@ -37,9 +37,11 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import axios from '@/plugins/axios'
-
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Reactive form data
 const form = reactive({
@@ -83,28 +85,20 @@ function onSlugInput() {
 }
 
 // Handle image input change and generate preview
-function onImageChange(file) {
-  form.image = file
+function onImageChange(event) {
+  const file = event?.target?.files?.[0] || event?.[0]
   if (file && file instanceof File) {
+    form.image = file
+
     const reader = new FileReader()
     reader.onload = (e) => {
       form.imagePreview = e.target.result
     }
     reader.readAsDataURL(file)
   } else {
+    form.image = null
     form.imagePreview = null
   }
-}
-
-// Reset form after successful submission
-function resetForm() {
-  form.title = ''
-  form.slug = ''
-  form.slugEdited = false
-  form.content = ''
-  form.image = null
-  form.imagePreview = null
-  editor.commands.setContent('<p></p>')
 }
 
 // Submit form data to API
@@ -125,15 +119,16 @@ async function handleSubmit() {
   }
 
   try {
-    const response = await axios.post('/blogs', payload, {
+    const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/admin/blog`, payload, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'multipart/form-data'
       },
     })
 
     if (response.status === 200) {
-      alert('Blog submitted successfully!')
-      resetForm()
+      // alert('Blog submitted successfully!')
+      // resetForm()
+      router.push('/blogs/list')
     } else {
       alert('Failed to submit blog. Please try again.')
       console.error('Failed to submit blog:', response)
@@ -155,5 +150,8 @@ async function handleSubmit() {
   margin-bottom: 20px;
   width: 100%;
   min-height: 160px;
+}
+.preview{
+  aspect-ratio: 16/9;
 }
 </style>
