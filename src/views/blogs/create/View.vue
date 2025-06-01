@@ -39,21 +39,21 @@
       <!-- Estimated Reading Time -->
       <div class="mt-4">
         <label for="estimated_reading_time" class="block mb-1 font-medium">Estimated Reading Time</label>
-        <input id="estimated_reading_time" name="estimated_reading_time" v-model="form.estimated_reading_time" required
+        <input id="estimated_reading_time" name="estimated_reading_time" v-model="form.estimated_reading_time"
           type="number" placeholder="e.g. 5 minutes" class="form-input border" />
       </div>
 
       <!-- Meta Description -->
       <div class="mt-4">
         <label for="meta_description" class="block mb-1 font-medium">Meta Description</label>
-        <textarea id="meta_description" name="meta_description" v-model="form.meta_description" required type="text"
+        <textarea id="meta_description" name="meta_description" v-model="form.meta_description" type="text"
           placeholder="Meta Description" class="form-input border" />
       </div>
 
       <!-- Tags -->
       <div class="mt-4">
         <label for="tags" class="block mb-1 font-medium">Tags</label>
-        <input id="tags" name="tags" v-model="form.tags" required type="text" placeholder="Tags separated by comma"
+        <input id="tags" name="tags" v-model="form.tags" type="text" placeholder="Tags separated by comma"
           class="form-input border" />
       </div>
 
