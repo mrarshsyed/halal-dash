@@ -50,7 +50,7 @@
           placeholder="Meta Description" class="form-input border" />
       </div>
 
-      <!-- Meta Description -->
+      <!-- Tags -->
       <div class="mt-4">
         <label for="tags" class="block mb-1 font-medium">Tags</label>
         <input id="tags" name="tags" v-model="form.tags" required type="text" placeholder="Tags separated by comma"
@@ -108,19 +108,20 @@ import axios from '@/plugins/axios'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { useRouter } from 'vue-router'
+import { makeSlug } from '@/utils/slug'
 
 const router = useRouter()
 
 // Reactive form data
 const form = reactive({
   title: '',
-  slug: '',
   slugEdited: false,
+  slug: '',
   content: '',
   category: '',
   tags: '',
-  image: null,
-  featured: false,
+  featured: "",
+  image: "",
   estimated_reading_time: "",
   imagePreview: null,
 })
@@ -136,14 +137,6 @@ const editor = useEditor({
     form.content = editor.getHTML()
   },
 })
-
-const makeSlug = (str) => {
-  return (str || "")
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove invalid chars
-    .trim()
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-}
 
 // Auto-generate slug when title changes (unless manually edited)
 watch(
@@ -200,8 +193,6 @@ async function handleSubmit(e) {
     })
 
     if (response.status === 200) {
-      // alert('Blog submitted successfully!')
-      // resetForm()
       router.push('/blogs/list')
     } else {
       alert('Failed to submit blog. Please try again.')
