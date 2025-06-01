@@ -13,7 +13,7 @@
 
       <v-spacer />
 
-      <v-btn variant="text" icon="mdi-theme-light-dark" @click="toggleTheme" />
+      <!-- <v-btn variant="text" icon="mdi-theme-light-dark" @click="toggleTheme" /> -->
       <v-btn
         v-if="!store.getUser"
         text="Login"
@@ -77,7 +77,7 @@
     <v-main>
       <v-container style="max-width: 1000px">
         <v-progress-linear v-if="loading" indeterminate color="primary" />
-        <v-card class="pa-4 overflow-scroll">
+        <v-card class="pa-4 overflow-scroll+">
           <slot />
         </v-card>
         <v-progress-linear v-if="loading" indeterminate color="primary" />

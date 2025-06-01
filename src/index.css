@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .form-input {
+    @apply w-full px-4 py-2 !border-gray-300 rounded-lg focus:outline-none;
+  }
+
+  /* Content Input */
+  .tiptap.ProseMirror {
+    @apply px-4 py-2 rounded-lg border border-gray-300 mb-4 focus:outline-none;
+    width: 100%;
+    min-height: 160px;                                                      
+  }
+}
