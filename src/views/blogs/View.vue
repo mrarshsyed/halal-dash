@@ -1,14 +1,25 @@
 <template>
   <h2 class="section-title">Blogs</h2>
   <div class="blogs">
-    <div v-for="blog in blogs" :key="blog.slug" class="blog-card flex flex-col">
+    <div v-for="blog in blogs" :key="blog.slug" class="blog-card flex flex-col relative">
+      <div v-if="blog.featured == 'on' || blog.featured"
+        class="absolute right-0 top-0 bg-primary text-white py-0.5 px-2 rounded-bl-xl">Featured</div>
       <a :href="`${VITE_URL}/blogs/${blog.slug}`" target="_blank" rel="noopener noreferrer">
         <img :src="blog.image" alt="Blog Image" class="blog-image" />
       </a>
-      <a :href="`${VITE_URL}/blogs/${blog.slug}`" target="_blank" rel="noopener noreferrer"
-        class="blog-title px-4 mt-2">{{ blog.title }}</a>
+      <a :href="`${VITE_URL}/blogs/${blog.slug}`" target="_blank" rel="noopener noreferrer" class="blog-title px-4 mt-2"
+        :title="JSON.stringify(blog, null, 2)">{{ blog.title }}</a>
       <div class="grow px-4">
         <p class="blog-text line-clamp-2" v-html="blog.content"></p>
+      </div>
+      <div class="px-4 mt-2" v-if="blog.category">
+        <strong>Category</strong>: {{ blog.category }}
+      </div>
+      <div class="px-4 mt-2" v-if="blog.tags">
+        <strong>Tags</strong>: {{ blog.tags?.join(', ') }}
+      </div>
+      <div class="px-4 mt-2" v-if="blog.estimated_reading_time">
+        <strong>Estimated Reading Time</strong>: {{ blog.estimated_reading_time }}
       </div>
       <div class="blog-actions px-4 mt-4 mb-4">
         <router-link :to="`${blog._id}/edit`">
