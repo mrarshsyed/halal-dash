@@ -13,15 +13,15 @@
       <!-- Slug -->
       <div class="mt-4">
         <label for="slug" class="block mb-1 font-medium">Slug</label>
-        <input id="slug" name="slug" v-model="form.slug" @input="onSlugInput" required type="text"
+        <input id="slug" name="slug" :value="form.slug" @input="onSlugInput" required type="text"
           placeholder="Enter slug" class="form-input border" />
       </div>
 
       <!-- Category -->
       <div class="mt-4">
         <label for="category" class="block mb-1 font-medium">Category</label>
-        <select id="category" name="category" v-model="form.category" @input="onSlugInput" required type="text"
-          placeholder="Enter slug" class="form-input border capitalize">
+        <select id="category" name="category" v-model="form.category" required type="text"
+          class="form-input border capitalize">
           <option value="">Category</option>
           <option value="destinations">destinations</option>
           <option value="halal_foods">halal foods</option>
@@ -53,8 +53,16 @@
       <!-- Tags -->
       <div class="mt-4">
         <label for="tags" class="block mb-1 font-medium">Tags</label>
-        <input id="tags" name="tags" v-model="form.tags" type="text" placeholder="Tags separated by comma"
-          class="form-input border" />
+        <div class="form-input border flex flex-wrap gap-2">
+          <span v-for="tag in form.tags" :key="tag"
+            class="px-2 py-0.5 bg-gray-200 rounded inline-flex items-center gap-2">
+            <input type="hidden" name="tags" :value="tag" />
+            {{ tag }}
+            <button type="button" @click="removeTag(tag)">x</button>
+          </span>
+          <input type="text" placeholder="Tags separated by comma" @blur="addTag" @keyup.enter="addTag"
+            class="focus:outline-none grow" />
+        </div>
       </div>
 
       <!-- Featured Checkbox -->
@@ -120,7 +128,7 @@ const form = reactive({
   slug: '',
   content: '',
   category: '',
-  tags: '',
+  tags: [],
   featured: "",
   image: "",
   estimated_reading_time: "",
@@ -167,8 +175,10 @@ watch(() => form.title, (newTitle) => {
 })
 
 // Mark slug as manually edited to stop auto generation
-function onSlugInput() {
+function onSlugInput(e) {
   form.slugEdited = true
+  const value = e.target.value
+  form.slug = makeSlug(value)
 }
 
 // Handle image input change and generate preview
@@ -200,9 +210,16 @@ async function handleSubmit(e) {
   loading.value = true
 
   const payload = new FormData(e.target)
-  payload.append('slug', makeSlug(form.slug))
-  payload.append('estimated_reading_time', Number(form.estimated_reading_time))
-  payload.append('tags', form.tags.split(',').map(tag => tag.trim()))
+  const data = {
+    title: form.title,
+    slug: form.slug,
+    category: form.category,
+    tags: form.tags,
+    featured: form.featured,
+    estimated_reading_time: form.estimated_reading_time,
+    content: form.content
+  }
+  payload.append('data', JSON.stringify(data))
   payload.append('content', form.content)
 
   try {

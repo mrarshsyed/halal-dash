@@ -1,19 +1,20 @@
 <template>
   <h2 class="section-title">Blogs</h2>
   <div class="blogs">
-    <div v-for="blog in blogs" :key="blog.slug" class="blog-card">
+    <div v-for="blog in blogs" :key="blog.slug" class="blog-card flex flex-col">
       <a :href="`${VITE_URL}/blogs/${blog.slug}`" target="_blank" rel="noopener noreferrer">
         <img :src="blog.image" alt="Blog Image" class="blog-image" />
       </a>
-      <div class="blog-content">
-        <h3 class="blog-title">{{ blog.title }}</h3>
-        <div class="blog-text" v-html="blog.content"></div>
-        <div class="blog-actions">
-          <router-link :to="`${blog._id}/edit`">
-            <v-btn color="primary">Edit</v-btn>
-          </router-link>
-          <v-btn @click="deleteBlog(blog._id)" color="error">Delete</v-btn>
-        </div>
+      <a :href="`${VITE_URL}/blogs/${blog.slug}`" target="_blank" rel="noopener noreferrer"
+        class="blog-title px-4 mt-2">{{ blog.title }}</a>
+      <div class="grow px-4">
+        <p class="blog-text line-clamp-2" v-html="blog.content"></p>
+      </div>
+      <div class="blog-actions px-4 mt-4 mb-4">
+        <router-link :to="`${blog._id}/edit`">
+          <v-btn color="primary">Edit</v-btn>
+        </router-link>
+        <v-btn @click="deleteBlog(blog._id)" color="error">Delete</v-btn>
       </div>
     </div>
   </div>
