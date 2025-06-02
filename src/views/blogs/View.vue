@@ -18,8 +18,8 @@
       <div class="px-4 mt-2" v-if="blog.tags">
         <strong>Tags</strong>: {{ blog.tags?.join(', ') }}
       </div>
-      <div class="px-4 mt-2" v-if="blog.estimated_reading_time">
-        <strong>Estimated Reading Time</strong>: {{ blog.estimated_reading_time }}
+      <div class="px-4 mt-2" v-if="blog.estimatedReadingTime">
+        <strong>Estimated Reading Time</strong>: {{ blog.estimatedReadingTime }}
       </div>
       <div class="blog-actions px-4 mt-4 mb-4">
         <router-link :to="`${blog._id}/edit`">
