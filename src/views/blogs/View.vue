@@ -22,7 +22,7 @@
         <strong>Estimated Reading Time</strong>: {{ blog.estimatedReadingTime }}
       </div>
       <div class="blog-actions px-4 mt-4 mb-4">
-        <router-link :to="`${blog._id}/edit`">
+        <router-link :to="`${blog.slug}/edit`">
           <v-btn color="primary">Edit</v-btn>
         </router-link>
         <v-btn @click="deleteBlog(blog._id)" color="error">Delete</v-btn>
