@@ -53,7 +53,7 @@
             {{ tag }}
             <button type="button" @click="form.tags = form.tags.filter(t => t !== tag)">x</button>
           </span>
-          <input type="text" placeholder="Tag" id="tags" @blur="addTag" @keyup.enter="addTag"
+          <input type="text" placeholder="Tag" id="tags" @blur="addTag" @keyup.enter.prevent="addTag"
             class="focus:outline-none grow" />
         </div>
       </div>
@@ -100,15 +100,8 @@
         <!-- Meta Title -->
         <div class="">
           <label for="seoMetaTitle" class="block mb-1 font-medium">SEO Meta Title</label>
-          <input id="seoMetaTitle" name="seoMetaTitle" v-model="form.seoMetaDescription" type="text"
-            placeholder="Meta Title" class="form-input border" />
-        </div>
-
-        <!-- Meta Robots -->
-        <div class="mt-4">
-          <label for="seoMetaRobots" class="block mb-1 font-medium">SEO Meta Robots</label>
-          <input id="seoMetaRobots" name="seoMetaRobots" v-model="form.seoMetaRobots" type="text"
-            placeholder="index, follow" class="form-input border" />
+          <input id="seoMetaTitle" name="seoMetaTitle" v-model="form.seoMetaTitle" type="text" placeholder="Meta Title"
+            class="form-input border" />
         </div>
 
         <!-- Meta Description -->
@@ -116,6 +109,13 @@
           <label for="seoMetaDescription" class="block mb-1 font-medium">SEO Meta Description</label>
           <textarea id="seoMetaDescription" name="seoMetaDescription" v-model="form.seoMetaDescription"
             placeholder="Meta Description" class="form-input border" />
+        </div>
+
+        <!-- Meta Robots -->
+        <div class="mt-4">
+          <label for="seoMetaRobots" class="block mb-1 font-medium">SEO Meta Robots</label>
+          <input id="seoMetaRobots" name="seoMetaRobots" v-model="form.seoMetaRobots" type="text"
+            placeholder="index, follow" class="form-input border" />
         </div>
 
         <!-- Meta Keywords -->
@@ -129,8 +129,8 @@
               <button type="button"
                 @click="form.seoMetaKeywords = form.seoMetaKeywords.filter(t => t !== keyword)">x</button>
             </span>
-            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @blur="addKeyword" @keyup.enter="addKeyword"
-              class="focus:outline-none grow" />
+            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @blur="addKeyword"
+              @keyup.enter.prevent="addKeyword" class="focus:outline-none grow" />
           </div>
         </div>
 
@@ -142,7 +142,8 @@
             'flex flex-col items-center justify-center'
           ]">
             <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif"
-              class="opacity-0 absolute inset-0 cursor-pointer" name="seoImage" id="seoImage" @change="onMetaImageChange" />
+              class="opacity-0 absolute inset-0 cursor-pointer" name="seoImage" id="seoImage"
+              @change="onMetaImageChange" />
             <div class="flex flex-col items-center justify-center text-gray-500 group-hover:text-blue-500">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -299,14 +300,14 @@ async function handleSubmit(e) {
 
   loading.value = true
 
-  const payload = new FormData(e.target)
+  const payload = new FormData()
   const data = {
     title: form.title,
     slug: form.slug,
     category: form.category,
     tags: form.tags,
-    featured: form.featured,
-    isDraft: form.isDraft,
+    featured: form.featured == 'on' ? true : false,
+    isDraft: form.isDraft == 'on' ? true : false,
     estimatedReadingTime: form.estimatedReadingTime,
     content: form.content,
     seoMetaTitle: form.seoMetaTitle,
@@ -314,8 +315,9 @@ async function handleSubmit(e) {
     seoMetaKeywords: form.seoMetaKeywords,
     seoMetaRobots: form.seoMetaRobots,
   }
-  payload.append('content', form.content)
   payload.append('data', JSON.stringify(data))
+  payload.append('image', form.image)
+  payload.append('seoImage', form.seoImage)
 
   try {
     const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/admin/blog`, payload, {
