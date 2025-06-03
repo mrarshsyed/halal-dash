@@ -65,7 +65,13 @@ export const permissions = {
   transferOrder: 'transfer_order-all',
 
   // custom holiday
-  customHoliday: 'full_holiday_package-all'
+  customHoliday: 'full_holiday_package-all',
+
+  // blogs
+  blogAll: 'blog-all',
+  blogCreate: 'blog-create',
+  blogUpdate: 'blog-update',
+  blogDelete: 'blog-delete',
 }
 
 export const routes = [
@@ -534,7 +540,7 @@ export const routes = [
     component: () => import('@/views/CustomHoliday.vue'),
     meta: {
       requiresAuth: true,
-      role: ['super-admin','admin','employee'],
+      role: ['super-admin', 'admin', 'employee'],
       permissions: [permissions.customHoliday]
     }
   },
@@ -556,6 +562,44 @@ export const routes = [
           permissions: ['']
         }
       }
+    ]
+  },
+  {
+    path: '/blogs',
+    name: 'blogs',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/blogs/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/blogs/create/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: ':slug/edit',
+        component: () => import('@/views/blogs/edit/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
     ]
   }
 ]
@@ -952,7 +996,7 @@ export const navLinks = [
     value: 'custom-holiday',
     icon: 'oil-temperature',
     to: '/custom-holiday',
-    role: ['super-admin','admin','employee'],
+    role: ['super-admin', 'admin', 'employee'],
     children: [],
     permissions: [permissions.customHoliday,]
   },
@@ -972,7 +1016,37 @@ export const navLinks = [
         permissions: [permissions.profitSettings]
       }
     ]
-  }
+  },
+  {
+    title: 'Blogs',
+    value: 'blogs',
+    icon: 'post',
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [
+      permissions.blogAll,
+      permissions.blogCreate,
+      permissions.blogUpdate,
+      permissions.blogDelete,
+    ],
+    children: [
+      {
+        icon: 'view-list',
+        title: 'List',
+        to: '/blogs/list',
+        value: 'blogs-list',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.blogAll]
+      },
+      {
+        icon: 'post',
+        title: 'Create',
+        to: '/blogs/create',
+        value: 'blogs-create',
+        role: ['super-admin'],
+        permissions: [permissions.blogCreate]
+      },
+    ]
+  },
 ]
 
 export const userCreatePermissions = [
@@ -1112,7 +1186,7 @@ export const userCreatePermissions = [
         title: 'Enquiry',
         value: permissions.holidayEnquiry
       },
-      {title: 'Custom Holiday Order',value: permissions.customHoliday}
+      { title: 'Custom Holiday Order', value: permissions.customHoliday }
 
     ]
   },
@@ -1143,6 +1217,20 @@ export const userCreatePermissions = [
         value: permissions.transferOrder
       }
     ]
+  },
+  {
+    title: 'Blogs',
+    value: permissions.blogAll,
+    children: [
+      {
+        title: 'List',
+        value: permissions.blogAll
+      },
+      {
+        title: 'Create',
+        value: permissions.blogCreate
+      },
+    ]
   }
 ]
 
@@ -1152,10 +1240,10 @@ export const managerCreatePermissions = [
 
   { title: 'Activity', value: permissions.activityList },
   { title: 'Activity Halal Rating Update', value: permissions.activityUpdateHalalRatings },
-  
+
   { title: 'Cruise', value: permissions.cruiseShip },
   { title: 'Cruise Halal Rating Update', value: permissions.cruiseUpdateHalalRatings },
-  
+
   { title: 'Restaurant', value: permissions.restaurantRestaurant },
   { title: 'Restaurant Halal Rating Update', value: permissions.restaurantUpdateHalalRatings }
 ]
