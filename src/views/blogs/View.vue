@@ -72,26 +72,30 @@ const goToPage = (page) => {
   }
 }
 
-watchEffect(() => {
-  axios.get(`/user/blog?page=${currentPage}&perPage=${itemsPerPage}`).then(({ data }) => {
+async function fetchBlogs() {
+  try {
+    const response = await axios.get(`/user/blog`, {
+      params: {
+        page: currentPage,
+        perPage: itemsPerPage,
+      },
+    });
+
+    const data = response.data;
+
     if (data) {
-      blogs.value = data.data;
+      blogs.value = (data.data || []).sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
       totalBlogs.value = data.total;
     }
-  })
-})
-
-watch(
-  () => route.query.page,
-  () => {
-    axios.get(`/user/blog?page=${currentPage}&perPage=${itemsPerPage}`).then(({ data }) => {
-      if (data) {
-        blogs.value = data.data;
-        totalBlogs.value = data.total;
-      }
-    })
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    // Optionally: show a toast or error UI
   }
-)
+}
+watchEffect(fetchBlogs)
+watch(() => route.query.page, fetchBlogs)
 </script>
 
 <style scoped>
