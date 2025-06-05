@@ -32,24 +32,26 @@
 
   <!-- Pagination Controls -->
   <div class="pagination">
-    <a :href="`?page=${1}`" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Prev</a>
+    <RouterLink :to="`?page=${currentPage - 1}`" v-if="currentPage > 1">Prev</RouterLink>
 
-    <a :key="page" :href="`?page=${page}`" v-for="page in totalPages" @click="goToPage(page)"
-      :class="{ active: currentPage === page }">{{ page }}</a>
+    <RouterLink :key="page" :to="`?page=${page}`" v-for="page in totalPages" @click="goToPage(page)"
+      :class="{ active: currentPage === page }">{{ page }}</RouterLink>
 
-    <a :href="`?page=${1}`" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</a>
+    <RouterLink :to="`?page=${currentPage + 1}`" v-if="currentPage < totalPages">Next</RouterLink>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { watchEffect } from 'vue'
 import axios from '@/plugins/axios'
+import { RouterLink, useRoute } from 'vue-router'
 
 const VITE_URL = import.meta.env.VITE_URL
 const API_URL = process.env.VUE_APP_API_BASE_URL
 // Simulate a larger list of blogs (add more if needed)
 const blogs = ref(null)
+const totalBlogs = ref(null)
 
 const deleteBlog = (id) => {
   axios.delete(`${API_URL}admin/blog/${id}`).then(res => {
@@ -59,26 +61,41 @@ const deleteBlog = (id) => {
   })
 }
 
+const route = useRoute()
 const itemsPerPage = 10
-const currentPage = ref(1)
-
-const totalPages = computed(() => Math.ceil(blogs.value.length / itemsPerPage))
+const currentPage = route.query.page ? parseInt(route.query.page) : 1
+const totalPages = computed(() => Math.ceil(totalBlogs.value / itemsPerPage))
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
+    route.query.page = page
   }
 }
 
-watchEffect(() => {
-  axios.get(`/user/blog`).then(res => {
-    res = res.data; // for axios
-    if (res) {
-      const { data, firstPage, from, hasNextPage, lastPage, perPage, to, total } = res;
-      blogs.value = data
+async function fetchBlogs() {
+  try {
+    const response = await axios.get(`/user/blog`, {
+      params: {
+        page: currentPage,
+        perPage: itemsPerPage,
+      },
+    });
+
+    const data = response.data;
+
+    if (data) {
+      blogs.value = (data.data || []).sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+      totalBlogs.value = data.total;
     }
-  })
-})
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    // Optionally: show a toast or error UI
+  }
+}
+watchEffect(fetchBlogs)
+watch(() => route.query.page, fetchBlogs)
 </script>
 
 <style scoped>

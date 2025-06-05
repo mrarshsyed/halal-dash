@@ -53,7 +53,7 @@
             {{ tag }}
             <button type="button" @click="form.tags = form.tags.filter(t => t !== tag)">x</button>
           </span>
-          <input type="text" placeholder="Tag" id="tags" @blur="addTag" @keyup.enter.prevent="addTag"
+          <input type="text" placeholder="Tag" id="tags" @keypress="addTag"
             class="focus:outline-none grow" />
         </div>
       </div>
@@ -127,10 +127,10 @@
               <input type="hidden" name="seoMetaKeywords" :value="keyword" />
               {{ keyword }}
               <button type="button"
-                @click="form.seoMetaKeywords = form.seoMetaKeywords.filter(t => t !== keyword)">x</button>
+                @click="form.seoMetaKeywords = form.seoMetaKeywords?.filter(t => t !== keyword)">x</button>
             </span>
-            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @blur="addKeyword"
-              @keyup.enter.prevent="addKeyword" class="focus:outline-none grow" />
+            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @keypress="addKeyword"
+              class="focus:outline-none grow" />
           </div>
         </div>
 
@@ -208,21 +208,25 @@ const form = reactive({
 })
 
 function addTag(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.tags.includes(e.target.value)) {
-      form.tags.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.tags.includes(value)) {
+      form.tags?.push(value);
+      e.target.value = '';
     }
   }
 }
 
 function addKeyword(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.seoMetaKeywords.includes(e.target.value)) {
-      form.seoMetaKeywords.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.seoMetaKeywords.includes(value)) {
+      form.seoMetaKeywords?.push(value);
+      e.target.value = '';
     }
   }
 }
