@@ -32,12 +32,12 @@
 
   <!-- Pagination Controls -->
   <div class="pagination">
-    <RouterLink :to="`?page=${currentPage - 1}`" :disabled="currentPage === 1">Prev</RouterLink>
+    <RouterLink :to="`?page=${currentPage - 1}`" v-if="currentPage > 1">Prev</RouterLink>
 
     <RouterLink :key="page" :to="`?page=${page}`" v-for="page in totalPages" @click="goToPage(page)"
       :class="{ active: currentPage === page }">{{ page }}</RouterLink>
 
-    <RouterLink :to="`?page=${currentPage + 1}`" :disabled="currentPage === totalPages">Next</RouterLink>
+    <RouterLink :to="`?page=${currentPage + 1}`" v-if="currentPage < totalPages">Next</RouterLink>
   </div>
 </template>
 
