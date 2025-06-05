@@ -20,8 +20,7 @@
       <!-- Category -->
       <div class="mt-4">
         <label for="category" class="block mb-1 font-medium">Category</label>
-        <select id="category" name="category" v-model="form.category" type="text"
-          class="form-input border capitalize">
+        <select id="category" name="category" v-model="form.category" type="text" class="form-input border capitalize">
           <option value="">Category</option>
           <option value="destinations">destinations</option>
           <option value="halal_foods">halal foods</option>
@@ -60,8 +59,7 @@
             {{ tag }}
             <button type="button" @click="form.tags = form.tags.filter(t => t !== tag)">x</button>
           </span>
-          <input type="text" placeholder="Tag" id="tags" @blur="addTag" @keyup.enter.prevent="addTag"
-            class="focus:outline-none grow" />
+          <input type="text" placeholder="Tag" id="tags" @keypress="addTag" class="focus:outline-none grow" />
         </div>
       </div>
 
@@ -136,8 +134,8 @@
               <button type="button"
                 @click="form.seoMetaKeywords = form.seoMetaKeywords.filter(t => t !== keyword)">x</button>
             </span>
-            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @blur="addKeyword"
-              @keyup.enter.prevent="addKeyword" class="focus:outline-none grow" />
+            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @keypress="addKeyword"
+              class="focus:outline-none grow" />
           </div>
         </div>
 
@@ -248,21 +246,25 @@ watchEffect(() => {
 })
 
 function addTag(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.tags.includes(e.target.value)) {
-      form.tags.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.tags.includes(value)) {
+      form.tags?.push(value);
+      e.target.value = '';
     }
   }
 }
 
 function addKeyword(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.seoMetaKeywords.includes(e.target.value)) {
-      form.seoMetaKeywords.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.seoMetaKeywords.includes(value)) {
+      form.seoMetaKeywords?.push(value);
+      e.target.value = '';
     }
   }
 }
