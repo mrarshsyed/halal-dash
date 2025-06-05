@@ -171,8 +171,8 @@
       <div class="mt-4">
         <button type="submit" :disabled="loading || !form.title || !form.slug || !form.content"
           class="bg-primary text-white px-6 py-2 rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed">
-          <span v-if="!loading">Publish</span>
-          <span v-else>Publishing...</span>
+          <span v-if="!loading">Update</span>
+          <span v-else>Updating...</span>
         </button>
       </div>
     </form>
