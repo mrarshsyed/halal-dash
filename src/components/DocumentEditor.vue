@@ -103,6 +103,7 @@ watch(
 :deep(.ck-content) {
   height: v-bind(height);
 }
+
 :deep(.ck-toolbar) {
   background: rgb(249 250 251 / 1) !important;
 }

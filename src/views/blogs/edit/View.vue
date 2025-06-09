@@ -20,7 +20,7 @@
       <!-- Category -->
       <div class="mt-4">
         <label for="category" class="block mb-1 font-medium">Category</label>
-        <select id="category" name="category" v-model="form.category" type="text" class="form-input border capitalize">
+        <select id="category" name="category" v-model="form.category" class="form-input border capitalize">
           <option value="">Category</option>
           <option value="destinations">destinations</option>
           <option value="halal_foods">halal foods</option>
@@ -31,8 +31,9 @@
       <!-- Content -->
       <div class="mt-4">
         <label for="content" class="block mb-1 font-medium">Content</label>
-        <editor-menu-bar v-if="editor" :editor="editor" />
-        <editor-content :editor="editor" name="content" />
+        <!-- <editor-menu-bar v-if="editor" :editor="editor" />
+        <editor-content :editor="editor" name="content" /> -->
+        <DocumentEditor v-if="contentReady" height="200px" v-model="content" class="mb-4" />
       </div>
 
       <!-- Estimated Reading Time -->
@@ -180,12 +181,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, watchEffect } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import axios from '@/plugins/axios'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { useRouter, useRoute } from 'vue-router'
 import { makeSlug } from '@/utils/slug'
+import DocumentEditor from '@/components/DocumentEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -213,8 +215,10 @@ const form = reactive({
   metaImagePreview: null,
 })
 const blogId = ref(null)
+const content = ref("")
+const contentReady = ref(false)
 
-watchEffect(() => {
+onMounted(() => {
   axios.get(`admin/blog/${route.params.slug}`)
     .then(res => {
       const data = res.data
@@ -222,6 +226,10 @@ watchEffect(() => {
         form.title = data.title;
         form.slug = data.slug;
         form.content = data.content;
+
+        content.value = data.content;
+        contentReady.value = true
+
         form.category = data.category;
         form.estimatedReadingTime = data.estimatedReadingTime;
         form.tags = data.tags;
@@ -353,7 +361,7 @@ async function handleSubmit(e) {
     featured: form.featured == 'on' ? true : false,
     isDraft: form.isDraft == 'on' ? true : false,
     estimatedReadingTime: form.estimatedReadingTime,
-    content: form.content,
+    content: content.value || form.content,
     seoMetaTitle: form.seoMetaTitle,
     seoMetaDescription: form.seoMetaDescription,
     seoMetaKeywords: form.seoMetaKeywords,

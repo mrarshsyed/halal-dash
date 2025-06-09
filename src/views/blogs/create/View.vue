@@ -20,8 +20,7 @@
       <!-- Category -->
       <div class="mt-4">
         <label for="category" class="block mb-1 font-medium">Category</label>
-        <select id="category" name="category" v-model="form.category" required type="text"
-          class="form-input border capitalize">
+        <select id="category" name="category" v-model="form.category" required class="form-input border capitalize">
           <option value="">Category</option>
           <option value="destinations">destinations</option>
           <option value="halal_foods">halal foods</option>
@@ -32,8 +31,9 @@
       <!-- Content -->
       <div class="mt-4">
         <label for="content" class="block mb-1 font-medium">Content</label>
-        <editor-menu-bar v-if="editor" :editor="editor" />
-        <editor-content :editor="editor" name="content" />
+        <!-- <editor-menu-bar v-if="editor" :editor="editor" /> -->
+        <!-- <editor-content :editor="editor" name="content" /> -->
+        <DocumentEditor v-if="contentIsReady" height="200px" v-model="content" class="mb-4" />
       </div>
 
       <!-- Estimated Reading Time -->
@@ -53,8 +53,7 @@
             {{ tag }}
             <button type="button" @click="form.tags = form.tags.filter(t => t !== tag)">x</button>
           </span>
-          <input type="text" placeholder="Tag" id="tags" @keypress="addTag"
-            class="focus:outline-none grow" />
+          <input type="text" placeholder="Tag" id="tags" @keypress="addTag" class="focus:outline-none grow" />
         </div>
       </div>
 
@@ -175,12 +174,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import axios from '@/plugins/axios'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { useRouter } from 'vue-router'
 import { makeSlug } from '@/utils/slug'
+import DocumentEditor from '@/components/DocumentEditor.vue'
 
 const router = useRouter()
 
@@ -204,7 +204,14 @@ const form = reactive({
   slugEdited: false,
   // preview
   imagePreview: null,
-  metaImagePreview: null,
+  metaImagePreview: null
+})
+
+const content = ref('')
+const contentIsReady = ref(false)
+
+onMounted(() => {
+  contentIsReady.value = true
 })
 
 function addTag(e) {
@@ -298,7 +305,7 @@ function onMetaImageChange(event) {
 async function handleSubmit(e) {
   e.preventDefault();
 
-  if (!form.title || !form.slug || !form.content) {
+  if (!form.title || !form.slug || !content.value) {
     alert('Please fill in all required fields.')
     return
   }
@@ -314,7 +321,7 @@ async function handleSubmit(e) {
     featured: form.featured == 'on' ? true : false,
     isDraft: form.isDraft == 'on' ? true : false,
     estimatedReadingTime: form.estimatedReadingTime,
-    content: form.content,
+    content: content.value || form.content,
     seoMetaTitle: form.seoMetaTitle,
     seoMetaDescription: form.seoMetaDescription,
     seoMetaKeywords: form.seoMetaKeywords,
