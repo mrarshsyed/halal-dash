@@ -20,8 +20,7 @@
       <!-- Category -->
       <div class="mt-4">
         <label for="category" class="block mb-1 font-medium">Category</label>
-        <select id="category" name="category" v-model="form.category" type="text"
-          class="form-input border capitalize">
+        <select id="category" name="category" v-model="form.category" class="form-input border capitalize">
           <option value="">Category</option>
           <option value="destinations">destinations</option>
           <option value="halal_foods">halal foods</option>
@@ -32,8 +31,9 @@
       <!-- Content -->
       <div class="mt-4">
         <label for="content" class="block mb-1 font-medium">Content</label>
-        <editor-menu-bar v-if="editor" :editor="editor" />
-        <editor-content :editor="editor" name="content" />
+        <!-- <editor-menu-bar v-if="editor" :editor="editor" />
+        <editor-content :editor="editor" name="content" /> -->
+        <DocumentEditor v-if="contentReady" height="200px" v-model="content" class="mb-4" />
       </div>
 
       <!-- Estimated Reading Time -->
@@ -60,8 +60,7 @@
             {{ tag }}
             <button type="button" @click="form.tags = form.tags.filter(t => t !== tag)">x</button>
           </span>
-          <input type="text" placeholder="Tag" id="tags" @blur="addTag" @keyup.enter.prevent="addTag"
-            class="focus:outline-none grow" />
+          <input type="text" placeholder="Tag" id="tags" @keypress="addTag" class="focus:outline-none grow" />
         </div>
       </div>
 
@@ -136,8 +135,8 @@
               <button type="button"
                 @click="form.seoMetaKeywords = form.seoMetaKeywords.filter(t => t !== keyword)">x</button>
             </span>
-            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @blur="addKeyword"
-              @keyup.enter.prevent="addKeyword" class="focus:outline-none grow" />
+            <input type="text" placeholder="SEO Meta Keyword" id="seoMetaKeywords" @keypress="addKeyword"
+              class="focus:outline-none grow" />
           </div>
         </div>
 
@@ -173,8 +172,8 @@
       <div class="mt-4">
         <button type="submit" :disabled="loading || !form.title || !form.slug || !form.content"
           class="bg-primary text-white px-6 py-2 rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed">
-          <span v-if="!loading">Publish</span>
-          <span v-else>Publishing...</span>
+          <span v-if="!loading">Update</span>
+          <span v-else>Updating...</span>
         </button>
       </div>
     </form>
@@ -182,12 +181,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, watchEffect } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import axios from '@/plugins/axios'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { useRouter, useRoute } from 'vue-router'
 import { makeSlug } from '@/utils/slug'
+import DocumentEditor from '@/components/DocumentEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -215,8 +215,10 @@ const form = reactive({
   metaImagePreview: null,
 })
 const blogId = ref(null)
+const content = ref("")
+const contentReady = ref(false)
 
-watchEffect(() => {
+onMounted(() => {
   axios.get(`admin/blog/${route.params.slug}`)
     .then(res => {
       const data = res.data
@@ -224,6 +226,10 @@ watchEffect(() => {
         form.title = data.title;
         form.slug = data.slug;
         form.content = data.content;
+
+        content.value = data.content;
+        contentReady.value = true
+
         form.category = data.category;
         form.estimatedReadingTime = data.estimatedReadingTime;
         form.tags = data.tags;
@@ -248,21 +254,25 @@ watchEffect(() => {
 })
 
 function addTag(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.tags.includes(e.target.value)) {
-      form.tags.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.tags.includes(value)) {
+      form.tags?.push(value);
+      e.target.value = '';
     }
   }
 }
 
 function addKeyword(e) {
-  e.preventDefault();
-  if (e.target.value) {
-    if (!form.seoMetaKeywords.includes(e.target.value)) {
-      form.seoMetaKeywords.push(e.target.value)
-      e.target.value = ''
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    e.preventDefault();
+
+    const value = e.target.value.trim();
+    if (value && !form.seoMetaKeywords.includes(value)) {
+      form.seoMetaKeywords?.push(value);
+      e.target.value = '';
     }
   }
 }
@@ -351,7 +361,7 @@ async function handleSubmit(e) {
     featured: form.featured == 'on' ? true : false,
     isDraft: form.isDraft == 'on' ? true : false,
     estimatedReadingTime: form.estimatedReadingTime,
-    content: form.content,
+    content: content.value || form.content,
     seoMetaTitle: form.seoMetaTitle,
     seoMetaDescription: form.seoMetaDescription,
     seoMetaKeywords: form.seoMetaKeywords,
