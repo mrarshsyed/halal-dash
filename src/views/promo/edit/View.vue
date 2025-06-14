@@ -58,15 +58,13 @@
       <!-- Start Date -->
       <div class="mt-4">
         <label for="startDate" class="block mb-1 font-medium">Start Date</label>
-        <input id="startDate" name="startDate" v-model="form.startDate" type="datetime-local"
-          class="form-input border" />
+        <input id="startDate" name="startDate" v-model="form.startDate" type="date" class="form-input border" />
       </div>
 
       <!-- End Date -->
       <div class="mt-4">
         <label for="endDate" class="block mb-1 font-medium">Expiry Date</label>
-        <input id="endDate" name="expireDate" v-model="form.expireDate" type="datetime-local"
-          class="form-input border" />
+        <input id="endDate" name="expireDate" v-model="form.expireDate" type="date" class="form-input border" />
       </div>
 
       <!-- Applicable To -->
@@ -149,8 +147,8 @@ onMounted(async () => {
       form.minOrderAmount = data.minOrderAmount
       form.usageLimit = data.usageLimit
       form.usageLimitPerUser = data.usageLimitPerUser
-      form.startDate = new Date(data.startDate).toISOString().slice(0, 16)
-      form.expireDate = new Date(data.expireDate).toISOString().slice(0, 16)
+      form.startDate = new Date(data.startDate).toISOString().slice(0, 10)
+      form.expireDate = new Date(data.expireDate).toISOString().slice(0, 10)
       form.applicableModule = data.applicableModule
       form.applicableUsers = data.applicableUsers
       form.active = data.active
