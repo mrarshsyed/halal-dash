@@ -92,7 +92,7 @@ const deletePromo = async (id) => {
   if (!confirm('Are you sure you want to delete this promo code?')) return
 
   try {
-    await axios.delete(`/promo/${id}`)
+    await axios.delete(`admin/settings/price-coupons/${id}`)
     promos.value = promos.value.filter((p) => p._id !== id)
   } catch (err) {
     console.error('Failed to delete promo:', err)

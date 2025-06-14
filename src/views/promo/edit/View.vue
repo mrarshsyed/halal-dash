@@ -150,7 +150,7 @@ onMounted(async () => {
       form.startDate = new Date(data.startDate).toISOString().slice(0, 10)
       form.expireDate = new Date(data.expireDate).toISOString().slice(0, 10)
       form.applicableModule = data.applicableModule
-      form.applicableUsers = data.applicableUsers
+      form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.join(',') : ''
       form.active = data.active
       form.isDraft = data.isDraft
     }
@@ -171,7 +171,7 @@ const handleSubmit = async (e) => {
     fakeApiSubmit(payload)
 
     // If editing an existing promo (e.g. route has an ID), use PUT
-    await axios.put(`admin/settings/price-coupons/${route.params.id}`, payload)
+    await axios.patch(`admin/settings/price-coupons/${route.params.id}`, payload)
     alert('Promo code updated successfully!')
     router.push('/promo/list')
   } catch (err) {
