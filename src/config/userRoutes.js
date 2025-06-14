@@ -636,7 +636,7 @@ export const routes = [
         }
       },
       {
-        path: '/edit/:id',
+        path: 'edit/:id',
         component: () => import('@/views/promo/edit/View.vue'),
         meta: {
           requiresAuth: true,

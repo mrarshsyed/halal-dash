@@ -8,10 +8,10 @@
           <th class="px-4 py-2 border-b whitespace-nowrap">Promo Code</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Type</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Applicable Module</th>
-          <th class="px-4 py-2 border-b whitespace-nowrap">Applicable Users</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Value</th>
+          <th class="px-4 py-2 border-b whitespace-nowrap">Applicable Users</th>
+          <th class="px-4 py-2 border-b whitespace-nowrap">Minimum Order Amount</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Usage Limit</th>
-          <th class="px-4 py-2 border-b whitespace-nowrap">Usage Limit Per User</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Usage Limit Per User</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Status</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Start Date</th>
@@ -24,7 +24,7 @@
         <tr v-for="promo in promos" :key="promo?._id" class="hover:bg-gray-50">
           <td class="px-4 py-2 border-b font-mono uppercase">{{ promo?.promoCode }}</td>
           <td class="px-4 py-2 border-b capitalize">{{ promo?.discountType }}</td>
-          <td class="px-4 py-2 border-b capitalize">{{ promo?.applicableModule }}</td>
+          <td class="px-4 py-2 border-b capitalize">{{ promo?.applicableModule?.join(', ') }}</td>
           <td class="px-4 py-2 border-b">
             {{ promo?.discountValue }}{{ promo?.discountType === 'percentage' ? '%' : 'AED' }}
           </td>
@@ -35,11 +35,12 @@
               </span>
             </template>
           </td>
+          <td class="px-4 py-2 border-b">{{ promo?.minOrderAmount }}</td>
           <td class="px-4 py-2 border-b">{{ promo?.usageLimit }}</td>
           <td class="px-4 py-2 border-b">{{ promo?.usageLimitPerUser }}</td>
           <td class="px-4 py-2 border-b">
-            <span :class="promo?.status ? 'text-green-600 font-medium' : 'text-gray-400'">
-              {{ promo?.status ? 'Active' : 'Inactive' }}
+            <span :class="promo?.active ? 'text-green-600 font-medium' : 'text-gray-400'">
+              {{ promo?.active ? 'Active' : 'Inactive' }}
             </span>
           </td>
           <td class="px-4 py-2 border-b capitalize whitespace-nowrap">
@@ -51,13 +52,15 @@
           <td class="px-4 py-2 border-b capitalize whitespace-nowrap">
             {{ promo?.isVerified ? "Yes" : "No" }}
           </td>
-          <td class="px-4 py-2 border-b text-center flex items-center gap-4">
-            <router-link :to="`/promos/edit/${promo?._id}`" class="text-blue-600 hover:underline">
-              Edit
-            </router-link>
-            <button @click="deletePromo(promo?._id)" class="ml-3 text-red-500 hover:underline">
-              Delete
-            </button>
+          <td class="px-4 py-2 text-center">
+            <div class="flex items-center gap-4">
+              <router-link :to="`/promo/edit/${promo?._id}`" class="text-blue-600 hover:underline">
+                Edit
+              </router-link>
+              <button @click="deletePromo(promo?._id)" class="ml-3 text-red-500 hover:underline">
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
         <tr v-if="promos.length === 0">
