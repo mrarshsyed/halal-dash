@@ -22,7 +22,7 @@
       </thead>
       <tbody>
         <tr v-for="promo in promos" :key="promo?._id" class="hover:bg-gray-50">
-          <td class="px-4 py-2 border-b font-mono uppercase">{{ promo?.promoCode }}</td>
+          <td class="px-4 py-2 border-b font-mono uppercase whitespace-nowrap">{{ promo?.promoCode }}</td>
           <td class="px-4 py-2 border-b capitalize">{{ promo?.discountType }}</td>
           <td class="px-4 py-2 border-b capitalize">{{ promo?.applicableModule?.join(', ') }}</td>
           <td class="px-4 py-2 border-b">
