@@ -72,6 +72,12 @@ export const permissions = {
   blogCreate: 'blog-create',
   blogUpdate: 'blog-update',
   blogDelete: 'blog-delete',
+
+  // promo code
+  promoAll: 'promo-all',
+  promoCreate: 'promo-create',
+  promoUpdate: 'promo-update',
+  promoDelete: 'promo-delete',
 }
 
 export const routes = [
@@ -601,6 +607,44 @@ export const routes = [
         }
       },
     ]
+  },
+  {
+    path: '/promo',
+    name: 'promo',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/promo/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/promo/create/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: 'edit/:id',
+        component: () => import('@/views/promo/edit/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+    ]
   }
 ]
 
@@ -1042,6 +1086,36 @@ export const navLinks = [
         title: 'Create',
         to: '/blogs/create',
         value: 'blogs-create',
+        role: ['super-admin'],
+        permissions: [permissions.blogCreate]
+      },
+    ]
+  },
+  {
+    title: 'Promo Codes',
+    value: 'promo',
+    icon: 'post',
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [
+      permissions.blogAll,
+      permissions.blogCreate,
+      permissions.blogUpdate,
+      permissions.blogDelete,
+    ],
+    children: [
+      {
+        icon: 'view-list',
+        title: 'List',
+        to: '/promo/list',
+        value: 'promo-list',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.blogAll]
+      },
+      {
+        icon: 'post',
+        title: 'Create',
+        to: '/promo/create',
+        value: 'promo-create',
         role: ['super-admin'],
         permissions: [permissions.blogCreate]
       },
