@@ -70,11 +70,13 @@
       <!-- Applicable To -->
       <div class="mt-4">
         <label for="applicableTo" class="block mb-1 font-medium">Applicable To</label>
-        <select id="applicableTo" name="applicableModule" v-model="form.applicableModule" class="form-input border"
-          multiple>
-          <option value="hotels">Hotels</option>
-          <option value="activities">Activities</option>
-          <option value="transfers">Transfers</option>
+        <select id="applicableTo" name="applicableModule" v-model="form.applicableModule" multiple
+          class="form-input border">
+          <option value="hotel">Hotel</option>
+          <option value="activity">Activity</option>
+          <option value="transfer">Transfer</option>
+          <option value="insurance">Insurance</option>
+          <option value="holiday">Holiday</option>
         </select>
       </div>
 
@@ -150,7 +152,7 @@ onMounted(async () => {
       form.startDate = new Date(data.startDate).toISOString().slice(0, 10)
       form.expireDate = new Date(data.expireDate).toISOString().slice(0, 10)
       form.applicableModule = data.applicableModule
-      form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.join(',') : ''
+      form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.map((user) => user?.email).join(',') : ''
       form.active = data.active
       form.isDraft = data.isDraft
     }
