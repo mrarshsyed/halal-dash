@@ -152,7 +152,7 @@ onMounted(async () => {
       form.startDate = new Date(data.startDate).toISOString().slice(0, 10)
       form.expireDate = new Date(data.expireDate).toISOString().slice(0, 10)
       form.applicableModule = data.applicableModule
-      form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.join(',') : ''
+      form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.map((user) => user?.email) : ''
       form.active = data.active
       form.isDraft = data.isDraft
     }
