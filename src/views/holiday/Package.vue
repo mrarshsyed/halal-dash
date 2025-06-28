@@ -43,15 +43,15 @@
         ]" />
       </v-col>
       <v-col cols="12" md="6">
+        <v-text-field v-model="formData.slug" label="Slug Preview" :rules="[(v) => !!v || `Slug is required`]" />
+      </v-col>
+      <v-col cols="12" md="6">
         <v-autocomplete clearable label="Select Currency" :items="currencyList" item-title="name" item-value="_id"
           required :rules="[(v) => !!v || `Currency is required`]" v-model="formData.currency" return-object />
       </v-col>
       <v-col cols="12" md="6">
-        <v-autocomplete clearable label="Select Country" :items="countryList" item-title="country.name" item-value="_id"
-          v-model="formData.country" return-object />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field v-model="formData.slug" label="Slug Preview" readonly />
+        <v-autocomplete clearable label="Select Country" :items="countryList" item-title="name" item-value="_id"
+          :rules="[(v) => !!v || `Country is required`]" v-model="formData.country" return-object />
       </v-col>
       <v-col cols="12">
         <v-textarea v-model="formData.address" label="Address" required
@@ -495,6 +495,7 @@ const save = async () => {
   form.value.validate()
   if (form.value.isValid) {
     const payload = getDataPayload()
+    // console.log(Object.fromEntries(payload.entries()));
     const response = id?.value
       ? await axios.patch(`admin/holiday/packages/${id.value}`, payload)
       : await axios.post('admin/holiday/packages', payload)
@@ -555,9 +556,7 @@ const getCountryList = async () => {
   await axios.get('misc/countries').then((res) => {
     if (res?.data?.length) {
       // countryList.value = res.data
-      const filtered = res.data.map(x => ({
-        country: x.country,
-      }))
+      const filtered = res.data.map(x => x.country)
       countryList.value = filtered
     }
   })
