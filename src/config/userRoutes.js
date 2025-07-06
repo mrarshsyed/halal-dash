@@ -78,6 +78,12 @@ export const permissions = {
   promoCreate: 'promo-create',
   promoUpdate: 'promo-update',
   promoDelete: 'promo-delete',
+
+  // carousel slider
+  sliderAll: 'slider-all',
+  sliderCreate: 'slider-create',
+  sliderUpdate: 'slider-update',
+  sliderDelete: 'slider-delete',
 }
 
 export const routes = [
@@ -645,6 +651,44 @@ export const routes = [
         }
       },
     ]
+  },
+  {
+    path: '/sliders',
+    name: 'sliders',
+    meta: {
+      requiresAuth: true,
+      role: ['super-admin', 'admin', 'employee', 'manager'],
+      permissions: []
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/sliders/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/sliders/create/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+      {
+        path: ':id/edit',
+        component: () => import('@/views/sliders/edit/View.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee', 'manager'],
+          permissions: []
+        }
+      },
+    ]
   }
 ]
 
@@ -1118,6 +1162,36 @@ export const navLinks = [
         value: 'promo-create',
         role: ['super-admin'],
         permissions: [permissions.blogCreate]
+      },
+    ]
+  },
+  {
+    title: 'Carousel Sliders',
+    value: 'sliders',
+    icon: 'post',
+    role: ['super-admin', 'admin', 'employee', 'manager'],
+    permissions: [
+      permissions.sliderAll,
+      permissions.sliderCreate,
+      permissions.sliderUpdate,
+      permissions.sliderDelete,
+    ],
+    children: [
+      {
+        icon: 'view-list',
+        title: 'List',
+        to: '/sliders/list',
+        value: 'sliders-list',
+        role: ['super-admin', 'admin', 'employee', 'manager'],
+        permissions: [permissions.sliderAll]
+      },
+      {
+        icon: 'post',
+        title: 'Create',
+        to: '/sliders/create',
+        value: 'sliders-create',
+        role: ['super-admin'],
+        permissions: [permissions.sliderCreate]
       },
     ]
   },
