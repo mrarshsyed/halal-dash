@@ -21,7 +21,7 @@
 
       <!-- Sliders -->
       <div v-for="(slider, index) in form.sliders" :key="index" class="border rounded p-4 space-y-3">
-        <h3 class="font-semibold">Slider {{ index }}</h3>
+        <h3 class="font-semibold">Slide {{ index + 1 }}</h3>
 
         <div>
           <label>Title</label>
