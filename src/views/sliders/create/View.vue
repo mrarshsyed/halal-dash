@@ -97,6 +97,9 @@ function onFileChange(e, index) {
   if (file) {
     sliderFiles.value[`slider_${index}`] = file
 
+    // Clear the image URL if a file is uploaded
+    form.sliders[index].image = ''
+
     const reader = new FileReader()
     reader.onload = (e) => {
       filePreviews.value[index] = e.target.result
