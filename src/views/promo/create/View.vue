@@ -58,13 +58,15 @@
       <!-- Start Date -->
       <div class="mt-4">
         <label for="startDate" class="block mb-1 font-medium">Start Date</label>
-        <input id="startDate" name="startDate" v-model="form.startDate" type="date" class="form-input border" />
+        <input id="startDate" name="startDate" v-model="form.startDate" type="date" class="form-input border"
+          :min="new Date().toISOString().split('T')[0]" />
       </div>
 
       <!-- End Date -->
       <div class="mt-4">
         <label for="endDate" class="block mb-1 font-medium">Expiry Date</label>
-        <input id="endDate" name="expireDate" v-model="form.expireDate" type="date" class="form-input border" />
+        <input id="endDate" name="expireDate" v-model="form.expireDate" type="date" class="form-input border"
+          :min="form.startDate" />
       </div>
 
       <!-- Applicable To -->
