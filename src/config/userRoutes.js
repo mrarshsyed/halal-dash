@@ -1193,7 +1193,7 @@ export const navLinks = [
   {
     title: 'Promo Codes',
     value: 'promo',
-    icon: 'post',
+    icon: 'brightness-percent',
     role: ['super-admin', 'admin', 'employee', 'manager'],
     permissions: [
       permissions.blogAll,
@@ -1223,7 +1223,7 @@ export const navLinks = [
   {
     title: 'Carousel Sliders',
     value: 'sliders',
-    icon: 'post',
+    icon: 'view-carousel',
     role: ['super-admin', 'admin', 'employee', 'manager'],
     permissions: [
       permissions.sliderAll,
