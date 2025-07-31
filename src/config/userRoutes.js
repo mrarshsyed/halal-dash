@@ -591,7 +591,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.blogAll,
+            permissions.blogCreate,
+            permissions.blogUpdate,
+            permissions.blogDelete,
+          ],
         }
       },
       {
@@ -600,7 +605,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.blogAll,
+            permissions.blogCreate,
+            permissions.blogUpdate,
+            permissions.blogDelete,
+          ],
         }
       },
       {
@@ -609,7 +619,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.blogAll,
+            permissions.blogCreate,
+            permissions.blogUpdate,
+            permissions.blogDelete,
+          ],
         }
       },
     ]
@@ -620,7 +635,12 @@ export const routes = [
     meta: {
       requiresAuth: true,
       role: ['super-admin', 'admin', 'employee', 'manager'],
-      permissions: []
+      permissions: [
+        permissions.promoAll,
+        permissions.promoCreate,
+        permissions.promoUpdate,
+        permissions.promoDelete
+      ]
     },
     children: [
       {
@@ -629,7 +649,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.promoAll,
+            permissions.promoCreate,
+            permissions.promoUpdate,
+            permissions.promoDelete
+          ]
         }
       },
       {
@@ -638,7 +663,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.promoAll,
+            permissions.promoCreate,
+            permissions.promoUpdate,
+            permissions.promoDelete
+          ]
         }
       },
       {
@@ -647,7 +677,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.promoAll,
+            permissions.promoCreate,
+            permissions.promoUpdate,
+            permissions.promoDelete
+          ]
         }
       },
     ]
@@ -658,7 +693,12 @@ export const routes = [
     meta: {
       requiresAuth: true,
       role: ['super-admin', 'admin', 'employee', 'manager'],
-      permissions: []
+      permissions: [
+        permissions.sliderAll,
+        permissions.sliderCreate,
+        permissions.sliderUpdate,
+        permissions.sliderDelete
+      ]
     },
     children: [
       {
@@ -667,7 +707,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.sliderAll,
+            permissions.sliderCreate,
+            permissions.sliderUpdate,
+            permissions.sliderDelete
+          ]
         }
       },
       {
@@ -676,7 +721,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.sliderAll,
+            permissions.sliderCreate,
+            permissions.sliderUpdate,
+            permissions.sliderDelete
+          ]
         }
       },
       {
@@ -685,7 +735,12 @@ export const routes = [
         meta: {
           requiresAuth: true,
           role: ['super-admin', 'admin', 'employee', 'manager'],
-          permissions: []
+          permissions: [
+            permissions.sliderAll,
+            permissions.sliderCreate,
+            permissions.sliderUpdate,
+            permissions.sliderDelete
+          ]
         }
       },
     ]
@@ -1379,7 +1434,7 @@ export const userCreatePermissions = [
         value: permissions.blogCreate
       },
     ]
-  }
+  },
 ]
 
 export const managerCreatePermissions = [
