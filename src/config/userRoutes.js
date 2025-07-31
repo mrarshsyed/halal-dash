@@ -1193,13 +1193,13 @@ export const navLinks = [
   {
     title: 'Promo Codes',
     value: 'promo',
-    icon: 'post',
+    icon: 'brightness-percent',
     role: ['super-admin', 'admin', 'employee', 'manager'],
     permissions: [
-      permissions.blogAll,
-      permissions.blogCreate,
-      permissions.blogUpdate,
-      permissions.blogDelete,
+      permissions.promoAll,
+      permissions.promoCreate,
+      permissions.promoUpdate,
+      permissions.promoDelete,
     ],
     children: [
       {
@@ -1208,7 +1208,12 @@ export const navLinks = [
         to: '/promo/list',
         value: 'promo-list',
         role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [permissions.blogAll]
+        permissions: [
+          permissions.promoAll,
+          permissions.promoCreate,
+          permissions.promoUpdate,
+          permissions.promoDelete,
+        ],
       },
       {
         icon: 'post',
@@ -1216,14 +1221,19 @@ export const navLinks = [
         to: '/promo/create',
         value: 'promo-create',
         role: ['super-admin'],
-        permissions: [permissions.blogCreate]
+        permissions: [
+          permissions.promoAll,
+          permissions.promoCreate,
+          permissions.promoUpdate,
+          permissions.promoDelete,
+        ],
       },
     ]
   },
   {
     title: 'Carousel Sliders',
     value: 'sliders',
-    icon: 'post',
+    icon: 'view-carousel',
     role: ['super-admin', 'admin', 'employee', 'manager'],
     permissions: [
       permissions.sliderAll,
@@ -1238,7 +1248,12 @@ export const navLinks = [
         to: '/sliders/list',
         value: 'sliders-list',
         role: ['super-admin', 'admin', 'employee', 'manager'],
-        permissions: [permissions.sliderAll]
+        permissions: [
+          permissions.sliderAll,
+          permissions.sliderCreate,
+          permissions.sliderUpdate,
+          permissions.sliderDelete,
+        ],
       },
       {
         icon: 'post',
@@ -1246,7 +1261,12 @@ export const navLinks = [
         to: '/sliders/create',
         value: 'sliders-create',
         role: ['super-admin'],
-        permissions: [permissions.sliderCreate]
+        permissions: [
+          permissions.sliderAll,
+          permissions.sliderCreate,
+          permissions.sliderUpdate,
+          permissions.sliderDelete,
+        ],
       },
     ]
   },
@@ -1435,6 +1455,34 @@ export const userCreatePermissions = [
       },
     ]
   },
+  {
+    title: 'Promo',
+    value: permissions.promoAll,
+    children: [
+      {
+        title: 'List',
+        value: permissions.promoAll
+      },
+      {
+        title: 'Create',
+        value: permissions.promoCreate
+      },
+    ]
+  },
+  {
+    title: 'Slider',
+    value: permissions.sliderAll,
+    children: [
+      {
+        title: 'List',
+        value: permissions.sliderAll
+      },
+      {
+        title: 'Create',
+        value: permissions.sliderCreate
+      },
+    ]
+  }
 ]
 
 export const managerCreatePermissions = [
