@@ -1435,6 +1435,34 @@ export const userCreatePermissions = [
       },
     ]
   },
+  {
+    title: 'Promo',
+    value: permissions.promoAll,
+    children: [
+      {
+        title: 'List',
+        value: permissions.promoAll
+      },
+      {
+        title: 'Create',
+        value: permissions.promoCreate
+      },
+    ]
+  },
+  {
+    title: 'Slider',
+    value: permissions.sliderAll,
+    children: [
+      {
+        title: 'List',
+        value: permissions.sliderAll
+      },
+      {
+        title: 'Create',
+        value: permissions.sliderCreate
+      },
+    ]
+  }
 ]
 
 export const managerCreatePermissions = [
