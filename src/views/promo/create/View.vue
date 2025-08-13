@@ -101,6 +101,18 @@
         </label>
       </div>
 
+      <div class="mt-4">
+        <label for="bank" class="block mb-1 font-medium">Eligible Bank</label>
+        <select id="bank" name="bank" v-model="form.bank" class="form-input border">
+          <option value="" disabled>Select Bank</option>
+          <template v-for="bank in banks" :key="bank.label">
+            <option :value="bank.label.split(' ').join('-').toLowerCase()">
+              {{ bank.label }}
+            </option>
+          </template>
+        </select>
+      </div>
+
       <!-- Submit Button -->
       <div class="mt-4">
         <button type="submit" :disabled="loading || !form.promoCode || !form.discountValue || !form.discountType"
@@ -117,6 +129,7 @@
 import { reactive, ref } from 'vue'
 import axios from '@/plugins/axios'
 import { useRouter } from 'vue-router'
+import banks from '@/utils/banks'
 
 const router = useRouter()
 const loading = ref(false)
@@ -135,6 +148,7 @@ const form = reactive({
   applicableUsers: '',
   active: true,
   isDraft: false,
+  bank: ''
 })
 
 const handleSubmit = async (e) => {

@@ -13,6 +13,7 @@
           <th class="px-4 py-2 border-b whitespace-nowrap">Minimum Order Amount</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Usage Limit</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Usage Limit Per User</th>
+          <th class="px-4 py-2 border-b whitespace-nowrap">Eligible Bank</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Status</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Start Date</th>
           <th class="px-4 py-2 border-b whitespace-nowrap">Expiry Date</th>
@@ -38,6 +39,7 @@
           <td class="px-4 py-2 border-b">{{ promo?.minOrderAmount }}</td>
           <td class="px-4 py-2 border-b">{{ promo?.usageLimit }}</td>
           <td class="px-4 py-2 border-b">{{ promo?.usageLimitPerUser }}</td>
+          <td class="px-4 py-2 border-b">{{ promo?.bank }}</td>
           <td class="px-4 py-2 border-b">
             <span :class="promo?.active ? 'text-green-600 font-medium' : 'text-gray-400'">
               {{ promo?.active ? 'Active' : 'Inactive' }}
