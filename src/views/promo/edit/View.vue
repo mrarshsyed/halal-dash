@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-xl font-bold">Create New Promo Code</h1>
+    <h1 class="text-xl font-bold">Edit Promo Code</h1>
 
     <form @submit="handleSubmit" class="mt-4" validate-on="submit lazy">
       <!-- Promo Code -->
@@ -101,6 +101,18 @@
         </label>
       </div>
 
+      <div class="mt-4">
+        <label for="bank" class="block mb-1 font-medium">Eligible Bank</label>
+        <select id="bank" name="bank" v-model="form.bank" class="form-input border">
+          <option value="" disabled>Select Bank</option>
+          <template v-for="bank in banks" :key="bank.label">
+            <option :value="bank.label.split(' ').join('-').toLowerCase()">
+              {{ bank.label }}
+            </option>
+          </template>
+        </select>
+      </div>
+
       <!-- Submit Button -->
       <div class="mt-4">
         <button type="submit" :disabled="loading || !form.promoCode || !form.discountValue || !form.discountType"
@@ -118,6 +130,7 @@ import { reactive, ref, onMounted } from 'vue'
 import axios from '@/plugins/axios'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
+import banks from '@/utils/banks'
 
 const router = useRouter()
 const loading = ref(false)
@@ -137,6 +150,7 @@ const form = reactive({
   applicableUsers: '',
   active: true,
   isDraft: false,
+  bank: '',
 })
 
 onMounted(async () => {
@@ -157,6 +171,7 @@ onMounted(async () => {
       form.applicableUsers = Array.isArray(data.applicableUsers) ? data.applicableUsers.map((user) => user?.email).join(',') : ''
       form.active = data.active
       form.isDraft = data.isDraft
+      form.bank = data.bank || ""
     }
   } catch (error) {
     console.error(error)
