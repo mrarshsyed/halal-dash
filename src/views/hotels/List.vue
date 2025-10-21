@@ -1,19 +1,11 @@
 <template>
   <div>
     <FormComponent />
-    <v-data-table-server
-      class="mt-4 hotels-data-table"
-      density="compact"
-      v-model:items-per-page="table_data.itemsPerPage"
-      :items-length="table_data.totalItems"
-      :headers="table_data.headers"
-      :items="table_data.serverItems"
-      :search="table_data.search"
-      :items-per-page-options="table_data.itemsPerPageOption"
-      :page="table_data.page"
-      @update:options="loadItems"
-      :show-current-page="true"
-    >
+    <v-data-table-server class="mt-4 hotels-data-table" density="compact"
+      v-model:items-per-page="table_data.itemsPerPage" :items-length="table_data.totalItems"
+      :headers="table_data.headers" :items="table_data.serverItems" :search="table_data.search"
+      :items-per-page-options="table_data.itemsPerPageOption" :page="table_data.page" @update:options="loadItems"
+      :show-current-page="true">
       <template #item.name="{ item }">
         {{ item?.name }}
       </template>
@@ -40,92 +32,47 @@
         <div class="d-flex ga-2 cursor-pointer">
           <v-tooltip text="Details" location="top">
             <template #activator="{ props }">
-              <v-icon
-                v-bind="props"
-                icon="mdi-eye"
-                @click="
-                  () => {
-                    store.setHotelDetails(item)
-                    detailsDialogShow = true
-                  }
-                "
-              />
+              <v-icon v-bind="props" icon="mdi-eye" @click="
+                () => {
+                  store.setHotelDetails(item)
+                  detailsDialogShow = true
+                }
+              " />
             </template>
           </v-tooltip>
-          <v-tooltip
-            v-if="store.hasPermission(permissions.hotelUpdateManager)"
-            text="Assign Manager"
-            location="top"
-          >
+          <v-tooltip v-if="store.hasPermission(permissions.hotelUpdateManager)" text="Assign Manager" location="top">
             <template #activator="{ props }">
-              <v-icon
-                v-bind="props"
-                @click="handelAssignManagerIconClick(item)"
-                icon="mdi-cog"
-              />
+              <v-icon v-bind="props" @click="handelAssignManagerIconClick(item)" icon="mdi-cog" />
             </template>
           </v-tooltip>
-          <v-tooltip
-            v-if="store.hasPermission(permissions.hotelUpdateManager)"
-            text="Remove Manager"
-            location="top"
-          >
+          <v-tooltip v-if="store.hasPermission(permissions.hotelUpdateManager)" text="Remove Manager" location="top">
             <template #activator="{ props }">
-              <v-icon
-                v-bind="props"
-                v-if="item?.manager?.email"
-                @click="handelRemoveManagerIconClick(item)"
-                icon="mdi-link-off"
-              />
+              <v-icon v-bind="props" v-if="item?.manager?.email" @click="handelRemoveManagerIconClick(item)"
+                icon="mdi-link-off" />
             </template>
           </v-tooltip>
-          <v-tooltip
-            text="Add Ratings"
-            location="top"
-            v-if="store.hasPermission(permissions.hotelUpdateHalalRatings)"
-          >
+          <v-tooltip text="Add Ratings" location="top" v-if="store.hasPermission(permissions.hotelUpdateHalalRatings)">
             <template #activator="{ props }">
-              <v-icon
-                v-bind="props"
-                @click="onRatingIconClick(item)"
-                icon="mdi-star"
-              />
+              <v-icon v-bind="props" @click="onRatingIconClick(item)" icon="mdi-star" />
             </template>
           </v-tooltip>
         </div>
       </template>
       <template #bottom>
         <div class="d-flex justify-end align-center ga-4 pt-4">
-          <v-btn
-            size="x-small"
-            icon="mdi-chevron-left"
-            :disabled="table_data.page === 1 || store.isLoading"
-            @click="onPreviousPage"
-          />
+          <v-btn size="x-small" icon="mdi-chevron-left" :disabled="table_data.page === 1 || store.isLoading"
+            @click="onPreviousPage" />
           <p>{{ table_data.page }}</p>
-          <v-btn
-            @click="onNextPage"
-            :disabled="!table_data.hasNextPage || store.isLoading"
-            size="x-small"
-            icon="mdi-chevron-right"
-          />
+          <v-btn @click="onNextPage" :disabled="!table_data.hasNextPage || store.isLoading" size="x-small"
+            icon="mdi-chevron-right" />
         </div>
       </template>
     </v-data-table-server>
-    <v-dialog
-      max-width="100%"
-      v-model="detailsDialogShow"
-      fullscreen
-      :scrim="false"
-      transition="dialog-bottom-transition"
-    >
+    <v-dialog max-width="100%" v-model="detailsDialogShow" fullscreen :scrim="false"
+      transition="dialog-bottom-transition">
       <v-card class="pa-5">
         <div class="text-right mb-4">
-          <v-icon
-            @click="detailsDialogShow = false"
-            color="error"
-            icon="mdi-close-circle"
-          />
+          <v-icon @click="detailsDialogShow = false" color="error" icon="mdi-close-circle" />
         </div>
         <v-card-text>
           <HotelDetails />
@@ -139,35 +86,20 @@
           <v-row>
             <v-col cols="12">
               <v-form ref="managerForm">
-                <v-autocomplete
-                  label="Select Manager"
-                  no-data-text="Hit enter to create"
-                  @update:search="onManagerSearch"
-                  :items="managers"
-                  item-title="email"
-                  return-object
-                  v-model="selectedManager"
-                  @keydown.enter="onManagerCreate"
-                  required
-                  :rules="[(v) => !!v || `Manager is required`]"
-                />
+                <v-autocomplete label="Select Manager" no-data-text="Hit enter to create"
+                  @update:search="onManagerSearch" :items="managers" item-title="email" return-object
+                  v-model="selectedManager" @keydown.enter="onManagerCreate" required
+                  :rules="[(v) => !!v || `Manager is required`]" />
               </v-form>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            color="error"
-            @click="
-              () => {
-                selectedManager = null
-                assignManagerDialogShow = false
-              }
-            "
-          >
-            Close
-          </v-btn>
+          <v-btn color="error" @click="() => {
+            selectedManager = null
+            assignManagerDialogShow = false
+          }">Close</v-btn>
           <v-btn color="primary" @click="onAssignManager">
             Assign Manager
           </v-btn>
@@ -176,16 +108,18 @@
     </v-dialog>
     <v-dialog v-model="assignRatingDialogShow">
       <v-card>
-        <v-card-title>Select Rating</v-card-title>
+        <div class="flex items-center gap-4">
+          <v-card-title>Select Rating</v-card-title>
+          <v-checkbox v-model="non_compliant" label="Non Compliant" name="non_compliant" />
+          <!-- Make all the below checkbox diable if non_compliant is checked -->
+        </div>
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
+              <v-checkbox v-model="selectedRatings" :value="r" :disabled="non_compliant">
                 <template #label>
                   {{ r?.name }}
-                  <v-chip class="ms-2">
-                    {{ r?.rating }}
-                  </v-chip>
+                  <v-chip class="ms-2">{{ r?.rating }}</v-chip>
                 </template>
               </v-checkbox>
             </v-col>
@@ -197,18 +131,11 @@
             {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
           </p>
           <v-spacer />
-          <v-btn
-            color="error"
-            @click="
-              () => {
-                selectedRatings = []
-                assignRatingDialogShow = false
-              }
-            "
-          >
-            Close
-          </v-btn>
-          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
+          <v-btn color="error" @click="() => {
+            selectedRatings = []
+            assignRatingDialogShow = false
+          }">Close</v-btn>
+          <v-btn color="primary" @click="onAssignRating"> Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -246,7 +173,7 @@ const table_data = ref({
   itemsPerPage: 20,
   totalItems: 100,
   page: 1,
-  serverItems: [],
+  serverItems: [], // hotels
   headers: [
     { title: 'Hotel', key: 'name', align: 'start' },
     { title: 'City', key: 'city', align: 'start' },
@@ -394,6 +321,8 @@ const searchForm = ref({
   isSearched: false,
   exportFunction: onExport
 })
+const non_compliant = ref(store.hotel_details?.non_compliant)
+
 const loadItems = async ({ page, itemsPerPage, sortBy }) => {
   table_data.value.page = page
   await axiosInstance
@@ -439,9 +368,8 @@ const handelRemoveManagerIconClick = (item) => {
   store.setHotelDetails(item)
   const dialogModal = {
     title: 'Remove Manager',
-    content: `Are you sure you want to remove ${
-      item?.manager?.name ?? item?.manager?.email
-    } from ${item?.name} ?`,
+    content: `Are you sure you want to remove ${item?.manager?.name ?? item?.manager?.email
+      } from ${item?.name} ?`,
     confirmText: 'Remove Manager',
     formComponents: [],
     confirmFunction: removeManager
@@ -477,7 +405,7 @@ const onManagerCreate = async () => {
             await store.updateUserRoleAndPermissions(
               selectedManager.value._id,
               'manager',
-              [permissions.hotelList,permissions.cruiseUpdateHalalRatings]
+              [permissions.hotelList, permissions.cruiseUpdateHalalRatings]
             )
           }
         })
@@ -513,13 +441,15 @@ const onRatingIconClick = async (item) => {
   }
   assignRatingDialogShow.value = true
 }
+
 const onAssignRating = async () => {
   const ids = selectedRatings.value?.map((x) => {
     return x._id
   })
   axios
     .patch(`admin/hotels/${store.hotel_details?._id}/update-halal-ratings`, {
-      ratingIds: ids
+      ratingIds: ids, // we can send empty array for non compliant
+      non_compliant: non_compliant.value
     })
     .then(async (res) => {
       store.showSnackbar('Ratings updated successfully')
