@@ -1,14 +1,9 @@
 <template>
   <div>
+    <Export />
     <div v-if="orderDetails">
       <v-card-text>
-        <v-btn
-          class="mb-4"
-          size="x-small"
-          color="primary"
-          icon="mdi-arrow-left"
-          @click="orderDetails = null"
-        />
+        <v-btn class="mb-4" size="x-small" color="primary" icon="mdi-arrow-left" @click="orderDetails = null" />
         <v-row>
           <v-col cols="12" md="6">
             <p class="text-h6 font-weight-bold">User Details</p>
@@ -69,27 +64,12 @@
         </v-row>
       </v-card-text>
     </div>
-    <v-data-table-server
-      v-else
-      class="mt-4"
-      v-model:items-per-page="table_data.itemsPerPage"
-      :headers="table_data.headers"
-      :items-length="table_data.totalItems"
-      :items="table_data.serverItems"
-      :search="table_data.search"
-      :items-per-page-options="table_data.itemsPerPageOption"
-      :page="table_data.page"
-      @update:options="loadItems"
-      :show-current-page="true"
-    >
+    <v-data-table-server v-else class="mt-4" v-model:items-per-page="table_data.itemsPerPage"
+      :headers="table_data.headers" :items-length="table_data.totalItems" :items="table_data.serverItems"
+      :search="table_data.search" :items-per-page-options="table_data.itemsPerPageOption" :page="table_data.page"
+      @update:options="loadItems" :show-current-page="true">
       <template #item.action="{ item }">
-        <v-btn
-          icon="mdi-eye"
-          size="x-small"
-          variant="text"
-          color="primary"
-          @click="onDetails(item)"
-        />
+        <v-btn icon="mdi-eye" size="x-small" variant="text" color="primary" @click="onDetails(item)" />
       </template>
       <template #item.bookingDate="{ item }">
         <p>
@@ -142,6 +122,7 @@ import { userFormStore } from '@/store/form'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
 import Hotel from '@/components/Order/Hotel.vue'
+import Export from '@/components/Export.vue'
 
 const formStore = userFormStore()
 
@@ -191,22 +172,35 @@ const onDetails = (data) => {
   orderDetails.value = data
 }
 
-
 const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page
-  await axiosInstance
-    .get(`admin/hotel-bookings`, {
-      params: {
-        page: page,
-        perPage: itemsPerPage,
-        ...formStore.getFilteredSearchFields()
-      }
-    })
-    .then((res) => {
-      // store.setUserList(res?.data?.data)
-      table_data.value.serverItems = res?.data?.data
-      table_data.value.totalItems = res?.data?.total
-    })
+  await axiosInstance.get(`admin/hotel-bookings`, {
+    params: {
+      page: page,
+      perPage: itemsPerPage,
+      ...formStore.getFilteredSearchFields()
+    }
+  }).then((res) => {
+    // store.setUserList(res?.data?.data)
+    table_data.value.serverItems = res?.data?.data
+    table_data.value.totalItems = res?.data?.total
+  })
+}
+
+async function onExport({ props }) {
+  await axiosInstance.get(`admin/hotel-bookings/export`, {
+    responseType: 'blob',
+    params: {
+      ...props
+    }
+  }).then((res) => {
+    const url = window.URL.createObjectURL(new Blob([res.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'hotels.xlsx')
+    document.body.appendChild(link)
+    link.click()
+  })
 }
 </script>
 
