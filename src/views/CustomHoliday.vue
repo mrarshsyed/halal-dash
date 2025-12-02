@@ -61,17 +61,13 @@
             </p>
             <p>{{ orderDetails?.amount }}</p>
           </v-col>
-          <v-col
-            cols="12"
-          >
+          <v-col cols="12">
             <v-card>
-              <v-card-title>
-                Hotel
-              </v-card-title>
+              <v-card-title> Hotel </v-card-title>
               <v-card-text>
                 <div
                   class="mb-4"
-                  v-for="(item,index) in hotelBookings"
+                  v-for="(item, index) in hotelBookings"
                   :key="index"
                 >
                   <Hotel
@@ -83,17 +79,13 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col
-            cols="12"
-          >
+          <v-col cols="12">
             <v-card>
-              <v-card-title>
-                Activity  
-              </v-card-title>
+              <v-card-title> Activity </v-card-title>
               <v-card-text>
                 <div
                   class="mb-4"
-                  v-for="(item,index) in activityBookings"
+                  v-for="(item, index) in activityBookings"
                   :key="index"
                 >
                   <Activity :order-details="item" />
@@ -102,14 +94,12 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col
-            cols="12"
-          >
+          <v-col cols="12">
             <v-card title="Transfer">
               <v-card-text>
                 <div
                   class="mb-4"
-                  v-for="(item,index) in transferBookings"
+                  v-for="(item, index) in transferBookings"
                   :key="index"
                 >
                   <Transfer :order-details="item" />
@@ -118,14 +108,12 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col
-            cols="12"
-          >
+          <v-col cols="12">
             <v-card title="Insurance">
               <v-card-text>
                 <div
                   class="mb-4"
-                  v-for="(item,index) in insuranceBookings"
+                  v-for="(item, index) in insuranceBookings"
                   :key="index"
                 >
                   <Insurance :order-details="item" />
@@ -260,15 +248,30 @@
         </div>
       </template>
       <template #item.insurance="{ item }">
-        <div v-if="item?.insuranceBookings?.length">
+        <div
+          class="d-flex flex-column ga-4 mb-4 nowrap"
+          v-if="item?.insuranceBookings?.length"
+        >
           <div
             v-for="(i, indexI) in item?.insuranceBookings"
             :key="indexI"
             class="d-flex flex-column ga-4 mb-4 nowrap"
           >
             <p>
-              <span class="font-weight-bold">ID: </span>
-              {{ i }}
+              <span class="font-weight-bold">Package Name :</span>
+              {{ i?.insurancePackage?.name }}
+            </p>
+            <p>
+              <span class="font-weight-bold">Type:</span>
+              {{ i?.insurancePackage?.insuranceType?.name }}
+            </p>
+            <p>
+              <span class="font-weight-bold">Area:</span>
+              {{ i?.insurancePackage?.insuranceArea?.name }}
+            </p>
+            <p>
+              <span class="font-weight-bold">Rest Type:</span>
+              {{ i?.insurancePackage?.insuranceRestType?.name }}
             </p>
           </div>
         </div>
@@ -281,14 +284,13 @@
 </template>
 
 <script setup>
-import { ref ,computed} from 'vue'
+import { ref, computed } from 'vue'
 import axiosInstance from '@/plugins/axios'
 import { formateDate } from '@/utils/date'
 import Hotel from '@/components/Order/Hotel.vue'
 import Activity from '@/components/Order/Activity.vue'
 import Transfer from '@/components/Order/Transfer.vue'
 import Insurance from '@/components/Order/Insurance.vue'
-
 
 const orderDetails = ref(null)
 
@@ -308,6 +310,7 @@ const transferBookings = computed(() => {
 const insuranceBookings = computed(() => {
   return orderDetails.value?.insuranceBookings
 })
+console.log(insuranceBookings.value)
 
 const table_data = ref({
   loading: true,
@@ -339,7 +342,7 @@ const loadItems = async ({ page, itemsPerPage }) => {
     .get(`admin/full-holiday-package/booking`, {
       params: {
         page: page,
-        perPage: itemsPerPage,
+        perPage: itemsPerPage
       }
     })
     .then((res) => {
