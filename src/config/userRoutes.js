@@ -30,6 +30,7 @@ export const permissions = {
   // settings
   profitSettings: 'profit-settings',
   settingAll: 'setting-all',
+  currencySettings: 'currency-settings',
 
   // cruise
   cruiseAll: 'cruise-all',
@@ -83,7 +84,7 @@ export const permissions = {
   sliderAll: 'slider-all',
   sliderCreate: 'slider-create',
   sliderUpdate: 'slider-update',
-  sliderDelete: 'slider-delete',
+  sliderDelete: 'slider-delete'
 }
 
 export const routes = [
@@ -573,6 +574,15 @@ export const routes = [
           role: ['super-admin'],
           permissions: ['']
         }
+      },
+      {
+        path: 'currency',
+        component: () => import('@/views/settings/Currency.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: ['']
+        }
       }
     ]
   },
@@ -595,8 +605,8 @@ export const routes = [
             permissions.blogAll,
             permissions.blogCreate,
             permissions.blogUpdate,
-            permissions.blogDelete,
-          ],
+            permissions.blogDelete
+          ]
         }
       },
       {
@@ -609,8 +619,8 @@ export const routes = [
             permissions.blogAll,
             permissions.blogCreate,
             permissions.blogUpdate,
-            permissions.blogDelete,
-          ],
+            permissions.blogDelete
+          ]
         }
       },
       {
@@ -623,10 +633,10 @@ export const routes = [
             permissions.blogAll,
             permissions.blogCreate,
             permissions.blogUpdate,
-            permissions.blogDelete,
-          ],
+            permissions.blogDelete
+          ]
         }
-      },
+      }
     ]
   },
   {
@@ -684,7 +694,7 @@ export const routes = [
             permissions.promoDelete
           ]
         }
-      },
+      }
     ]
   },
   {
@@ -742,7 +752,7 @@ export const routes = [
             permissions.sliderDelete
           ]
         }
-      },
+      }
     ]
   }
 ]
@@ -1141,7 +1151,7 @@ export const navLinks = [
     to: '/custom-holiday',
     role: ['super-admin', 'admin', 'employee'],
     children: [],
-    permissions: [permissions.customHoliday,]
+    permissions: [permissions.customHoliday]
   },
   {
     title: 'Settings',
@@ -1157,6 +1167,14 @@ export const navLinks = [
         value: 'settings-profit',
         role: ['super-admin'],
         permissions: [permissions.profitSettings]
+      },
+      {
+        icon: 'currency-usd',
+        title: 'Currency',
+        to: '/settings/currency',
+        value: 'settings-currency',
+        role: ['super-admin'],
+        permissions: [permissions.currencySettings]
       }
     ]
   },
@@ -1169,7 +1187,7 @@ export const navLinks = [
       permissions.blogAll,
       permissions.blogCreate,
       permissions.blogUpdate,
-      permissions.blogDelete,
+      permissions.blogDelete
     ],
     children: [
       {
@@ -1187,7 +1205,7 @@ export const navLinks = [
         value: 'blogs-create',
         role: ['super-admin'],
         permissions: [permissions.blogCreate]
-      },
+      }
     ]
   },
   {
@@ -1199,7 +1217,7 @@ export const navLinks = [
       permissions.promoAll,
       permissions.promoCreate,
       permissions.promoUpdate,
-      permissions.promoDelete,
+      permissions.promoDelete
     ],
     children: [
       {
@@ -1212,8 +1230,8 @@ export const navLinks = [
           permissions.promoAll,
           permissions.promoCreate,
           permissions.promoUpdate,
-          permissions.promoDelete,
-        ],
+          permissions.promoDelete
+        ]
       },
       {
         icon: 'post',
@@ -1225,9 +1243,9 @@ export const navLinks = [
           permissions.promoAll,
           permissions.promoCreate,
           permissions.promoUpdate,
-          permissions.promoDelete,
-        ],
-      },
+          permissions.promoDelete
+        ]
+      }
     ]
   },
   {
@@ -1239,7 +1257,7 @@ export const navLinks = [
       permissions.sliderAll,
       permissions.sliderCreate,
       permissions.sliderUpdate,
-      permissions.sliderDelete,
+      permissions.sliderDelete
     ],
     children: [
       {
@@ -1252,8 +1270,8 @@ export const navLinks = [
           permissions.sliderAll,
           permissions.sliderCreate,
           permissions.sliderUpdate,
-          permissions.sliderDelete,
-        ],
+          permissions.sliderDelete
+        ]
       },
       {
         icon: 'post',
@@ -1265,11 +1283,11 @@ export const navLinks = [
           permissions.sliderAll,
           permissions.sliderCreate,
           permissions.sliderUpdate,
-          permissions.sliderDelete,
-        ],
-      },
+          permissions.sliderDelete
+        ]
+      }
     ]
-  },
+  }
 ]
 
 export const userCreatePermissions = [
@@ -1410,7 +1428,6 @@ export const userCreatePermissions = [
         value: permissions.holidayEnquiry
       },
       { title: 'Custom Holiday Order', value: permissions.customHoliday }
-
     ]
   },
   {
@@ -1452,7 +1469,7 @@ export const userCreatePermissions = [
       {
         title: 'Create',
         value: permissions.blogCreate
-      },
+      }
     ]
   },
   {
@@ -1466,7 +1483,7 @@ export const userCreatePermissions = [
       {
         title: 'Create',
         value: permissions.promoCreate
-      },
+      }
     ]
   },
   {
@@ -1480,21 +1497,33 @@ export const userCreatePermissions = [
       {
         title: 'Create',
         value: permissions.sliderCreate
-      },
+      }
     ]
   }
 ]
 
 export const managerCreatePermissions = [
   { title: 'Hotel', value: permissions.hotelList },
-  { title: 'Hotel Halal Rating Update', value: permissions.hotelUpdateHalalRatings },
+  {
+    title: 'Hotel Halal Rating Update',
+    value: permissions.hotelUpdateHalalRatings
+  },
 
   { title: 'Activity', value: permissions.activityList },
-  { title: 'Activity Halal Rating Update', value: permissions.activityUpdateHalalRatings },
+  {
+    title: 'Activity Halal Rating Update',
+    value: permissions.activityUpdateHalalRatings
+  },
 
   { title: 'Cruise', value: permissions.cruiseShip },
-  { title: 'Cruise Halal Rating Update', value: permissions.cruiseUpdateHalalRatings },
+  {
+    title: 'Cruise Halal Rating Update',
+    value: permissions.cruiseUpdateHalalRatings
+  },
 
   { title: 'Restaurant', value: permissions.restaurantRestaurant },
-  { title: 'Restaurant Halal Rating Update', value: permissions.restaurantUpdateHalalRatings }
+  {
+    title: 'Restaurant Halal Rating Update',
+    value: permissions.restaurantUpdateHalalRatings
+  }
 ]
