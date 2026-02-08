@@ -32,11 +32,18 @@
     :items-per-page-options="table_data.itemsPerPageOption"
     :page="table_data.page"
   >
+    <template #item.countries="{ item }">
+      <v-chip-group v-if="item.countries?.length">
+        <v-chip
+          v-for="country in item.countries"
+          :key="country"
+        >
+          {{ getCountryName(country) }}
+        </v-chip>
+      </v-chip-group>
+    </template>
     <template #item.action="{ item }">
-      <div
-        v-if="item?.code !== 'AED'"
-        class="d-flex ga-3"
-      >
+      <div class="d-flex ga-3">
         <v-icon
           class="cursor-pointer"
           @click="onEdit(item)"
@@ -45,22 +52,18 @@
       </div>
     </template>
   </v-data-table>
-  <v-dialog
-    v-model="showDialog"
-    width="auto"
-  >
+  <v-dialog v-model="showDialog">
     <v-card
-      width="800"
       prepend-icon="mdi-update"
       text="Update Currency"
       title="Update Currency"
     >
       <v-card-text>
         <v-form ref="formRef">
-          <v-row>
+          <v-row class="align-center">
             <v-col
               cols="12"
-              md="6"
+              md="4"
             >
               <v-text-field
                 readonly
@@ -71,7 +74,7 @@
             </v-col>
             <v-col
               cols="12"
-              md="6"
+              md="4"
             >
               <v-text-field
                 readonly
@@ -82,7 +85,7 @@
             </v-col>
             <v-col
               cols="12"
-              md="6"
+              md="4"
             >
               <v-text-field
                 readonly
@@ -98,8 +101,10 @@
               <v-text-field
                 label="conversionRate"
                 v-model="form.conversionRate"
+                :clearable="false"
               />
             </v-col>
+
             <v-col
               cols="12"
               md="6"
@@ -108,6 +113,19 @@
                 label="Enabled"
                 v-model="form.enabled"
                 color="primary"
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-autocomplete
+                label="SELECT Countries"
+                :items="countries"
+                v-model="form.countries"
+                multiple
+                chips
+                clearable
+                item-value="code"
+                item-title="name"
               />
             </v-col>
           </v-row>
@@ -151,6 +169,7 @@ const table_data = ref({
     { title: 'Conversion Rate', key: 'conversionRate', align: 'start' },
     { title: 'Code', key: 'code', align: 'start' },
     { title: 'Enabled', key: 'enabled', align: 'start' },
+    { title: 'Countries', key: 'countries', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -172,10 +191,13 @@ const form = ref({
   rounding: 0,
   symbol: '',
   symbolNative: '',
-  _id: ''
+  _id: '',
+  countries: []
 })
 const showDialog = ref(false)
 const formRef = ref(null)
+const countries = ref([])
+
 const onEdit = async (item) => {
   form.value = {
     ...item
@@ -218,7 +240,8 @@ const hideDialog = () => {
     rounding: 0,
     symbol: '',
     symbolNative: '',
-    _id: ''
+    _id: '',
+    countries: []
   }
 }
 const updateCurrency = async () => {
@@ -244,7 +267,24 @@ const updateCurrency = async () => {
       hideDialog()
     })
 }
+const fetchCountries = async () => {
+  await axios.get('/misc/countries').then((response) => {
+    if (response.data?.length) {
+      countries.value = response.data?.map((c) => {
+        return {
+          name: c?.country?.name,
+          code: c?.country?.code
+        }
+      })
+    }
+  })
+}
+const getCountryName = (code) => {
+  const country = countries.value.find((c) => c.code === code)
+  return country?.name
+}
 onMounted(async () => {
+  await fetchCountries()
   await fetchList()
 })
 </script>
