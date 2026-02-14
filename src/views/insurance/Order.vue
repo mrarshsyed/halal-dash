@@ -10,40 +10,72 @@
           @click="orderDetails = null"
         />
         <v-row>
-          <v-col cols="12" md="6">
-            <p class="text-h6 font-weight-bold">User Details</p>
-            <p class="font-weight-bold">User Name</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="text-h6 font-weight-bold">
+              User Details
+            </p>
+            <p class="font-weight-bold">
+              User Name
+            </p>
             <p class="mb-2">
               {{ orderDetails?.user?.name }}
             </p>
-            <p class="font-weight-bold">User Email</p>
+            <p class="font-weight-bold">
+              User Email
+            </p>
             <p class="mb-2">
               {{ orderDetails?.user?.email }}
             </p>
-            <p class="font-weight-bold">User Phone</p>
+            <p class="font-weight-bold">
+              User Phone
+            </p>
             <p>{{ orderDetails?.user?.contactNumber }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="text-h6 font-weight-bold">Contact Details</p>
-            <p class="font-weight-bold">Contact Name</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="text-h6 font-weight-bold">
+              Contact Details
+            </p>
+            <p class="font-weight-bold">
+              Contact Name
+            </p>
             <p class="mb-2">
               {{ orderDetails?.bookingPayload?.mainContact?.name }}
             </p>
-            <p class="font-weight-bold">Contact Email</p>
+            <p class="font-weight-bold">
+              Contact Email
+            </p>
             <p class="mb-2">
               {{ orderDetails?.bookingPayload?.mainContact?.email }}
             </p>
-            <p class="font-weight-bold">Contact Phone</p>
+            <p class="font-weight-bold">
+              Contact Phone
+            </p>
             <p>
               {{ orderDetails?.bookingPayload?.mainContact?.phone }}
             </p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">Booking Date</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              Booking Date
+            </p>
             <p>{{ formateDate(orderDetails?.createdAt) }}</p>
           </v-col>
-          <v-col cols="12" md="6">
-            <p class="font-weight-bold">HEx Booking ID</p>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <p class="font-weight-bold">
+              HEx Booking ID
+            </p>
             <p>{{ orderDetails?.bookingId }}</p>
           </v-col>
         </v-row>
@@ -89,7 +121,10 @@
         {{ item?.mainContact?.phone }}
       </template>
       <template #item.dates="{ item }">
-        <div class="d-block" style="width: max-content">
+        <div
+          class="d-block"
+          style="width: max-content"
+        >
           <p>
             Start Date:
             {{ formateDate(item?.bookingPayload?.travelingDate?.start) }}
@@ -101,7 +136,10 @@
         </div>
       </template>
       <template #item.guests="{ item }">
-        <div class="d-block" style="width: max-content">
+        <div
+          class="d-block"
+          style="width: max-content"
+        >
           <p>
             Adults :
             {{ item?.bookingPayload?.travelerInformation?.adults?.count }}
@@ -116,7 +154,9 @@
           </p>
         </div>
       </template>
-      <template #item.price="{ item }"> AED {{ item?.quotedPrice }} </template>
+      <template #item.price="{ item }">
+        {{ item?.currencyCode || 'AED' }} {{ getPrice(item?.price) }}
+      </template>
       <template #item.port="{ item }">
         {{ item?.preferredDeparturePort?.name }}
       </template>
@@ -177,5 +217,12 @@ const loadItems = async ({ page, itemsPerPage, sortBy }) => {
 const onDetails = (data) => {
   orderDetails.value = data
   console.log(orderDetails.value)
+}
+const getPrice = (price) => {
+  try {
+    return Math.ceil(Number(price))
+  } catch (error) {
+    return price
+  }
 }
 </script>

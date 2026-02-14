@@ -9,7 +9,7 @@
       </p>
       <p>{{ orderDetails?.hotelbedsBookingResponse?.reference }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -19,7 +19,7 @@
       </p>
       <p>{{ orderDetails?.activity?.name }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -29,7 +29,7 @@
       </p>
       <p>{{ orderDetails?.bookingPayload?.activities[0]?.paxes?.length }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -44,7 +44,7 @@
         {{ orderDetails?.bookingPayload?.activities[0]?.paxes[0]?.name }}
       </p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -54,7 +54,7 @@
       </p>
       <p>{{ orderDetails?.bookingPayload?.customObjects?.pickup }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -64,7 +64,7 @@
       </p>
       <p>{{ orderDetails?.bookingPayload?.customObjects?.dropOff }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -74,7 +74,7 @@
       </p>
       <p>{{ orderDetails?.bookingPayload?.customObjects?.note }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -84,7 +84,7 @@
       </p>
       <p>{{ orderDetails?.status }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -92,14 +92,13 @@
       <p class="font-weight-bold">
         Total Amount
       </p>
-      <p>AED {{ orderDetails?.price }}</p>
+      <p>{{ orderDetails?.currencyCode || 'AED' }} {{ orderDetails?.price }}</p>
     </v-col>
   </v-row>
 </template>
-  
+
   <script setup>
   defineProps({
     orderDetails: Object,
   });
   </script>
-  

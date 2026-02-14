@@ -59,7 +59,7 @@
             <p class="font-weight-bold">
               Total
             </p>
-            <p>{{ orderDetails?.amount }}</p>
+            <p>{{ orderDetails?.price }}</p>
           </v-col>
           <v-col cols="12">
             <v-card>
@@ -191,7 +191,8 @@
           </p>
           <p>
             <span class="font-weight-bold">Price : </span>
-            AED {{ item?.hotelBookings[0]?.price }}
+            {{ item?.hotelBookings[0]?.currencyCode || 'AED' }}
+            {{ item?.hotelBookings[0]?.price }}
           </p>
         </div>
       </template>
@@ -216,7 +217,7 @@
             </p>
             <p>
               <span class="font-weight-bold">Price : </span>
-              AED {{ ac?.price }}
+              {{ ac?.currencyCode || 'AED' }} {{ ac?.price }}
             </p>
           </div>
         </div>
@@ -242,7 +243,7 @@
             </p>
             <p>
               <span class="font-weight-bold">Price : </span>
-              EURO {{ tf?.price }}
+              {{ tf?.currencyCode || 'EURO' }} {{ tf?.price }}
             </p>
           </div>
         </div>
@@ -277,7 +278,10 @@
         </div>
       </template>
       <template #item.total="{ item }">
-        <p>Total : {{ item?.amount?.toFixed(2) }}</p>
+        <p>
+          Total : {{ item?.currencyCode || 'AED' }}
+          {{ item?.price?.toFixed(2) }}
+        </p>
       </template>
     </v-data-table-server>
   </div>
@@ -310,7 +314,6 @@ const transferBookings = computed(() => {
 const insuranceBookings = computed(() => {
   return orderDetails.value?.insuranceBookings
 })
-console.log(insuranceBookings.value)
 
 const table_data = ref({
   loading: true,

@@ -9,7 +9,7 @@
       </p>
       <p>{{ orderDetails?.bookingInfo?.bookings?.[0]?.reference }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -19,7 +19,7 @@
       </p>
       <p>{{ orderDetails?.service?.transferType }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -29,7 +29,7 @@
       </p>
       <p>{{ orderDetails?.search?.from?.description }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -39,7 +39,7 @@
       </p>
       <p>{{ orderDetails?.search?.to?.description }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -54,7 +54,7 @@
         }}
       </p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -77,7 +77,7 @@
         }}
       </p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -87,7 +87,7 @@
       </p>
       <p>{{ orderDetails?.bookingPayload?.remark }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -97,7 +97,7 @@
       </p>
       <p>{{ orderDetails?.status }}</p>
     </v-col>
-  
+
     <v-col
       cols="12"
       md="6"
@@ -105,14 +105,13 @@
       <p class="font-weight-bold">
         Total Amount
       </p>
-      <p>{{ orderDetails?.bookingInfo?.bookings?.[0]?.currency }} {{ orderDetails?.price }}</p>
+      <p>{{ orderDetails?.currencyCode || 'EUR' }} {{ orderDetails?.price }}</p>
     </v-col>
   </v-row>
 </template>
-  
+
   <script setup>
   defineProps({
     orderDetails: Object,
   });
   </script>
-  

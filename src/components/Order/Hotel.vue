@@ -1,6 +1,11 @@
 <template>
   <v-row v-if="props.orderDetails">
-    <v-col v-for="(item, index) in orderFields" :key="index" cols="12" md="6">
+    <v-col
+      v-for="(item, index) in orderFields"
+      :key="index"
+      cols="12"
+      md="6"
+    >
       <p class="font-weight-bold">
         {{ item.label }}
       </p>
@@ -9,6 +14,9 @@
       </p>
       <p v-else-if="item.isBoolean">
         {{ getNestedValue(props.orderDetails, item.key) ? 'Yes' : 'No' }}
+      </p>
+      <p v-else-if="item?.label === 'Price'">
+        {{ orderDetails?.currencyCode || 'AED' }} {{ orderDetails?.price }}
       </p>
       <p v-else>
         {{

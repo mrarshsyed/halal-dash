@@ -1,7 +1,9 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <p class="text-h6 font-weight-bold">Package Details</p>
+      <p class="text-h6 font-weight-bold">
+        Package Details
+      </p>
       <p>
         Insurance Type:
         {{ orderDetails?.insurancePackage?.insuranceType?.name }}
@@ -20,8 +22,13 @@
       </p>
     </v-col>
 
-    <v-col cols="12" md="6">
-      <p class="font-weight-bold">Dates</p>
+    <v-col
+      cols="12"
+      md="6"
+    >
+      <p class="font-weight-bold">
+        Dates
+      </p>
       <p>
         Start:
         {{ formateDate(orderDetails?.bookingPayload?.travelingDate?.start) }}
@@ -31,23 +38,43 @@
       </p>
     </v-col>
 
-    <v-col cols="12" md="6">
-      <p class="font-weight-bold">Status</p>
+    <v-col
+      cols="12"
+      md="6"
+    >
+      <p class="font-weight-bold">
+        Status
+      </p>
       <p>{{ orderDetails?.status }}</p>
     </v-col>
 
-    <v-col cols="12" md="6">
-      <p class="font-weight-bold">Payment Status</p>
+    <v-col
+      cols="12"
+      md="6"
+    >
+      <p class="font-weight-bold">
+        Payment Status
+      </p>
       <p>{{ orderDetails?.paymentStatus }}</p>
     </v-col>
 
-    <v-col cols="12" md="6">
-      <p class="font-weight-bold">Price</p>
-      <p>AED {{ orderDetails?.bookingPayload?.quotedPrice }}</p>
+    <v-col
+      cols="12"
+      md="6"
+    >
+      <p class="font-weight-bold">
+        Price
+      </p>
+      <p>
+        {{ orderDetails?.currencyCode || 'AED' }}
+        {{ getPrice(orderDetails?.price) }}
+      </p>
     </v-col>
 
     <v-col cols="12">
-      <p class="text-h6 font-weight-bold">Guest Details</p>
+      <p class="text-h6 font-weight-bold">
+        Guest Details
+      </p>
 
       <div v-if="orderDetails?.bookingPayload?.travelerInformation">
         <GuestSection
@@ -78,4 +105,11 @@ import { formateDate } from '@/utils/date'
 defineProps({
   orderDetails: Object
 })
+const getPrice = (price) => {
+  try {
+    return Math.ceil(Number(price))
+  } catch (error) {
+    return price
+  }
+}
 </script>
