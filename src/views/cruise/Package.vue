@@ -53,22 +53,23 @@
         <template #item.endPrice="{ item }">
           {{ item?.endPrice }} {{ item?.currency?.code }}
         </template>
-
-
         <template #item.action="{ item }">
           <div class="d-flex ga-3">
             <v-icon
               class="cursor-pointer"
+              @click="onFavoriteUpdate(item)"
+              :icon="item?.isFavorite ? 'mdi-star' : 'mdi-star-outline'"
+            />
+            <v-icon
+              class="cursor-pointer"
               @click="onEdit(item)"
-              icon="mdi-pencil-box"
+              icon="mdi-pencil-box-outline"
             />
             <v-icon
               @click="onDelete(item)"
-              color="error"
               class="cursor-pointer"
-            >
-              mdi-delete
-            </v-icon>
+              icon="mdi-delete-outline"
+            />
           </div>
         </template>
       </v-data-table-server>
@@ -394,7 +395,7 @@
                 >
                   <v-checkbox
                     label="Sold out"
-                    v-model="price.isSoldOut "
+                    v-model="price.isSoldOut"
                   />
                   <div class="d-flex flex-wrap ga-4 mb-2">
                     <v-text-field
@@ -412,7 +413,7 @@
                       readonly
                     />
                   </div>
-                 
+
                   <v-text-field
                     label="Price"
                     :rules="[(v) => !!v || 'Price is required']"
@@ -616,7 +617,7 @@ const initialFormData = {
   itinerary: [],
   uploads: [],
   images: [],
-  prices: [],
+  prices: []
 }
 
 const formData = ref(initialFormData)
@@ -872,6 +873,18 @@ const onEndDateSelect = (endDate) => {
         departureTimeMenu: false
       }
     })
+  }
+}
+const onFavoriteUpdate = async (item) => {
+  if (!item) return
+  if (store.loading) return
+
+  const response = await axios.patch(`admin/cruise/packages/${item?._id}`, {
+    isFavorite: !item.isFavorite
+  })
+  if (response.data) {
+    await loadItems()
+    store.showSnackbar('Successfully Updated')
   }
 }
 onBeforeMount(async () => {
