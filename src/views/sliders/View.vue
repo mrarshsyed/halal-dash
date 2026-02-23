@@ -31,7 +31,7 @@
                 :class="{
                   'text-green-600': blog.active,
                   'text-gray-400': !blog.active,
-                  'opacity-50 pointer-events-none': activatingId === blog._id
+                  'opacity-50 pointer-events-none': !!activatingId
                 }"
                 :icon="blog.active ? 'mdi-check-circle' : 'mdi-check-circle-outline'"
                 @click="setActive(blog)"
@@ -222,31 +222,79 @@ const toSliderPayload = (slide) => ({
   sliderType: slide?.sliderType || (slide?.video || slide?.mobileVideo ? 'video' : 'image')
 })
 
+const normalizeListResponse = (data) => {
+  if (Array.isArray(data)) {
+    return {
+      items: data,
+      total: data.length
+    }
+  }
+
+  const items = data?.items || data?.results || []
+  return {
+    items: Array.isArray(items) ? items : [],
+    total: Number(data?.total || items?.length || 0)
+  }
+}
+
+const createSliderFormData = (blog, active) => {
+  const payload = new FormData()
+  payload.append(
+    'data',
+    JSON.stringify({
+      name: blog?.name || '',
+      location: blog?.location || '',
+      active,
+      sliders: Array.isArray(blog?.sliders) ? blog.sliders.map(toSliderPayload) : []
+    })
+  )
+  return payload
+}
+
+const updateSliderActive = async (blog, active) => {
+  const payload = createSliderFormData(blog, active)
+  await axios.patch(`admin/ui-slider/${blog._id}`, payload, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+const fetchAllSlidersForActivation = async () => {
+  try {
+    const response = await axios.get(`admin/ui-slider`, {
+      params: {
+        page: 1,
+        perPage: Math.max(totalBlogs.value || 0, blogs.value.length, 1000)
+      }
+    })
+
+    return normalizeListResponse(response.data).items
+  } catch (error) {
+    console.error('Error loading sliders for activation sync:', error)
+    return blogs.value
+  }
+}
+
 const setActive = async (blog) => {
-  if (!blog?._id || blog.active || activatingId.value === blog._id) return
+  if (!blog?._id || activatingId.value) return
 
   try {
     activatingId.value = blog._id
 
-    const payload = new FormData()
-    payload.append(
-      'data',
-      JSON.stringify({
-        name: blog?.name || '',
-        location: blog?.location || '',
-        active: true,
-        sliders: Array.isArray(blog?.sliders) ? blog.sliders.map(toSliderPayload) : []
-      })
+    const allSliders = await fetchAllSlidersForActivation()
+    const deactivateTargets = allSliders.filter(
+      (item) => item?._id && item._id !== blog._id && item.active
     )
 
-    await axios.patch(`admin/ui-slider/${blog._id}`, payload, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    await Promise.all([
+      updateSliderActive(blog, true),
+      ...deactivateTargets.map((item) => updateSliderActive(item, false))
+    ])
 
     blogs.value = blogs.value.map((item) => ({
       ...item,
       active: item._id === blog._id
     }))
+    fetchBlogs()
   } catch (error) {
     console.error('Error activating slider:', error)
   } finally {
@@ -281,16 +329,9 @@ async function fetchBlogs() {
       }
     })
 
-    const data = response.data
-    if (data) {
-      if (Array.isArray(data)) {
-        blogs.value = data
-        totalBlogs.value = data.length
-      } else {
-        blogs.value = data.items || data.results || []
-        totalBlogs.value = data.total || blogs.value.length
-      }
-    }
+    const normalized = normalizeListResponse(response.data)
+    blogs.value = normalized.items
+    totalBlogs.value = normalized.total
   } catch (error) {
     console.error('Error fetching sliders:', error)
   }
@@ -467,6 +508,7 @@ watchEffect(fetchBlogs)
 .preview-video {
   width: 100%;
   max-height: 220px;
+  object-fit: cover;
   border-radius: 8px;
   background: #000;
 }
