@@ -415,6 +415,36 @@ export const routes = [
         }
       },
       {
+        path: 'type',
+        name: 'holiday-type',
+        component: () => import('@/views/holiday/Type.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayMasterData]
+        }
+      },
+      {
+        path: 'offer',
+        name: 'holiday-offer',
+        component: () => import('@/views/holiday/Offer.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayMasterData]
+        }
+      },
+      {
+        path: 'category',
+        name: 'holiday-category',
+        component: () => import('@/views/holiday/Category.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin', 'admin', 'employee'],
+          permissions: [permissions.holidayMasterData]
+        }
+      },
+      {
         path: 'package',
         name: 'holiday-package',
         component: () => import('@/views/holiday/Package.vue'),
@@ -1033,6 +1063,30 @@ export const navLinks = [
         permissions: [permissions.holidayMasterData]
       },
       {
+        icon: 'tag-outline',
+        title: 'Type',
+        to: '/holiday/type',
+        value: 'holiday-type',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayMasterData]
+      },
+      {
+        icon: 'tag-heart-outline',
+        title: 'Offer',
+        to: '/holiday/offer',
+        value: 'holiday-offer',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayMasterData]
+      },
+      {
+        icon: 'shape-outline',
+        title: 'Category',
+        to: '/holiday/category',
+        value: 'holiday-category',
+        role: ['super-admin', 'admin', 'employee'],
+        permissions: [permissions.holidayMasterData]
+      },
+      {
         icon: 'package-variant',
         title: 'Package',
         to: '/holiday/package',
@@ -1416,7 +1470,7 @@ export const userCreatePermissions = [
     value: permissions.holidayAll,
     children: [
       {
-        title: 'Master Data ( Inclusion Icon )',
+        title: 'Master Data ( Inclusion Icon, Type, Offer, Category )',
         value: permissions.holidayMasterData
       },
       {
