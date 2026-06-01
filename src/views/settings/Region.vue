@@ -27,7 +27,7 @@
         <span v-else>-</span>
       </template>
       <template #item.image="{ item }">
-        <v-img :src="item?.image" height="30" width="30" cover class="icon-preview" />
+        <v-img v-if="item?.image" :src="item?.image" height="30" width="30" cover class="icon-preview" />
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
