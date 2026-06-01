@@ -613,6 +613,36 @@ export const routes = [
           role: ['super-admin'],
           permissions: ['']
         }
+      },
+      {
+        path: 'country',
+        name: 'settings-country',
+        component: () => import('@/views/settings/Country.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: ['']
+        }
+      },
+      {
+        path: 'region',
+        name: 'settings-region',
+        component: () => import('@/views/settings/Region.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: ['']
+        }
+      },
+      {
+        path: 'sub-region',
+        name: 'settings-sub-region',
+        component: () => import('@/views/settings/SubRegion.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: ['']
+        }
       }
     ]
   },
@@ -1229,6 +1259,30 @@ export const navLinks = [
         value: 'settings-currency',
         role: ['super-admin'],
         permissions: [permissions.currencySettings]
+      },
+      {
+        icon: 'earth',
+        title: 'Country',
+        to: '/settings/country',
+        value: 'settings-country',
+        role: ['super-admin'],
+        permissions: []
+      },
+      {
+        icon: 'map-outline',
+        title: 'Region',
+        to: '/settings/region',
+        value: 'settings-region',
+        role: ['super-admin'],
+        permissions: []
+      },
+      {
+        icon: 'map-marker-outline',
+        title: 'Sub Region',
+        to: '/settings/sub-region',
+        value: 'settings-sub-region',
+        role: ['super-admin'],
+        permissions: []
       }
     ]
   },

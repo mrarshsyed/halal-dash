@@ -37,12 +37,13 @@
       <template #item.name="{ item }">
         {{ item?.name }}
       </template>
-      <template #item.icon="{ item }">
+      <template #item.image="{ item }">
         <v-img
           :src="item?.image"
           height="30"
           width="30"
           cover
+          class="icon-preview"
         />
       </template>
       <template #item.action="{ item }">
@@ -99,7 +100,7 @@ const resetForm = async () => {
   Form.value.fields = Form.value.fields?.map((form) => {
     return {
       ...form,
-      value: null
+      value: form.type === 'image-list' ? [] : null
     }
   })
 }
@@ -128,7 +129,7 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Icon', key: 'icon', align: 'start' },
+    { title: 'Icon', key: 'image', align: 'start' },
     // { title: 'Rating', key: 'rating', align: 'start' },
     { title: 'Action', key: 'action', align: 'start' }
   ],
@@ -187,7 +188,7 @@ const onEdit = async (item) => {
   store.setRatingDetails(item)
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  Form.value.fields[1].value = [item?.image]
+  Form.value.fields[1].value = item?.image ? [item?.image] : []
   const dialogModal = {
     title: 'Update Icon',
     content: '',
@@ -235,4 +236,4 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

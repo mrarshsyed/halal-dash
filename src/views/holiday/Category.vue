@@ -29,7 +29,7 @@
         {{ item?.icon }}
       </template>
       <template #item.image="{ item }">
-        <v-img :src="item?.image" height="30" width="30" cover />
+        <v-img :src="item?.image" height="30" width="30" cover class="icon-preview" />
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
@@ -219,4 +219,4 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

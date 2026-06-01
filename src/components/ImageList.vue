@@ -12,8 +12,8 @@
         <v-img
           :src="image"
           height="250"
-          class="rounded"
-          alt="image"          
+          class="rounded icon-preview"
+          alt="image"
         />
         <v-btn
           @click="removeImage(index)"

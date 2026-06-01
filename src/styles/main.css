@@ -2,6 +2,12 @@
   cursor: pointer;
 }
 
+.icon-preview {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+}
+
 .hotels-data-table .v-data-table-footer__info {
   display: none !important;
 }

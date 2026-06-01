@@ -22,7 +22,7 @@
           <v-img
             :src="getImageUrl(image)"
             height="250"
-            class="rounded"
+            class="rounded icon-preview"
             alt="image"
           />
           <v-btn
