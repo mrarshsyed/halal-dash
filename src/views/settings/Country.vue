@@ -21,6 +21,10 @@
         {{ item?.subRegion?.name }}
         <v-chip v-if="item?.subRegion?.holidayIndex > 0" size="x-small" class="ml-1">{{ item?.subRegion?.holidayIndex }}</v-chip>
       </template>
+      <template #item.holidayIndex="{ item }">
+        <v-chip v-if="item?.holidayIndex > 0" size="x-small">{{ item?.holidayIndex }}</v-chip>
+        <span v-else>-</span>
+      </template>
       <template #item.action="{ item }">
         <v-icon class="cursor-pointer" @click="onEdit(item)" icon="mdi-pencil-box" />
       </template>
@@ -29,6 +33,12 @@
     <v-dialog v-model="dialog.show" max-width="970" persistent>
       <v-card :title="`Update Image — ${dialog.countryName}`">
         <v-card-text>
+          <v-text-field
+            v-model="dialog.holidayIndex"
+            label="Holiday Index"
+            type="number"
+            class="mb-2"
+          />
           <v-file-input
             v-model="dialog.file"
             label="Image"
@@ -90,6 +100,7 @@ const dialog = ref({
   countryName: '',
   regionId: null,
   subRegionId: null,
+  holidayIndex: 0,
   existingImage: null,
   file: null
 })
@@ -109,6 +120,7 @@ const headers = [
   { title: 'Country', key: 'name', align: 'start' },
   { title: 'Region', key: 'region', align: 'start' },
   { title: 'Sub Region', key: 'subRegion', align: 'start' },
+  { title: 'Holiday Index', key: 'holidayIndex', align: 'start' },
   { title: 'Action', key: 'action', align: 'start' }
 ]
 
@@ -130,6 +142,7 @@ const onEdit = (item) => {
   dialog.value.countryName = item?.country?.name
   dialog.value.regionId = item?.region?._id
   dialog.value.subRegionId = item?.subRegion?._id
+  dialog.value.holidayIndex = item?.holidayIndex ?? 0
   dialog.value.existingImage = item?.image ?? null
   dialog.value.file = null
   dialog.value.show = true
@@ -137,16 +150,13 @@ const onEdit = (item) => {
 
 const save = async () => {
   const file = Array.isArray(dialog.value.file) ? dialog.value.file[0] : dialog.value.file
-  if (!file) {
-    store.showSnackbar('Please select an image', 'error')
-    return
-  }
 
   const formData = new FormData()
-  formData.append('image', file)
+  if (file) formData.append('image', file)
   formData.append('data', JSON.stringify({
     region: dialog.value.regionId,
-    subRegion: dialog.value.subRegionId
+    subRegion: dialog.value.subRegionId,
+    holidayIndex: Number(dialog.value.holidayIndex) || 0
   }))
 
   const response = await axios.patch(`admin/misc/countries/${dialog.value.countryCode}`, formData)

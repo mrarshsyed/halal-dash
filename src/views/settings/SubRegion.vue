@@ -53,6 +53,7 @@ const Form = ref({
   id: null,
   fields: [
     { type: 'text', key: 'name', label: 'Name', isRequired: true, value: null },
+    { type: 'text', key: 'holidayIndex', label: 'Holiday Index', isRequired: false, value: null, inputType: 'number' },
     {
       type: 'select',
       key: 'region',
@@ -141,6 +142,7 @@ const save = async () => {
     'data',
     JSON.stringify({
       name: store.getFieldValue('name'),
+      holidayIndex: Number(store.getFieldValue('holidayIndex')) || 0,
       region: store.getFieldValue('region')
     })
   )
@@ -178,9 +180,10 @@ const onEdit = (item) => {
   store.setRatingDetails(item)
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  Form.value.fields[1].value = item?.region?._id ?? item?.region
-  Form.value.fields[1].options = regions.value
-  Form.value.fields[2].value = item?.image ? [item?.image] : []
+  Form.value.fields[1].value = item?.holidayIndex ?? 0
+  Form.value.fields[2].value = item?.region?._id ?? item?.region
+  Form.value.fields[2].options = regions.value
+  Form.value.fields[3].value = item?.image ? [item?.image] : []
   store.showDialog({
     title: 'Update Sub Region',
     content: '',

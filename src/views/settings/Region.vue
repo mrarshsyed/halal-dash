@@ -50,6 +50,7 @@ const Form = ref({
   id: null,
   fields: [
     { type: 'text', key: 'name', label: 'Name', isRequired: true, value: null },
+    { type: 'text', key: 'holidayIndex', label: 'Holiday Index', isRequired: false, value: null, inputType: 'number' },
     {
       cols: 12,
       md: 12,
@@ -113,7 +114,10 @@ const save = async () => {
   const uploads = store.getFieldValue('uploads')
 
   const formData = new FormData()
-  formData.append('data', JSON.stringify({ name: store.getFieldValue('name') }))
+  formData.append('data', JSON.stringify({
+    name: store.getFieldValue('name'),
+    holidayIndex: Number(store.getFieldValue('holidayIndex')) || 0
+  }))
   if (uploads?.[0]) {
     formData.append('image', uploads[0])
   }
@@ -146,7 +150,8 @@ const onEdit = (item) => {
   store.setRatingDetails(item)
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  Form.value.fields[1].value = item?.image ? [item?.image] : []
+  Form.value.fields[1].value = item?.holidayIndex ?? 0
+  Form.value.fields[2].value = item?.image ? [item?.image] : []
   store.showDialog({
     title: 'Update Region',
     content: '',
