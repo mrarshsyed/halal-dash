@@ -179,9 +179,10 @@ const onEdit = (item) => {
   resetForm()
   store.setRatingDetails(item)
   Form.value.id = item?._id
+  const regionId = item?.region?._id ?? item?.region
   Form.value.fields[0].value = item?.name
   Form.value.fields[1].value = item?.holidayIndex ?? 0
-  Form.value.fields[2].value = item?.region?._id ?? item?.region
+  Form.value.fields[2].value = regionId
   Form.value.fields[2].options = regions.value
   Form.value.fields[3].value = item?.image ? [item?.image] : []
   store.showDialog({
@@ -191,6 +192,7 @@ const onEdit = (item) => {
     formComponents: Form.value,
     confirmFunction: save
   })
+  store.updateField('region', regionId)
 }
 
 const deleteSubRegion = async () => {
