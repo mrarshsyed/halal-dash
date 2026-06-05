@@ -82,361 +82,378 @@
         </h3>
       </v-col>
 
-      <!-- Name & Slug -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.name"
-          label="Name"
-          required
-          :rules="[
-            (v) => !!v || 'Name is required',
-            (v) => (v && v.length <= 25) || 'Name must be 25 characters or less'
-          ]"
-          @update:model-value="onNameChange"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.slug"
-          label="Slug Preview"
-          :rules="[(v) => !!v || 'Slug is required']"
-        />
-      </v-col>
-
-      <!-- Currency -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Select Currency"
-          :items="currencyList"
-          item-title="name"
-          item-value="_id"
-          required
-          :rules="[(v) => !!v || 'Currency is required']"
-          v-model="formData.currency"
-          return-object
-        />
-      </v-col>
-
-      <!-- Category (required) -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Category"
-          :items="categoryList"
-          item-title="name"
-          item-value="_id"
-          required
-          :rules="[(v) => !!v || 'Category is required']"
-          v-model="formData.category"
-        />
-      </v-col>
-
-      <!-- Type (optional) -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Type (optional)"
-          :items="typeList"
-          item-title="name"
-          item-value="_id"
-          v-model="formData.type"
-          @update:model-value="onTypeChange"
-        />
-      </v-col>
-
-      <!-- Offer (optional, filtered by type) -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Offer (optional)"
-          :items="getFilteredOfferList()"
-          item-title="name"
-          item-value="_id"
-          v-model="formData.offer"
-          :disabled="!formData.type"
-          :hint="!formData.type ? 'Select a type first' : ''"
-          persistent-hint
-        />
-      </v-col>
-
-      <!-- Country -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Select Country"
-          :items="countryList"
-          :item-title="(item) => item.country?.name"
-          item-value="_id"
-          :rules="[(v) => !!v || 'Country is required']"
-          v-model="formData.country"
-        />
-      </v-col>
-
-      <!-- Address -->
       <v-col cols="12">
-        <v-textarea
-          v-model="formData.address"
-          label="Address"
-          required
-          :rules="[(v) => !!v || 'Address is required']"
-        />
-      </v-col>
-
-      <!-- Duration -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.duration.days"
-          label="Duration (Days)"
-          type="number"
-          :rules="[validatePositiveInteger, validateRequired]"
-          required
-          @update:model-value="onDurationChange"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-text-field
-          v-model="formData.duration.nights"
-          label="Duration (Nights)"
-          type="number"
-          :rules="[validatePositiveInteger, validateRequired]"
-          required
-          @update:model-value="onDurationChange"
-        />
-      </v-col>
-
-      <!-- Date mode toggle -->
-      <v-col cols="12">
-        <v-btn-toggle
-          v-model="dateMode"
-          mandatory
-          color="primary"
-          density="compact"
-          @update:model-value="onDateModeChange"
-        >
-          <v-btn value="fixed">
-            Fixed Dates
-          </v-btn>
-          <v-btn value="approx">
-            Approximate Dates
-          </v-btn>
-        </v-btn-toggle>
-      </v-col>
-
-      <!-- Fixed Dates -->
-      <template v-if="dateMode === 'fixed'">
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <div
-            class="border pa-4"
-            v-if="
-              formData.duration.nights === '' || formData.duration.days === ''
-            "
+        <v-sheet elevation="2">
+          <v-tabs
+            v-model="activeTab"
+            color="primary"
           >
-            Start Date: Add Duration (Days & Nights) First
-          </div>
-          <v-menu
-            v-else
-            v-model="startDateMenu"
-            :close-on-content-click="false"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                label="Start Date"
-                :rules="[(v) => !!v || 'Start Date is required']"
-                v-model="formData.startDate"
-                v-bind="props"
-                prepend-inner-icon="mdi-calendar"
-                readonly
-              />
-            </template>
-            <v-date-picker
-              v-bind="$attrs"
-              v-model="formData.startDate"
-              color="primary"
-              @update:model-value="onStartDateChange"
-            />
-          </v-menu>
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <div
-            class="border pa-4"
-            v-if="
-              formData.duration.nights === '' || formData.duration.days === ''
-            "
-          >
-            End Date: Add Duration (Days & Nights) First
-          </div>
-          <v-menu
-            v-else
-            v-model="endDateMenu"
-            :close-on-content-click="false"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                label="End Date"
-                :rules="[(v) => !!v || 'End Date is required']"
-                v-model="formData.endDate"
-                v-bind="props"
-                prepend-inner-icon="mdi-calendar"
-                readonly
-                disabled
-              />
-            </template>
-            <v-date-picker
-              v-bind="$attrs"
-              v-model="formData.endDate"
-              color="primary"
-            />
-          </v-menu>
-        </v-col>
-      </template>
+            <v-tab value="basic">Basic Info</v-tab>
+            <v-tab value="dates">Duration &amp; Dates</v-tab>
+            <v-tab value="gallery">Gallery</v-tab>
+            <v-tab value="details">Details</v-tab>
+            <v-tab value="itinerary">Itinerary &amp; Info</v-tab>
+            <v-tab value="prices">Prices</v-tab>
+          </v-tabs>
+          <v-divider />
+          <v-window v-model="activeTab">
 
-      <!-- Approx Dates -->
-      <template v-if="dateMode === 'approx'">
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            v-model="approxStartMonth"
-            label="Approx Start Date"
-            type="month"
-            :rules="[(v) => !!v || 'Approx Start Date is required']"
-            prepend-inner-icon="mdi-calendar"
-            @update:model-value="onApproxStartMonthChange"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            v-model="approxEndMonth"
-            label="Approx End Date (optional)"
-            type="month"
-            prepend-inner-icon="mdi-calendar"
-            :rules="[
-              (v) =>
-                !v ||
-                !approxStartMonth ||
-                v >= approxStartMonth ||
-                'End date must be after start date'
-            ]"
-            @update:model-value="onApproxEndMonthChange"
-          />
-        </v-col>
-      </template>
+            <!-- Basic Info -->
+            <v-window-item value="basic">
+              <v-row class="pa-4">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.name"
+                    label="Name"
+                    required
+                    :rules="[
+                      (v) => !!v || 'Name is required',
+                      (v) => (v && v.length <= 25) || 'Name must be 25 characters or less'
+                    ]"
+                    @update:model-value="onNameChange"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.slug"
+                    label="Slug Preview"
+                    :rules="[(v) => !!v || 'Slug is required']"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Select Currency"
+                    :items="currencyList"
+                    item-title="name"
+                    item-value="_id"
+                    required
+                    :rules="[(v) => !!v || 'Currency is required']"
+                    v-model="formData.currency"
+                    return-object
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Category"
+                    :items="categoryList"
+                    item-title="name"
+                    item-value="_id"
+                    required
+                    :rules="[(v) => !!v || 'Category is required']"
+                    v-model="formData.category"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Type"
+                    :items="typeList"
+                    item-title="name"
+                    item-value="_id"
+                    required
+                    :rules="[(v) => !!v || 'Type is required']"
+                    v-model="formData.type"
+                    @update:model-value="onTypeChange"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Offer"
+                    :items="getFilteredOfferList()"
+                    item-title="name"
+                    item-value="_id"
+                    required
+                    :rules="[(v) => !!v || 'Offer is required']"
+                    v-model="formData.offer"
+                    :disabled="!formData.type"
+                    :hint="!formData.type ? 'Select a type first' : ''"
+                    persistent-hint
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Select Country"
+                    :items="countryList"
+                    :item-title="(item) => item.country?.name"
+                    item-value="_id"
+                    :rules="[(v) => !!v || 'Country is required']"
+                    v-model="formData.country"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    v-model="formData.address"
+                    label="Address"
+                    required
+                    :rules="[(v) => !!v || 'Address is required']"
+                  />
+                </v-col>
+              </v-row>
+            </v-window-item>
 
-      <!-- Offer Type -->
-      <v-col cols="12">
-        <p class="mb-2">
-          Offer Type
-        </p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.offerType"
-          class="mb-4"
-        />
-      </v-col>
+            <!-- Duration & Dates -->
+            <v-window-item value="dates">
+              <v-row class="pa-4">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.duration.days"
+                    label="Duration (Days)"
+                    type="number"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                    required
+                    @update:model-value="onDurationChange"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-text-field
+                    v-model="formData.duration.nights"
+                    label="Duration (Nights)"
+                    type="number"
+                    :rules="[validatePositiveInteger, validateRequired]"
+                    required
+                    @update:model-value="onDurationChange"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <v-btn-toggle
+                    v-model="dateMode"
+                    mandatory
+                    color="primary"
+                    density="compact"
+                    @update:model-value="onDateModeChange"
+                  >
+                    <v-btn value="fixed">
+                      Fixed Dates
+                    </v-btn>
+                    <v-btn value="approx">
+                      Approximate Dates
+                    </v-btn>
+                  </v-btn-toggle>
+                </v-col>
+                <template v-if="dateMode === 'fixed'">
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <div
+                      class="border pa-4"
+                      v-if="formData.duration.nights === '' || formData.duration.days === ''"
+                    >
+                      Start Date: Add Duration (Days &amp; Nights) First
+                    </div>
+                    <v-menu
+                      v-else
+                      v-model="startDateMenu"
+                      :close-on-content-click="false"
+                    >
+                      <template #activator="{ props }">
+                        <v-text-field
+                          label="Start Date"
+                          :rules="[(v) => !!v || 'Start Date is required']"
+                          v-model="formData.startDate"
+                          v-bind="props"
+                          prepend-inner-icon="mdi-calendar"
+                          readonly
+                        />
+                      </template>
+                      <v-date-picker
+                        v-bind="$attrs"
+                        v-model="formData.startDate"
+                        color="primary"
+                        @update:model-value="onStartDateChange"
+                      />
+                    </v-menu>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <div
+                      class="border pa-4"
+                      v-if="formData.duration.nights === '' || formData.duration.days === ''"
+                    >
+                      End Date: Add Duration (Days &amp; Nights) First
+                    </div>
+                    <v-menu
+                      v-else
+                      v-model="endDateMenu"
+                      :close-on-content-click="false"
+                    >
+                      <template #activator="{ props }">
+                        <v-text-field
+                          label="End Date"
+                          :rules="[(v) => !!v || 'End Date is required']"
+                          v-model="formData.endDate"
+                          v-bind="props"
+                          prepend-inner-icon="mdi-calendar"
+                          readonly
+                          disabled
+                        />
+                      </template>
+                      <v-date-picker
+                        v-bind="$attrs"
+                        v-model="formData.endDate"
+                        color="primary"
+                      />
+                    </v-menu>
+                  </v-col>
+                </template>
+                <template v-if="dateMode === 'approx'">
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="approxStartMonth"
+                      label="Approx Start Date"
+                      type="month"
+                      :rules="[(v) => !!v || 'Approx Start Date is required']"
+                      prepend-inner-icon="mdi-calendar"
+                      @update:model-value="onApproxStartMonthChange"
+                    />
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="approxEndMonth"
+                      label="Approx End Date (optional)"
+                      type="month"
+                      prepend-inner-icon="mdi-calendar"
+                      :rules="[
+                        (v) =>
+                          !v ||
+                          !approxStartMonth ||
+                          v >= approxStartMonth ||
+                          'End date must be after start date'
+                      ]"
+                      @update:model-value="onApproxEndMonthChange"
+                    />
+                  </v-col>
+                </template>
+              </v-row>
+            </v-window-item>
 
-      <!-- Inclusion Icons -->
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-autocomplete
-          clearable
-          label="Inclusion Icons"
-          :items="inclusionIconList"
-          item-title="name"
-          item-value="_id"
-          required
-          :rules="[
-            (v) => formData.inclusionIcons.length > 0 || 'Icons are required'
-          ]"
-          v-model="formData.inclusionIcons"
-          multiple
-          chips
-        />
-      </v-col>
+            <!-- Gallery -->
+            <v-window-item value="gallery">
+              <v-row class="pa-4">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-autocomplete
+                    clearable
+                    label="Inclusion Icons"
+                    :items="inclusionIconList"
+                    item-title="name"
+                    item-value="_id"
+                    required
+                    :rules="[
+                      (v) => formData.inclusionIcons.length > 0 || 'Icons are required'
+                    ]"
+                    v-model="formData.inclusionIcons"
+                    multiple
+                    chips
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <ImageUploader
+                    label="Images"
+                    :value="formData.uploads"
+                    @update="(data) => onUploadsUpdate(data, 'uploads')"
+                    :image-list="formData.images"
+                    @update-image-link="(data) => onImageUpdate(data, 'images')"
+                    enable-video
+                    :video-upload="formData.videoUpload"
+                    :video-url="formData.video"
+                    @update:video-upload="(f) => { formData.videoUpload = f }"
+                    @update:video-url="(url) => { formData.video = url }"
+                    @error="(msg) => store.showSnackbar(msg, 'error')"
+                  />
+                </v-col>
+              </v-row>
+            </v-window-item>
 
-      <!-- Images -->
-      <v-col cols="12">
-        <ImageUploader
-          label="Images"
-          :value="formData.uploads"
-          @update="(data) => onUploadsUpdate(data, 'uploads')"
-          :image-list="formData.images"
-          @update-image-link="(data) => onImageUpdate(data, 'images')"
-        />
-      </v-col>
+            <!-- Details -->
+            <v-window-item value="details">
+              <v-row class="pa-4">
+                <v-col cols="12">
+                  <p class="mb-2">
+                    Offer Type
+                  </p>
+                  <DocumentEditor
+                    height="200px"
+                    v-model="formData.offerType"
+                    class="mb-4"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <p>Overview</p>
+                  <DocumentEditor
+                    height="200px"
+                    v-model="formData.overview"
+                    class="mb-4"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <p>Inclusion</p>
+                  <DocumentEditor
+                    height="200px"
+                    v-model="formData.inclusions"
+                    class="mb-4"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <p>Exclusion</p>
+                  <DocumentEditor
+                    height="200px"
+                    v-model="formData.exclusions"
+                    class="mb-4"
+                  />
+                </v-col>
+              </v-row>
+            </v-window-item>
 
-      <!-- Rich text fields -->
-      <v-col cols="12">
-        <p>Overview</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.overview"
-          class="mb-4"
-        />
-      </v-col>
-      <v-col cols="12">
-        <p>Inclusion</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.inclusions"
-          class="mb-4"
-        />
-      </v-col>
-      <v-col cols="12">
-        <p>Exclusion</p>
-        <DocumentEditor
-          height="200px"
-          v-model="formData.exclusions"
-          class="mb-4"
-        />
-      </v-col>
-
-      <!-- Expansion Panels -->
-      <v-col cols="12">
-        <v-expansion-panels v-model="panel">
-          <!-- Itinerary -->
-          <v-expansion-panel title="Itinerary *">
-            <v-expansion-panel-text>
-              <v-row>
+            <!-- Itinerary & Info -->
+            <v-window-item value="itinerary">
+              <v-row class="pa-4">
+                <v-col cols="12">
+                  <p class="text-subtitle-1 font-weight-bold mb-2">
+                    Itinerary
+                  </p>
+                </v-col>
                 <v-col
                   cols="12"
                   v-if="dateMode === 'approx'"
@@ -481,7 +498,6 @@
                       Delete
                     </v-btn>
                   </div>
-                  <!-- Fixed mode: readonly date auto-set from start date -->
                   <v-text-field
                     v-if="dateMode === 'fixed'"
                     label="Date"
@@ -491,7 +507,6 @@
                     prepend-inner-icon="mdi-calendar"
                     readonly
                   />
-                  <!-- Approx mode: manually pick date -->
                   <v-text-field
                     v-else
                     label="Date"
@@ -516,14 +531,66 @@
                     class="mb-4"
                   />
                 </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
 
-          <!-- Prices -->
-          <v-expansion-panel title="Prices">
-            <v-expansion-panel-text class="pb-10">
-              <v-row class="mt-4">
+                <v-col cols="12">
+                  <v-divider class="my-6" />
+                  <p class="text-subtitle-1 font-weight-bold mb-4">
+                    Additional Information
+                  </p>
+                </v-col>
+                <v-col cols="12">
+                  <div class="text-right">
+                    <v-btn
+                      color="primary"
+                      size="small"
+                      @click="addMoreAdditionalInfo"
+                    >
+                      + Add More
+                    </v-btn>
+                  </div>
+                </v-col>
+                <v-col
+                  v-for="(value, key) in formData.additionalInformation"
+                  :key="key"
+                  cols="12"
+                  class="border px-2 mb-4 rounded"
+                >
+                  <div class="text-right my-4">
+                    <v-btn
+                      color="error"
+                      size="x-small"
+                      @click="removeAdditionalInfo(key)"
+                    >
+                      Delete
+                    </v-btn>
+                  </div>
+                  <v-text-field
+                    v-model="value.title"
+                    label="Title"
+                    :rules="[validateRequired]"
+                  />
+                  <p class="mt-6 mb-2">
+                    Description
+                  </p>
+                  <DocumentEditor
+                    :key="`additional-info-description-${editorKey}`"
+                    height="200px"
+                    v-model="value.description"
+                    class=""
+                  />
+                  <p
+                    v-if="!value.description"
+                    class="text-error"
+                  >
+                    Description is required
+                  </p>
+                </v-col>
+              </v-row>
+            </v-window-item>
+
+            <!-- Prices -->
+            <v-window-item value="prices">
+              <v-row class="pa-4">
                 <v-col
                   cols="12"
                   md="6"
@@ -576,62 +643,10 @@
                   />
                 </v-col>
               </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
+            </v-window-item>
 
-          <!-- Additional Information -->
-          <v-expansion-panel title="Additional Information">
-            <v-expansion-panel-text class="pb-10">
-              <v-row class="mt-4">
-                <v-col cols="12">
-                  <div class="text-right">
-                    <v-btn
-                      color="primary"
-                      @click="addMoreAdditionalInfo"
-                    >
-                      + Add More
-                    </v-btn>
-                  </div>
-                </v-col>
-                <v-col
-                  v-for="(value, key) in formData.additionalInformation"
-                  :key="key"
-                  cols="12"
-                  class="border px-2 mb-4 rounded"
-                >
-                  <div class="text-right my-4">
-                    <v-btn
-                      color="error"
-                      @click="removeAdditionalInfo(key)"
-                    >
-                      Delete
-                    </v-btn>
-                  </div>
-                  <v-text-field
-                    v-model="value.title"
-                    label="Title"
-                    :rules="[validateRequired]"
-                  />
-                  <p class="mt-6 mb-2">
-                    Description
-                  </p>
-                  <DocumentEditor
-                    :key="`additional-info-description-${editorKey}`"
-                    height="200px"
-                    v-model="value.description"
-                    class=""
-                  />
-                  <p
-                    v-if="!value.description"
-                    class="text-error"
-                  >
-                    Description is required
-                  </p>
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
+          </v-window>
+        </v-sheet>
       </v-col>
 
       <v-col cols="12">
@@ -890,6 +905,7 @@ const moduleName = 'Package'
 
 const initialFormData = {
   name: '',
+  slug: '',
   address: '',
   country: null,
   category: null,
@@ -916,7 +932,9 @@ const initialFormData = {
   inclusionIcons: [],
   itinerary: [],
   images: [],
-  uploads: []
+  uploads: [],
+  video: null,
+  videoUpload: null
 }
 
 const currencyList = ref([])
@@ -941,7 +959,7 @@ const form = ref()
 const formValue = ref(false)
 const showForm = ref(false)
 const detailsData = ref({})
-const panel = ref([0])
+const activeTab = ref('basic')
 
 const table_data = ref({
   loading: true,
@@ -1020,6 +1038,7 @@ const onDetails = (item) => {
 const removeUploads = (obj) => {
   let newObject = { ...obj }
   delete newObject.uploads
+  delete newObject.videoUpload
   return newObject
 }
 
@@ -1034,12 +1053,13 @@ const getFilesPayload = () => {
       }
     })
   }
-  return { files, fileMapper }
+  const videoFile = formData.value?.videoUpload instanceof File ? formData.value.videoUpload : null
+  return { files, fileMapper, videoFile }
 }
 
 const getDataPayload = () => {
   try {
-    let { files, fileMapper } = getFilesPayload()
+    let { files, fileMapper, videoFile } = getFilesPayload()
     let data = removeUploads(formData.value)
     data.fileMapper = fileMapper
 
@@ -1077,6 +1097,9 @@ const getDataPayload = () => {
     files?.forEach((file) => {
       formdata.append('uploads', file)
     })
+    if (videoFile) {
+      formdata.append('video', videoFile)
+    }
     return formdata
   } catch (error) {
     console.log(error)
@@ -1084,8 +1107,7 @@ const getDataPayload = () => {
 }
 
 const save = async () => {
-  panel.value = [0, 1, 2]
-  form.value.validate()
+  await form.value.validate()
 
   if (!formData.value.itinerary?.length) {
     store.showSnackbar('Itinerary must have at least 1 item', 'error')
@@ -1245,8 +1267,8 @@ onBeforeMount(async () => {
         const data = { ...details.data }
 
         // Normalize populated objects to ObjectId strings for form selects
-        data.country = data.country?._id ?? data.country
-        data.category = data.category?._id ?? data.category
+        data.country = data.country?._id ?? data.country ?? null
+        data.category = data.category?._id ?? data.category ?? null
         data.type = data.type?._id ?? data.type ?? null
         data.offer = data.offer?._id ?? data.offer ?? null
         data.inclusionIcons = data.inclusionIcons?.map((x) => x?._id ?? x)
@@ -1268,7 +1290,7 @@ onBeforeMount(async () => {
             el.date = new Date(el.date)
           })
         }
-        formData.value = data
+        formData.value = { ...data, videoUpload: null, video: data.video || null }
       } else if (detailsMode.value) {
         // Keep full populated objects for display
         detailsData.value = { ...details.data }

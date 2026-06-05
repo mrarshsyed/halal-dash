@@ -1,11 +1,12 @@
 <template>
   <v-layout>
     <v-app-bar density="comfortable" class="py-1">
-      <!-- <v-app-bar-nav-icon
-        v-if="store?.user?.data._id"
+      <!-- Hamburger — mobile only, when logged in -->
+      <v-app-bar-nav-icon
+        v-if="mobile && store.getUser"
         variant="text"
-        @click.stop="drawer != drawer"
-      /> -->
+        @click.stop="mobileDrawerOpen = !mobileDrawerOpen"
+      />
 
       <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">
         <v-img src="@/assets/logo.svg" height="80px" width="220px" />
@@ -31,7 +32,8 @@
     <v-navigation-drawer
       v-model="drawer"
       location="left"
-      permanent
+      :permanent="!mobile"
+      :temporary="mobile"
       style="min-width: max-content"
       class="py-2"
       :key="navKey"
@@ -47,6 +49,7 @@
             :title="item?.title"
             exact
             link
+            @click="mobile && (mobileDrawerOpen = false)"
           />
           <v-list-group v-else :value="item?.value">
             <template #activator="{ props }">
@@ -68,6 +71,7 @@
               :value="child?.value"
               :to="child?.to"
               color="primary"
+              @click="mobile && (mobileDrawerOpen = false)"
             />
           </v-list-group>
         </div>
@@ -85,21 +89,22 @@
     </v-main>
   </v-layout>
 </template>
+
 <script setup>
 import { useAppStore } from '@/store/app'
-import { computed } from 'vue'
-import { useTheme } from 'vuetify'
+import { computed, ref } from 'vue'
+import { useDisplay, useTheme } from 'vuetify'
 
 const store = useAppStore()
 const theme = useTheme()
+const { mobile } = useDisplay()
 
-const links = computed(() => {
-  return store.sideBarLinks
-})
+const mobileDrawerOpen = ref(false)
 
-const navKey = computed(() => {
-  return store.sideBarLinks?.length ? store.sideBarLinks.length : 0
-})
+const links = computed(() => store.sideBarLinks)
+
+const navKey = computed(() => store.sideBarLinks?.length ?? 0)
+
 const loading = computed(() => store.isLoading)
 
 const toggleTheme = () => {
@@ -108,11 +113,11 @@ const toggleTheme = () => {
 
 const drawer = computed({
   get: () => {
+    if (mobile.value) return mobileDrawerOpen.value
     return store.sideBarLinks?.length ? true : false
   },
-  set: (newValue) => {
-    // Assuming fields[2] already exists, if not, you may need to initialize it
-    console.log(newValue)
+  set: (val) => {
+    if (mobile.value) mobileDrawerOpen.value = val
   }
 })
 </script>

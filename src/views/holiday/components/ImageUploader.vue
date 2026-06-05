@@ -64,11 +64,58 @@
         </div>
       </v-col>
     </v-row>
+
+    <!-- Optional single video upload -->
+    <template v-if="enableVideo">
+      <v-file-input
+        v-model="videoFileInput"
+        :prepend-icon="null"
+        prepend-inner-icon="mdi-video"
+        label="Video (optional)"
+        variant="outlined"
+        accept="video/*"
+        :chips="true"
+        class="mt-2"
+        clearable
+        @click:clear="clearVideo"
+      />
+      <!-- Local preview -->
+      <div v-if="videoUploadRef" class="pa-2">
+        <video
+          :src="getVideoUrl(videoUploadRef)"
+          controls
+          style="width: 100%; max-height: 320px; border-radius: 8px"
+        />
+        <v-btn
+          @click="clearVideo"
+          icon="mdi-delete"
+          color="error"
+          size="x-small"
+          class="mt-1"
+        />
+      </div>
+      <!-- API / remote URL preview (only for valid https URLs) -->
+      <div v-else-if="safeVideoUrl" class="pa-2">
+        <video
+          :src="safeVideoUrl"
+          controls
+          style="width: 100%; max-height: 320px; border-radius: 8px"
+        />
+        <v-btn
+          v-if="showVideoDeleteIcon"
+          @click="clearVideoUrl"
+          icon="mdi-delete"
+          color="error"
+          size="x-small"
+          class="mt-1"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps({
   value: {
@@ -79,19 +126,49 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  showImgListDeleteIcon : {
+  showImgListDeleteIcon: {
     type: Boolean,
     default: true
   },
-  label:{
+  label: {
     type: String,
     default: 'Images'
+  },
+  // --- video props (all optional, existing usages unaffected) ---
+  enableVideo: {
+    type: Boolean,
+    default: false
+  },
+  videoUpload: {
+    default: null
+  },
+  videoUrl: {
+    type: String,
+    default: null
+  },
+  showVideoDeleteIcon: {
+    type: Boolean,
+    default: true
   }
 })
-const emit = defineEmits(['update', 'updateImageLink'])
+const emit = defineEmits(['update', 'updateImageLink', 'update:videoUpload', 'update:videoUrl', 'error'])
 
-const uploads = ref([...props.value]);
-const images = ref([...props.imageList]);
+const uploads = ref([...props.value])
+const images = ref([...props.imageList])
+// v-file-input always gives an array; keep a separate array ref for the input binding
+const videoFileInput = ref(props.videoUpload ? [props.videoUpload] : [])
+// single File (or null) derived from the input array
+const videoUploadRef = ref(props.videoUpload instanceof File ? props.videoUpload : null)
+
+const safeVideoUrl = computed(() => {
+  try {
+    if (!props.videoUrl || typeof props.videoUrl !== 'string') return null
+    const url = new URL(props.videoUrl)
+    return url.protocol === 'https:' ? props.videoUrl : null
+  } catch {
+    return null
+  }
+})
 
 const removeImage = (index) => {
   uploads.value.splice(index, 1)
@@ -102,31 +179,57 @@ const removeImageLink = (index) => {
   emit('updateImageLink', images.value)
 }
 
+const clearVideo = () => {
+  videoFileInput.value = []
+  videoUploadRef.value = null
+  emit('update:videoUpload', null)
+}
+
+const clearVideoUrl = () => {
+  emit('update:videoUrl', null)
+}
+
 const getImageUrl = (file) => {
-  if (!file) {
-    console.error('File object is null or undefined.')
+  if (!file) return null
+  try {
+    return URL.createObjectURL(file)
+  } catch {
     return null
   }
+}
+
+const getVideoUrl = (file) => {
+  if (!file) return null
   try {
-    const localURL = URL.createObjectURL(file)
-    return localURL
-  } catch (error) {
-    console.error('Error creating local URL:', error)
+    return URL.createObjectURL(file)
+  } catch {
     return null
   }
 }
 
 watch(() => uploads.value, () => {
   emit('update', uploads.value)
-
 })
 
 watch(() => images.value, () => {
   emit('updateImageLink', images.value)
-
 })
 
+const VIDEO_MAX_BYTES = 4 * 1024 * 1024 // 4 MB
 
+watch(videoFileInput, (val) => {
+  // v-file-input returns an array; unwrap to single File or null
+  const file = Array.isArray(val) ? (val[0] ?? null) : (val ?? null)
+  if (file instanceof File && file.size > VIDEO_MAX_BYTES) {
+    videoFileInput.value = []
+    videoUploadRef.value = null
+    emit('update:videoUpload', null)
+    emit('error', 'Video file must be 4 MB or less')
+    return
+  }
+  videoUploadRef.value = file instanceof File ? file : null
+  emit('update:videoUpload', videoUploadRef.value)
+})
 </script>
 
 <style scoped>
@@ -135,11 +238,9 @@ watch(() => images.value, () => {
   top: 5px;
   right: 5px;
 }
-.imageLinkDelete{
+.imageLinkDelete {
   position: absolute;
   top: 5px;
   right: 5px;
 }
-
-/* Add your component-specific styles here */
 </style>
