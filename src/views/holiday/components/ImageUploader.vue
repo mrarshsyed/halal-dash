@@ -215,18 +215,9 @@ watch(() => images.value, () => {
   emit('updateImageLink', images.value)
 })
 
-const VIDEO_MAX_BYTES = 4 * 1024 * 1024 // 4 MB
-
 watch(videoFileInput, (val) => {
   // v-file-input returns an array; unwrap to single File or null
   const file = Array.isArray(val) ? (val[0] ?? null) : (val ?? null)
-  if (file instanceof File && file.size > VIDEO_MAX_BYTES) {
-    videoFileInput.value = []
-    videoUploadRef.value = null
-    emit('update:videoUpload', null)
-    emit('error', 'Video file must be 4 MB or less')
-    return
-  }
   videoUploadRef.value = file instanceof File ? file : null
   emit('update:videoUpload', videoUploadRef.value)
 })

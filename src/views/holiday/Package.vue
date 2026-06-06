@@ -1053,13 +1053,17 @@ const getFilesPayload = () => {
       }
     })
   }
-  const videoFile = formData.value?.videoUpload instanceof File ? formData.value.videoUpload : null
-  return { files, fileMapper, videoFile }
+  if (formData.value?.videoUpload instanceof File) {
+    // index in uploads array must match index in fileMapper
+    files.push(formData.value.videoUpload)
+    fileMapper.push({ resource: 'video', name: formData.value.videoUpload.name })
+  }
+  return { files, fileMapper }
 }
 
 const getDataPayload = () => {
   try {
-    let { files, fileMapper, videoFile } = getFilesPayload()
+    let { files, fileMapper } = getFilesPayload()
     let data = removeUploads(formData.value)
     data.fileMapper = fileMapper
 
@@ -1092,14 +1096,16 @@ const getDataPayload = () => {
       }
     })
 
+    // If a new video file is being uploaded, clear the stored URL so they don't conflict
+    if (formData.value?.videoUpload instanceof File) {
+      delete data.video
+    }
+
     let formdata = new FormData()
     formdata.append('data', JSON.stringify(data))
     files?.forEach((file) => {
       formdata.append('uploads', file)
     })
-    if (videoFile) {
-      formdata.append('video', videoFile)
-    }
     return formdata
   } catch (error) {
     console.log(error)
@@ -1173,39 +1179,45 @@ const onDelete = (item) => {
 }
 
 const getCurrencyList = async () => {
-  await axios.get('misc/currencies').then((res) => {
+  try {
+    const res = await axios.get('misc/currencies')
     if (res?.data?.length) currencyList.value = res.data
-  })
+  } catch {}
 }
 
 const getCountryList = async () => {
-  await axios.get('admin/misc/countries').then((res) => {
+  try {
+    const res = await axios.get('admin/misc/countries')
     if (res?.data?.length) countryList.value = res.data
-  })
+  } catch {}
 }
 
 const getInclusionIconList = async () => {
-  await axios.get('/admin/holiday/inclusion-icons').then((res) => {
+  try {
+    const res = await axios.get('/admin/holiday/inclusion-icons')
     if (res?.data?.length) inclusionIconList.value = res.data
-  })
+  } catch {}
 }
 
 const getCategoryList = async () => {
-  await axios.get('admin/holiday/categories').then((res) => {
+  try {
+    const res = await axios.get('admin/holiday/categories')
     if (res?.data?.length) categoryList.value = res.data
-  })
+  } catch {}
 }
 
 const getTypeList = async () => {
-  await axios.get('admin/holiday/types').then((res) => {
+  try {
+    const res = await axios.get('admin/holiday/types')
     if (res?.data?.length) typeList.value = res.data
-  })
+  } catch {}
 }
 
 const getOfferList = async () => {
-  await axios.get('admin/holiday/offers').then((res) => {
+  try {
+    const res = await axios.get('admin/holiday/offers')
     if (res?.data?.length) offerList.value = res.data
-  })
+  } catch {}
 }
 
 const onStartDateChange = (date) => {
@@ -1260,42 +1272,44 @@ onBeforeMount(async () => {
   ])
 
   if (id.value) {
-    const details = await axios.get(`admin/holiday/packages/${id.value}`)
+    try {
+      const details = await axios.get(`admin/holiday/packages/${id.value}`)
 
-    if (details?.data?._id) {
-      if (formMode.value) {
-        const data = { ...details.data }
+      if (details?.data?._id) {
+        if (formMode.value) {
+          const data = { ...details.data }
 
-        // Normalize populated objects to ObjectId strings for form selects
-        data.country = data.country?._id ?? data.country ?? null
-        data.category = data.category?._id ?? data.category ?? null
-        data.type = data.type?._id ?? data.type ?? null
-        data.offer = data.offer?._id ?? data.offer ?? null
-        data.inclusionIcons = data.inclusionIcons?.map((x) => x?._id ?? x)
+          // Normalize populated objects to ObjectId strings for form selects
+          data.country = data.country?._id ?? data.country ?? null
+          data.category = data.category?._id ?? data.category ?? null
+          data.type = data.type?._id ?? data.type ?? null
+          data.offer = data.offer?._id ?? data.offer ?? null
+          data.inclusionIcons = data.inclusionIcons?.map((x) => x?._id ?? x)
 
-        if (data.approxStartDate) {
-          dateMode.value = 'approx'
-          approxStartMonth.value = data.approxStartDate.substring(0, 7)
-          approxEndMonth.value = data.approxEndDate?.substring(0, 7) ?? ''
-          data.approxStartDate = data.approxStartDate.substring(0, 10)
-          data.approxEndDate = data.approxEndDate ? data.approxEndDate.substring(0, 10) : null
-          data.itinerary?.forEach((el) => {
-            el.date = el.date ? el.date.substring(0, 10) : ''
-          })
-        } else {
-          dateMode.value = 'fixed'
-          if (data.startDate) data.startDate = new Date(data.startDate)
-          if (data.endDate) data.endDate = new Date(data.endDate)
-          data.itinerary?.forEach((el) => {
-            el.date = new Date(el.date)
-          })
+          if (data.approxStartDate) {
+            dateMode.value = 'approx'
+            approxStartMonth.value = data.approxStartDate.substring(0, 7)
+            approxEndMonth.value = data.approxEndDate?.substring(0, 7) ?? ''
+            data.approxStartDate = data.approxStartDate.substring(0, 10)
+            data.approxEndDate = data.approxEndDate ? data.approxEndDate.substring(0, 10) : null
+            data.itinerary?.forEach((el) => {
+              el.date = el.date ? el.date.substring(0, 10) : ''
+            })
+          } else {
+            dateMode.value = 'fixed'
+            if (data.startDate) data.startDate = new Date(data.startDate)
+            if (data.endDate) data.endDate = new Date(data.endDate)
+            data.itinerary?.forEach((el) => {
+              el.date = new Date(el.date)
+            })
+          }
+          formData.value = { ...data, videoUpload: null, video: data.video || null }
+        } else if (detailsMode.value) {
+          // Keep full populated objects for display
+          detailsData.value = { ...details.data }
         }
-        formData.value = { ...data, videoUpload: null, video: data.video || null }
-      } else if (detailsMode.value) {
-        // Keep full populated objects for display
-        detailsData.value = { ...details.data }
       }
-    }
+    } catch {}
   }
 
   showForm.value = true
