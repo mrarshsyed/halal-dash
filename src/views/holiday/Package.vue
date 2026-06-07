@@ -766,6 +766,28 @@
         </v-col>
       </v-row>
     </div>
+    <div v-if="detailsData?.images?.length" class="mb-6">
+      <p class="mb-2">Images :</p>
+      <v-row>
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+          v-for="(img, index) in detailsData.images"
+          :key="index"
+        >
+          <v-img :src="img" height="220" class="rounded" cover />
+        </v-col>
+      </v-row>
+    </div>
+    <div v-if="detailsData?.video" class="mb-6">
+      <p class="mb-2">Video :</p>
+      <video
+        :src="detailsData.video"
+        controls
+        style="width: 100%; max-height: 360px; border-radius: 8px"
+      />
+    </div>
     <div class="mb-6">
       <p class="mb-2">
         Overview :
