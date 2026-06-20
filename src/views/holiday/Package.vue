@@ -330,36 +330,20 @@
                   </v-col>
                 </template>
                 <template v-if="dateMode === 'approx'">
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <v-text-field
-                      v-model="approxStartMonth"
-                      label="Approx Start Date"
-                      type="month"
-                      :rules="[(v) => !!v || 'Approx Start Date is required']"
-                      prepend-inner-icon="mdi-calendar"
-                      @update:model-value="onApproxStartMonthChange"
-                    />
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <v-text-field
-                      v-model="approxEndMonth"
-                      label="Approx End Date (optional)"
-                      type="month"
-                      prepend-inner-icon="mdi-calendar"
-                      :rules="[
-                        (v) =>
-                          !v ||
-                          !approxStartMonth ||
-                          v >= approxStartMonth ||
-                          'End date must be after start date'
-                      ]"
-                      @update:model-value="onApproxEndMonthChange"
+                  <v-col cols="12">
+                    <v-autocomplete
+                      v-model="selectedApproxMonths"
+                      label="Select Months"
+                      :items="monthOptions"
+                      item-title="title"
+                      item-value="value"
+                      multiple
+                      chips
+                      closable-chips
+                      clearable
+                      prepend-inner-icon="mdi-calendar-month"
+                      :rules="[(v) => (!!v && v.length > 0) || 'At least one month is required']"
+                      @update:model-value="onApproxMonthsChange"
                     />
                   </v-col>
                 </template>
@@ -970,8 +954,59 @@ const formMode = ref(false)
 const detailsMode = ref(false)
 const id = ref(null)
 const dateMode = ref('fixed')
-const approxStartMonth = ref('')
-const approxEndMonth = ref('')
+const selectedApproxMonths = ref([])
+
+// ─── Pure helpers (no side effects, no refs) ─────────────────────────────────
+
+/**
+ * Returns Jan–Dec options for the given year.
+ * value: 'YYYY-MM' (used for date logic), title: 'Month name only' (shown in UI).
+ */
+const buildMonthOptions = (year) =>
+  Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(year, i, 1)
+    return { value: format(d, 'yyyy-MM'), title: format(d, 'MMMM') }
+  })
+
+/**
+ * Given an array of 'YYYY-MM' strings, sorts them and returns
+ * { approxStartDate: 'YYYY-MM-01', approxEndDate: 'YYYY-MM-DD' }.
+ * Returns null when the array is empty.
+ */
+const approxMonthsToRange = (months) => {
+  if (!months?.length) return null
+  const sorted = [...months].sort()
+  const startMonth = sorted[0]
+  const endMonth = sorted[sorted.length - 1]
+  const [year, month] = endMonth.split('-').map(Number)
+  const lastDay = new Date(year, month, 0).getDate()
+  return {
+    approxStartDate: `${startMonth}-01`,
+    approxEndDate: `${endMonth}-${String(lastDay).padStart(2, '0')}`
+  }
+}
+
+/**
+ * Expands a stored date range back into every 'YYYY-MM' month it contains.
+ * Used when loading an existing record for editing.
+ */
+const dateRangeToMonths = (startDateStr, endDateStr) => {
+  const startM = startDateStr.substring(0, 7)
+  const endM = (endDateStr ?? startDateStr).substring(0, 7)
+  const currentYear = new Date().getFullYear()
+  const months = []
+  let cur = new Date(`${startM}-01`)
+  const stop = new Date(`${endM}-01`)
+  while (cur <= stop) {
+    // Normalize to current year so values match monthOptions entries
+    months.push(`${currentYear}-${format(cur, 'MM')}`)
+    cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1)
+  }
+  return months
+}
+
+// ─── Static options (evaluated once at setup) ────────────────────────────────
+const monthOptions = buildMonthOptions(new Date().getFullYear())
 
 const editorKey = ref(0)
 const startDateMenu = ref(false)
@@ -1005,7 +1040,6 @@ const validateRequired = (v) => !!v || 'This field is required'
 const validatePositiveInteger = (v) =>
   !v || Number(v) > 0 || 'Must be greater than 0'
 
-// Pure functions replacing computed/watch
 const getFilteredOfferList = () => {
   if (!formData.value.type) return offerList.value
   return offerList.value.filter(
@@ -1022,29 +1056,28 @@ const onTypeChange = () => {
 }
 
 const onDurationChange = () => {
+  if (id.value) return // preserve dates in edit mode
   formData.value.startDate = null
   formData.value.endDate = null
 }
 
 const onDateModeChange = (val) => {
+  if (id.value) return // preserve values in edit mode
   if (val === 'fixed') {
     formData.value.approxStartDate = null
     formData.value.approxEndDate = null
-    approxStartMonth.value = ''
-    approxEndMonth.value = ''
+    selectedApproxMonths.value = []
   } else {
     formData.value.startDate = null
     formData.value.endDate = null
-    formData.value.itinerary = [] // clear auto-generated fixed items
+    formData.value.itinerary = []
   }
 }
 
-const onApproxStartMonthChange = (val) => {
-  formData.value.approxStartDate = val ? `${val}-01` : null
-}
-
-const onApproxEndMonthChange = (val) => {
-  formData.value.approxEndDate = val ? `${val}-01` : null
+const onApproxMonthsChange = (selected) => {
+  const range = approxMonthsToRange(selected)
+  formData.value.approxStartDate = range?.approxStartDate ?? null
+  formData.value.approxEndDate = range?.approxEndDate ?? null
 }
 
 const onCreate = () => {
@@ -1130,7 +1163,9 @@ const getDataPayload = () => {
     })
     return formdata
   } catch (error) {
-    console.log(error)
+    console.error('getDataPayload failed:', error)
+    store.showSnackbar('Failed to prepare data for saving', 'error')
+    return null
   }
 }
 
@@ -1155,6 +1190,7 @@ const save = async () => {
 
   if (form.value.isValid) {
     const payload = getDataPayload()
+    if (!payload) return
     const response = id?.value
       ? await axios.patch(`admin/holiday/packages/${id.value}`, payload)
       : await axios.post('admin/holiday/packages', payload)
@@ -1310,10 +1346,9 @@ onBeforeMount(async () => {
 
           if (data.approxStartDate) {
             dateMode.value = 'approx'
-            approxStartMonth.value = data.approxStartDate.substring(0, 7)
-            approxEndMonth.value = data.approxEndDate?.substring(0, 7) ?? ''
             data.approxStartDate = data.approxStartDate.substring(0, 10)
-            data.approxEndDate = data.approxEndDate ? data.approxEndDate.substring(0, 10) : null
+            data.approxEndDate = data.approxEndDate?.substring(0, 10) ?? null
+            selectedApproxMonths.value = dateRangeToMonths(data.approxStartDate, data.approxEndDate)
             data.itinerary?.forEach((el) => {
               el.date = el.date ? el.date.substring(0, 10) : ''
             })
