@@ -691,37 +691,16 @@
     <template v-if="detailsData?.startDate">
       <p class="mb-4">
         Start Date :
-        {{
-          detailsData?.startDate
-            ? format(new Date(detailsData?.startDate), 'MM/dd/yyyy')
-            : ''
-        }}
+        {{ format(new Date(detailsData.startDate), 'MM/dd/yyyy') }}
       </p>
       <p class="mb-4">
         End Date :
-        {{
-          detailsData?.endDate
-            ? format(new Date(detailsData?.endDate), 'MM/dd/yyyy')
-            : ''
-        }}
+        {{ detailsData?.endDate ? format(new Date(detailsData.endDate), 'MM/dd/yyyy') : '—' }}
       </p>
     </template>
-    <template v-else-if="detailsData?.approxStartDate">
+    <template v-else-if="detailsData?.months?.length">
       <p class="mb-4">
-        Approx Start Date :
-        {{
-          detailsData?.approxStartDate
-            ? format(new Date(detailsData?.approxStartDate), 'MMM yyyy')
-            : ''
-        }}
-      </p>
-      <p class="mb-4">
-        Approx End Date :
-        {{
-          detailsData?.approxEndDate
-            ? format(new Date(detailsData?.approxEndDate), 'MMM yyyy')
-            : ''
-        }}
+        Months : {{ detailsData.months.join(', ') }}
       </p>
     </template>
     <p class="mb-2">
@@ -920,8 +899,7 @@ const initialFormData = {
   duration: { nights: '', days: '' },
   startDate: null,
   endDate: null,
-  approxStartDate: null,
-  approxEndDate: null,
+  months: [],
   currency: null,
   prices: {
     adultSingleOccupancy: '',
@@ -968,42 +946,6 @@ const buildMonthOptions = (year) =>
     return { value: format(d, 'yyyy-MM'), title: format(d, 'MMMM') }
   })
 
-/**
- * Given an array of 'YYYY-MM' strings, sorts them and returns
- * { approxStartDate: 'YYYY-MM-01', approxEndDate: 'YYYY-MM-DD' }.
- * Returns null when the array is empty.
- */
-const approxMonthsToRange = (months) => {
-  if (!months?.length) return null
-  const sorted = [...months].sort()
-  const startMonth = sorted[0]
-  const endMonth = sorted[sorted.length - 1]
-  const [year, month] = endMonth.split('-').map(Number)
-  const lastDay = new Date(year, month, 0).getDate()
-  return {
-    approxStartDate: `${startMonth}-01`,
-    approxEndDate: `${endMonth}-${String(lastDay).padStart(2, '0')}`
-  }
-}
-
-/**
- * Expands a stored date range back into every 'YYYY-MM' month it contains.
- * Used when loading an existing record for editing.
- */
-const dateRangeToMonths = (startDateStr, endDateStr) => {
-  const startM = startDateStr.substring(0, 7)
-  const endM = (endDateStr ?? startDateStr).substring(0, 7)
-  const currentYear = new Date().getFullYear()
-  const months = []
-  let cur = new Date(`${startM}-01`)
-  const stop = new Date(`${endM}-01`)
-  while (cur <= stop) {
-    // Normalize to current year so values match monthOptions entries
-    months.push(`${currentYear}-${format(cur, 'MM')}`)
-    cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1)
-  }
-  return months
-}
 
 // ─── Static options (evaluated once at setup) ────────────────────────────────
 const monthOptions = buildMonthOptions(new Date().getFullYear())
@@ -1064,8 +1006,7 @@ const onDurationChange = () => {
 const onDateModeChange = (val) => {
   if (id.value) return // preserve values in edit mode
   if (val === 'fixed') {
-    formData.value.approxStartDate = null
-    formData.value.approxEndDate = null
+    formData.value.months = []
     selectedApproxMonths.value = []
   } else {
     formData.value.startDate = null
@@ -1075,9 +1016,7 @@ const onDateModeChange = (val) => {
 }
 
 const onApproxMonthsChange = (selected) => {
-  const range = approxMonthsToRange(selected)
-  formData.value.approxStartDate = range?.approxStartDate ?? null
-  formData.value.approxEndDate = range?.approxEndDate ?? null
+  formData.value.months = selected ?? []
 }
 
 const onCreate = () => {
@@ -1123,8 +1062,7 @@ const getDataPayload = () => {
     data.fileMapper = fileMapper
 
     if (dateMode.value === 'fixed') {
-      delete data.approxStartDate
-      delete data.approxEndDate
+      delete data.months
     } else {
       delete data.startDate
       delete data.endDate
@@ -1191,6 +1129,7 @@ const save = async () => {
   if (form.value.isValid) {
     const payload = getDataPayload()
     if (!payload) return
+    console.log(id?.value ? '[UPDATE]' : '[CREATE]', JSON.parse(JSON.stringify(formData.value)))
     const response = id?.value
       ? await axios.patch(`admin/holiday/packages/${id.value}`, payload)
       : await axios.post('admin/holiday/packages', payload)
@@ -1344,11 +1283,9 @@ onBeforeMount(async () => {
           data.offer = data.offer?._id ?? data.offer ?? null
           data.inclusionIcons = data.inclusionIcons?.map((x) => x?._id ?? x)
 
-          if (data.approxStartDate) {
+          if (data.months?.length) {
             dateMode.value = 'approx'
-            data.approxStartDate = data.approxStartDate.substring(0, 10)
-            data.approxEndDate = data.approxEndDate?.substring(0, 10) ?? null
-            selectedApproxMonths.value = dateRangeToMonths(data.approxStartDate, data.approxEndDate)
+            selectedApproxMonths.value = data.months
             data.itinerary?.forEach((el) => {
               el.date = el.date ? el.date.substring(0, 10) : ''
             })
