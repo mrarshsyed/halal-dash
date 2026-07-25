@@ -108,20 +108,30 @@
     </v-dialog>
     <v-dialog v-model="assignRatingDialogShow">
       <v-card>
-        <div class="flex items-center gap-4">
-          <v-card-title>Select Rating</v-card-title>
-          <v-checkbox v-model="non_compliant" label="Non Compliant" name="non_compliant" />
-          <!-- Make all the below checkbox diable if non_compliant is checked -->
+        <div class="d-flex align-center ga-4 pa-4">
+          <v-card-title class="pa-0">Select Rating</v-card-title>
+          <v-checkbox v-model="non_compliant" label="Non Compliant" name="non_compliant" hide-details />
         </div>
         <v-card-text>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r" :disabled="non_compliant">
-                <template #label>
-                  {{ r?.name }}
-                  <v-chip class="ms-2">{{ r?.rating }}</v-chip>
-                </template>
-              </v-checkbox>
+            <v-col cols="12" v-for="(r, index) in ratings" :key="index" class="mb-2">
+              <div class="d-flex align-center ga-4">
+                <div class="flex-grow-1 d-flex align-center ga-2">
+                  <span>{{ r?.name }}</span>
+                  <v-chip size="small">{{ r?.rating }}</v-chip>
+                </div>
+                <v-select
+                  v-model="ratingScores[r._id]"
+                  :items="scoreOptions"
+                  item-title="title"
+                  item-value="value"
+                  density="compact"
+                  :disabled="non_compliant"
+                  placeholder="Select"
+                  style="max-width: 200px"
+                  hide-details
+                />
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -132,10 +142,10 @@
           </p>
           <v-spacer />
           <v-btn color="error" @click="() => {
-            selectedRatings = []
+            ratingScores = {}
             assignRatingDialogShow = false
           }">Close</v-btn>
-          <v-btn color="primary" @click="onAssignRating"> Save</v-btn>
+          <v-btn color="primary" @click="onAssignRating">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -162,7 +172,12 @@ const managers = computed(() => {
 })
 const ratings = ref([])
 const selectedManager = ref(null)
-const selectedRatings = ref([])
+const ratingScores = ref({}) // { [ratingId]: 1 | 0.5 | 0 | null }
+const scoreOptions = [
+  { title: 'Matched', value: 1 },
+  { title: 'Partially Matched', value: 0.5 },
+  { title: 'Not Matched', value: 0 }
+]
 const managerSearch = ref('')
 const managerForm = ref()
 const assignRatingDialogShow = ref(false)
@@ -191,12 +206,16 @@ const table_data = ref({
 })
 
 const sumOfSelectedRatings = computed(() => {
-  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
+  return ratings.value.reduce((total, r) => {
+    const score = ratingScores.value[r._id]
+    return score != null ? total + r.rating * score : total
+  }, 0)
 })
 const sumOfTotalRating = computed(() => {
   return ratings.value.reduce((total, r) => total + r.rating, 0)
 })
 const ratingPercentage = computed(() => {
+  if (!sumOfTotalRating.value) return 0
   return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
 })
 
@@ -436,19 +455,24 @@ const onAssignManager = async () => {
 }
 const onRatingIconClick = async (item) => {
   store.setHotelDetails(item)
+  non_compliant.value = item?.non_compliant ?? false
+  ratingScores.value = {}
   if (item?.halal_ratings?.length) {
-    selectedRatings.value = item?.halal_ratings
+    item.halal_ratings.forEach((r) => {
+      const id = r._id || r.ratingId || r.rating?._id
+      const score = r.score !== undefined ? r.score : 1
+      if (id) ratingScores.value[id] = score
+    })
   }
   assignRatingDialogShow.value = true
 }
 
 const onAssignRating = async () => {
-  const ids = selectedRatings.value?.map((x) => {
-    return x._id
-  })
+  const ratingsPayload = Object.entries(ratingScores.value)
+    .map(([ratingId, score]) => ({ ratingId, score }))
   axios
     .patch(`admin/hotels/${store.hotel_details?._id}/update-halal-ratings`, {
-      ratingIds: ids, // we can send empty array for non compliant
+      ratings: ratingsPayload,
       non_compliant: non_compliant.value
     })
     .then(async (res) => {
@@ -460,7 +484,7 @@ const onAssignRating = async () => {
         sortBy: 'ascending'
       })
       assignRatingDialogShow.value = false
-      selectedRatings.value = []
+      ratingScores.value = {}
     })
 }
 const onNextPage = async () => {

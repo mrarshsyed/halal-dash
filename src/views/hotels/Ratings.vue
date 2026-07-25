@@ -56,6 +56,17 @@
       <template #item.category="{ item }">
         {{ item?.category?.name }}
       </template>
+      <template #item.mandatory_for_class="{ item }">
+        <div class="d-flex flex-wrap ga-1">
+          <v-chip
+            v-for="cls in item?.mandatory_for_class"
+            :key="cls"
+            size="small"
+          >
+            {{ mandatoryClassLabel(cls) }}
+          </v-chip>
+        </div>
+      </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
           <v-icon
@@ -80,6 +91,19 @@ const baseurl = 'admin/halal-ratings'
 import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
+
+const mandatoryClassOptions = [
+  { title: 'Platinum', value: 'platinum' },
+  { title: 'Gold', value: 'gold' },
+  { title: 'Silver', value: 'silver' },
+  { title: 'Bronze', value: 'bronze' },
+  { title: 'Level Not Achieved', value: 'level_not_achieved' },
+  { title: 'Assessed Under Progress', value: 'assessed_under_progress' }
+]
+
+const mandatoryClassLabel = (value) => {
+  return mandatoryClassOptions.find((o) => o.value === value)?.title ?? value
+}
 
 const categoryList = ref([])
 const getCategoryList = async () => {
@@ -111,6 +135,18 @@ const ratingForm = ref({
       itemValue: '_id',
       multiple: false,
       returnObject: true
+    },
+    {
+      key: 'mandatory_for_class',
+      type: 'select',
+      label: 'Mandatory For Class',
+      isRequired: false,
+      options: mandatoryClassOptions,
+      value: [],
+      itemTitle: 'title',
+      itemValue: 'value',
+      multiple: true,
+      returnObject: false
     }
   ]
 })
@@ -155,6 +191,7 @@ const table_data = ref({
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Rating', key: 'rating', align: 'start' },
     { title: 'Category', key: 'category', align: 'start' },
+    { title: 'Mandatory For Class', key: 'mandatory_for_class', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -195,7 +232,8 @@ const saveRating = async () => {
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
     rating: newRating,
-    category: store.getFieldValue('category')
+    category: store.getFieldValue('category'),
+    mandatory_for_class: store.getFieldValue('mandatory_for_class') ?? []
   }
 
   const response = isUpdate
@@ -218,6 +256,7 @@ const saveRating = async () => {
 const showDialog = () => {
   resetForm()
   ratingForm.value.fields[2].options = categoryList.value
+  ratingForm.value.fields[3].options = mandatoryClassOptions
   const dialogModal = {
     title: 'Add new rating',
     content: '',
@@ -238,6 +277,7 @@ const onEdit = async (item) => {
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
   ratingForm.value.fields[2].value = item.category
+  ratingForm.value.fields[3].value = item?.mandatory_for_class ?? []
   selectedRating.value = item?.rating
 
   const dialogModal = {
