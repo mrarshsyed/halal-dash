@@ -106,7 +106,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="assignRatingDialogShow">
+    <v-dialog v-model="assignRatingDialogShow" max-width="700">
       <v-card>
         <div class="d-flex align-center ga-4 pa-4">
           <v-card-title class="pa-0">Select Rating</v-card-title>
@@ -128,7 +128,7 @@
                   density="compact"
                   :disabled="non_compliant"
                   placeholder="Select"
-                  style="max-width: 200px"
+                  style="min-width: 220px; max-width: 220px"
                   hide-details
                 />
               </div>
@@ -469,10 +469,10 @@ const onRatingIconClick = async (item) => {
 
 const onAssignRating = async () => {
   const ratingsPayload = Object.entries(ratingScores.value)
-    .map(([ratingId, score]) => ({ ratingId, score }))
+    .map(([id, score]) => ({ halal_rating: id, score }))
   axios
     .patch(`admin/hotels/${store.hotel_details?._id}/update-halal-ratings`, {
-      ratings: ratingsPayload,
+      ratingIds: ratingsPayload,
       non_compliant: non_compliant.value
     })
     .then(async (res) => {

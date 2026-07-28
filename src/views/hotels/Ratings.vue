@@ -56,10 +56,10 @@
       <template #item.category="{ item }">
         {{ item?.category?.name }}
       </template>
-      <template #item.mandatory_for_class="{ item }">
+      <template #item.mandatoryForClass="{ item }">
         <div class="d-flex flex-wrap ga-1">
           <v-chip
-            v-for="cls in item?.mandatory_for_class"
+            v-for="cls in item?.mandatoryForClass"
             :key="cls"
             size="small"
           >
@@ -137,7 +137,7 @@ const ratingForm = ref({
       returnObject: true
     },
     {
-      key: 'mandatory_for_class',
+      key: 'mandatoryForClass',
       type: 'select',
       label: 'Mandatory For Class',
       isRequired: false,
@@ -191,7 +191,7 @@ const table_data = ref({
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Rating', key: 'rating', align: 'start' },
     { title: 'Category', key: 'category', align: 'start' },
-    { title: 'Mandatory For Class', key: 'mandatory_for_class', align: 'start' },
+    { title: 'Mandatory For Class', key: 'mandatoryForClass', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -233,7 +233,7 @@ const saveRating = async () => {
     name: store.dialog.formComponents?.fields[0]?.value,
     rating: newRating,
     category: store.getFieldValue('category'),
-    mandatory_for_class: store.getFieldValue('mandatory_for_class') ?? []
+    mandatoryForClass: store.getFieldValue('mandatoryForClass') ?? []
   }
 
   const response = isUpdate
@@ -277,7 +277,7 @@ const onEdit = async (item) => {
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
   ratingForm.value.fields[2].value = item.category
-  ratingForm.value.fields[3].value = item?.mandatory_for_class ?? []
+  ratingForm.value.fields[3].value = item?.mandatoryForClass ?? []
   selectedRating.value = item?.rating
 
   const dialogModal = {
