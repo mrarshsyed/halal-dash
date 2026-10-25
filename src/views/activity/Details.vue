@@ -13,9 +13,41 @@
         variant="tonal"
         class="font-weight-bold"
       >
-        {{ hotel?.halal_ratings_percentage }} %
+        {{ hotel?.halal_ratings_percentage_v2 }} %
+      </v-chip>
+      <v-chip
+        variant="outlined"
+        class="font-weight-bold"
+      >
+        {{ hotel?.halal_ratings_total_v2 ?? 0 }} points
       </v-chip>
     </p>
+    <div class="mt-8">
+      <p>Selected Parameters</p>
+      <p
+        v-if="!ratingGroups.length"
+        class="text-medium-emphasis mt-2"
+      >
+        No parameters have been selected yet.
+      </p>
+      <div
+        v-for="group in ratingGroups"
+        :key="group.name"
+        class="mt-2"
+      >
+        <p class="font-weight-bold">
+          {{ group.name }}
+        </p>
+        <ul class="ps-4">
+          <li
+            v-for="r in group.items"
+            :key="r._id"
+          >
+            {{ r.name }} ({{ r.rating }})
+          </li>
+        </ul>
+      </div>
+    </div>
     <div class="mt-8">
       <p>Modalities</p>
       <v-row class="mt-2">
@@ -68,6 +100,17 @@ const store = useAppStore()
 
 const hotel = computed(() => {
   return store.details
+})
+
+// Common parameters (no subcategory) first, then one group per subcategory.
+const ratingGroups = computed(() => {
+  const groups = new Map()
+  for (const r of hotel.value?.halal_ratings_v2 ?? []) {
+    const name = r?.category?.name ?? r?.mainCategory?.name ?? 'Other'
+    if (!groups.has(name)) groups.set(name, { name, items: [] })
+    groups.get(name).items.push(r)
+  }
+  return [...groups.values()]
 })
 </script>
 

@@ -10,21 +10,11 @@
       <v-col cols="12" md="4">
         <v-btn
           @click="showDialog"
-          :disabled="current_percentage >= 100"
           block
           color="primary"
         >
-          + Add New Rating
+          + Add New Parameter
         </v-btn>
-      </v-col>
-      <v-col cols="12" class="d-flex justify-end">
-        <div class="d-flex flex-column ga-1">
-          <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
-          <p>
-            Current Percentage:
-            <span class="font-weight-bold">{{ current_percentage }}%</span>
-          </p>
-        </div>
       </v-col>
     </v-row>
     <v-data-table
@@ -43,6 +33,9 @@
       </template>
       <template #item.rating="{ item }">
         {{ item?.rating }}
+      </template>
+      <template #item.mainCategory="{ item }">
+        {{ item?.mainCategory?.name ?? item?.category?.mainCategory?.name }}
       </template>
       <template #item.category="{ item }">
         {{ item?.category?.name }}
@@ -67,69 +60,76 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
 
 const store = useAppStore()
-const selectedRating= ref(null)
 
 const baseurl = 'admin/activity-halal-ratings'
+const mainCategoryList = ref([])
 const categoryList = ref([])
-const getCategoryList = async () => {
-  await axios.get('admin/activity-halal-rating-categories').then((res) => {
-    if (res.data.length) {
-      categoryList.value = res.data
-    }
-  })
+const getLists = async () => {
+  const [main, cat] = await Promise.all([
+    axios.get('admin/activity-halal-rating-main-categories'),
+    axios.get('admin/activity-halal-rating-categories')
+  ])
+  mainCategoryList.value = main?.data ?? []
+  categoryList.value = cat?.data ?? []
 }
 const ratingForm = ref({
   id: null,
   fields: [
-    { type: 'text', label: 'Name', isRequired: true, value: null },
+    { key: 'name', type: 'text', label: 'Name', isRequired: true, value: null },
     {
+      key: 'rating',
       type: 'number',
-      label: 'Rating',
+      label: 'Points',
       isRequired: true,
+      positive: true,
       value: null
     },
     {
-      key: 'category',
+      key: 'mainCategory',
       type: 'select',
-      label: 'Select Category',
+      label: 'Category',
       isRequired: true,
       options: [],
       value: null,
       itemTitle: 'name',
       itemValue: '_id',
-      multiple: false,
-      returnObject: true
+      multiple: false
+    },
+    {
+      key: 'category',
+      type: 'select',
+      label: 'Subcategory',
+      isRequired: false,
+      hidden: true,
+      options: [],
+      value: null,
+      itemTitle: 'name',
+      itemValue: '_id',
+      multiple: false
     }
   ]
 })
-const resetForm = async () => {
+const resetForm = () => {
   ratingForm.value.id = null
-  ratingForm.value.fields = ratingForm.value.fields?.map((form) => {
-    return {
-      ...form,
-      value: null
-    }
-  })
+  ratingForm.value.fields = ratingForm.value.fields.map((f) => ({
+    ...f,
+    value: null
+  }))
+  ratingForm.value.fields[2].options = mainCategoryList.value
+  ratingForm.value.fields[3].options = []
+  ratingForm.value.fields[3].hidden = true
+  ratingForm.value.fields[3].isRequired = false
 }
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
-  await axios
-    .get(baseurl, {
-      page: page,
-      itemsPerPage: itemsPerPage,
-      sortBy: sortBy
-    })
-    .then((res) => {
-      if (res?.data?.length) {
-        // store.setUserList(res?.data?.data)
-        table_data.value.serverItems = res?.data
-        table_data.value.totalItems = res?.data?.length
-      }
-    })
+const loadItems = async () => {
+  await axios.get(baseurl).then((res) => {
+    table_data.value.serverItems = res?.data ?? []
+    table_data.value.totalItems = res?.data?.length ?? 0
+  })
 }
 const table_data = ref({
   loading: true,
@@ -140,8 +140,9 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Rating', key: 'rating', align: 'start' },
-    { title: 'Category', key: 'category', align: 'start' },
+    { title: 'Points', key: 'rating', align: 'start' },
+    { title: 'Category', key: 'mainCategory', align: 'start' },
+    { title: 'Subcategory', key: 'category', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -150,114 +151,140 @@ const table_data = ref({
     { value: -1, title: 'All' }
   ]
 })
-const current_percentage = computed(() => {
-  return table_data.value.serverItems.reduce(
-    (sum, item) => sum + item?.rating,
-    0
-  )
-})
-const maximum_percentage_reached = (newRating, isUpdate = false, oldRating = 0) => {
-  const total = isUpdate
-    ? Number(current_percentage.value) - Number(oldRating) + Number(newRating)
-    : Number(current_percentage.value) + Number(newRating)
 
-  return total > 100
+// The subcategory picker only exists for main categories that allow them.
+const syncCategoryField = (mainId) => {
+  const fields = store.dialog.formComponents?.fields
+  if (!fields?.length) return
+  const main = mainCategoryList.value.find((m) => m._id === mainId)
+  const categoryField = fields[3]
+  const allows = !!main?.allow_category
+  categoryField.hidden = !allows
+  categoryField.isRequired = allows
+  categoryField.options = allows
+    ? categoryList.value.filter((c) => c?.mainCategory?._id === mainId)
+    : []
+  if (!categoryField.options.some((c) => c._id === categoryField.value)) {
+    categoryField.value = null
+  }
+}
+watch(
+  () => store.dialog.formComponents?.fields?.[2]?.value,
+  (mainId) => syncCategoryField(mainId)
+)
+
+// An activity is scored on the Common Parameters plus ONE subcategory, so that
+// total must not go above 100. Check every subcategory after this save.
+const exceedsMaximum = (payload) => {
+  const editingId = ratingForm.value.id
+  let common = 0
+  const subtotals = {}
+  for (const item of table_data.value.serverItems) {
+    if (item._id === editingId) continue
+    if (item.category?._id) {
+      subtotals[item.category._id] =
+        (subtotals[item.category._id] ?? 0) + Number(item.rating)
+    } else {
+      common += Number(item.rating)
+    }
+  }
+  if (payload.category) {
+    subtotals[payload.category] =
+      (subtotals[payload.category] ?? 0) + payload.rating
+  } else {
+    common += payload.rating
+  }
+  const largestSubtotal = Math.max(0, ...Object.values(subtotals))
+  return common + largestSubtotal > 100
 }
 const saveRating = async () => {
-  const ratingField = store.dialog.formComponents?.fields[1]
-  const newRating = Number(ratingField?.value)
-  const isUpdate = !!ratingForm?.value?.id
-  const oldRating = isUpdate ? Number(selectedRating.value || 0) : 0
-  if (maximum_percentage_reached(newRating, isUpdate, oldRating)) {
-    store.showSnackbar('Maximum rating can be up to 100%', 'error')
+  const mainId = store.getFieldValue('mainCategory')
+  const main = mainCategoryList.value.find((m) => m._id === mainId)
+  const payload = {
+    name: store.getFieldValue('name'),
+    rating: Number(store.getFieldValue('rating'))
+  }
+  if (main?.allow_category) {
+    payload.category = store.getFieldValue('category')
+  } else {
+    payload.mainCategory = mainId
+  }
+  if (exceedsMaximum(payload)) {
+    store.showSnackbar(
+      'Common parameters plus a subcategory cannot total more than 100 points',
+      'error'
+    )
     return
   }
-
-  const payload = {
-    name: store.dialog.formComponents?.fields[0]?.value,
-    rating: newRating,
-    category: store.getFieldValue('category')
-  }
-  const response = !ratingForm?.value?.id
-    ? await axios.post(baseurl, payload)
-    : await axios.patch(`${baseurl}/${ratingForm?.value?.id}`, payload)
-  if (response?.status === 200) {
-    store.showSnackbar('Rating saved successfully')
-    await loadItems({
-      page: table_data.value.page,
-      itemsPerPage: table_data.value.itemsPerPage,
-      sortBy: 'ascending'
-    })
-    store.closeDialog()
-    resetForm()
+  try {
+    const response = !ratingForm.value.id
+      ? await axios.post(baseurl, payload)
+      : await axios.patch(`${baseurl}/${ratingForm.value.id}`, payload)
+    if (response?.status === 200 || response?.status === 201) {
+      store.showSnackbar('Parameter saved successfully')
+      await loadItems()
+      store.closeDialog()
+      resetForm()
+    }
+  } catch (e) {
+    // the axios interceptor already shows the API message; keep the form open
   }
 }
 const showDialog = () => {
   resetForm()
-  ratingForm.value.fields[2].options = categoryList.value
-  const dialogModal = {
-    title: 'Add new rating',
+  store.showDialog({
+    title: 'Add new parameter',
     content: '',
     confirmText: 'Save',
     formComponents: { ...ratingForm.value },
     confirmFunction: saveRating
-  }
-  store.showDialog(dialogModal)
+  })
 }
 const onEdit = async (item) => {
   resetForm()
   store.setRatingDetails(item)
-  ratingForm.value.fields[2].options = categoryList.value
+  const mainId = item?.mainCategory?._id ?? item?.category?.mainCategory?._id
   ratingForm.value.id = item?._id
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
-  ratingForm.value.fields[2].value = item.category
-  selectedRating.value = item?.rating
-  const dialogModal = {
-    title: 'Update rating',
+  ratingForm.value.fields[2].value = mainId
+  store.showDialog({
+    title: 'Update parameter',
     content: '',
     confirmText: 'Save',
     formComponents: ratingForm.value,
     confirmFunction: saveRating
-  }
-  store.showDialog(dialogModal)
+  })
+  ratingForm.value.fields[3].value = item?.category?._id ?? null
+  syncCategoryField(mainId)
 }
 const deleteRating = async () => {
-  if (store.rating_details?._id) {
-    await axios
-      .delete(`${baseurl}/${store.rating_details?._id}`)
-      .then(async (res) => {
-        if (res?.status === 204) {
-          store.showSnackbar('Rating Deleted Successfully')
-          await loadItems({
-            page: table_data.value.page,
-            itemsPerPage: table_data.value.itemsPerPage,
-            sortBy: 'ascending'
-          })
-          store.setRatingDetails({})
-          store.closeDialog()
-        }
-      })
+  if (!store.rating_details?._id) return
+  try {
+    const res = await axios.delete(`${baseurl}/${store.rating_details._id}`)
+    if (res?.status === 204) {
+      store.showSnackbar('Parameter deleted successfully')
+      await loadItems()
+      store.setRatingDetails({})
+      store.closeDialog()
+    }
+  } catch (e) {
+    // error snackbar shown by interceptor; keep the row
   }
 }
 const onDelete = async (item) => {
   store.setRatingDetails(item)
-  const dialogModal = {
-    title: 'Delete Rating',
-    content: 'Are you sure to delete? ',
+  store.showDialog({
+    title: 'Delete Parameter',
+    content: 'Are you sure to delete?',
     confirmText: 'Delete',
     formComponents: {},
     confirmFunction: deleteRating
-  }
-  store.showDialog(dialogModal)
+  })
 }
 onMounted(async () => {
-  await getCategoryList()
-  await loadItems({
-    page: table_data.value.page,
-    itemsPerPage: table_data.value.itemsPerPage,
-    sortBy: 'ascending'
-  })
+  await getLists()
+  await loadItems()
 })
 </script>
 

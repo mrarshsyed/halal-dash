@@ -10,19 +10,18 @@
       <v-col cols="12" md="4">
         <v-btn
           @click="showDialog"
-          :disabled="current_percentage >= 100"
+          :disabled="total_points >= 100"
           block
           color="primary"
         >
-          + Add New Rating
+          + Add New Parameter
         </v-btn>
       </v-col>
       <v-col cols="12" class="d-flex justify-end">
         <div class="d-flex flex-column ga-1">
-          <p>Maximum Percentage : <span class="font-weight-bold">100%</span></p>
           <p>
-            Current Percentage:
-            <span class="font-weight-bold">{{ current_percentage }}%</span>
+            Total Points:
+            <span class="font-weight-bold">{{ total_points }} / 100</span>
           </p>
         </div>
       </v-col>
@@ -46,6 +45,17 @@
       </template>
       <template #item.category="{ item }">
         {{ item?.category?.name }}
+      </template>
+      <template #item.mandatoryForClass="{ item }">
+        <div class="d-flex flex-wrap ga-1">
+          <v-chip
+            v-for="cls in item?.mandatoryForClass"
+            :key="cls"
+            size="small"
+          >
+            {{ mandatoryClassLabel(cls) }}
+          </v-chip>
+        </div>
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
@@ -74,6 +84,16 @@ import axios from '@/plugins/axios'
 const store = useAppStore()
 
 const baseurl = 'admin/cruise-halal-ratings'
+const mandatoryClassOptions = [
+  { title: 'Platinum', value: 'platinum' },
+  { title: 'Gold', value: 'gold' },
+  { title: 'Silver', value: 'silver' },
+  { title: 'Bronze', value: 'bronze' }
+]
+const mandatoryClassLabel = (value) => {
+  return mandatoryClassOptions.find((o) => o.value === value)?.title ?? value
+}
+
 const categoryList = ref([])
 const getCategoryList = async () => {
   await axios.get('admin/cruise-halal-rating-categories').then((res) => {
@@ -88,14 +108,15 @@ const ratingForm = ref({
     { type: 'text', label: 'Name', isRequired: true, value: null },
     {
       type: 'number',
-      label: 'Rating',
+      label: 'Points',
       isRequired: true,
+      positive: true,
       value: null
     },
     {
       key: 'category',
       type: 'select',
-      label: 'Select Category',
+      label: 'Category',
       isRequired: true,
       options: [],
       value: null,
@@ -103,6 +124,18 @@ const ratingForm = ref({
       itemValue: '_id',
       multiple: false,
       returnObject: true
+    },
+    {
+      key: 'mandatoryForClass',
+      type: 'select',
+      label: 'Mandatory For Class',
+      isRequired: false,
+      options: mandatoryClassOptions,
+      value: [],
+      itemTitle: 'title',
+      itemValue: 'value',
+      multiple: true,
+      returnObject: false
     }
   ]
 })
@@ -139,8 +172,9 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Rating', key: 'rating', align: 'start' },
+    { title: 'Points', key: 'rating', align: 'start' },
     { title: 'Category', key: 'category', align: 'start' },
+    { title: 'Mandatory For Class', key: 'mandatoryForClass', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
   ],
   itemsPerPageOption: [
@@ -149,36 +183,38 @@ const table_data = ref({
     { value: -1, title: 'All' }
   ]
 })
-const current_percentage = computed(() => {
+const total_points = computed(() => {
   return table_data.value.serverItems.reduce(
     (sum, item) => sum + item?.rating,
     0
   )
 })
-const maximum_percentage_reached = (rating, isUpdate = false) => {
+// No module's catalog may total more than 100 points.
+const selectedRating = ref(null)
+const maximum_points_reached = (newRating, isUpdate, oldRating = 0) => {
   const total = isUpdate
-    ? Number(current_percentage.value) - rating // Subtract the rating being updated
-    : Number(current_percentage.value) + Number(rating)
+    ? Number(total_points.value) - Number(oldRating) + Number(newRating)
+    : Number(total_points.value) + Number(newRating)
   return total > 100
 }
 const saveRating = async () => {
-  const ratingField = store.dialog.formComponents?.fields[1]
-  const rating = ratingField?.value
   const isUpdate = !!ratingForm?.value?.id
-  if (maximum_percentage_reached(rating, isUpdate)) {
-    store.showSnackbar('Maximum rating can be up to 100%', 'error')
+  const newRating = Number(store.dialog.formComponents?.fields[1]?.value)
+  if (maximum_points_reached(newRating, isUpdate, isUpdate ? selectedRating.value : 0)) {
+    store.showSnackbar('Total points cannot go above 100', 'error')
     return
   }
   const payload = {
     name: store.dialog.formComponents?.fields[0]?.value,
     rating: store.dialog.formComponents?.fields[1]?.value,
-    category: store.getFieldValue('category')
+    category: store.getFieldValue('category'),
+    mandatoryForClass: store.getFieldValue('mandatoryForClass') ?? []
   }
   const response = !ratingForm?.value?.id
     ? await axios.post(baseurl, payload)
     : await axios.patch(`${baseurl}/${ratingForm?.value?.id}`, payload)
   if (response?.status === 200) {
-    store.showSnackbar('Rating saved successfully')
+    store.showSnackbar('Parameter saved successfully')
     await loadItems({
       page: table_data.value.page,
       itemsPerPage: table_data.value.itemsPerPage,
@@ -192,7 +228,7 @@ const showDialog = () => {
   resetForm()
   ratingForm.value.fields[2].options = categoryList.value
   const dialogModal = {
-    title: 'Add new rating',
+    title: 'Add new parameter',
     content: '',
     confirmText: 'Save',
     formComponents: { ...ratingForm.value },
@@ -207,9 +243,11 @@ const onEdit = async (item) => {
   ratingForm.value.id = item?._id
   ratingForm.value.fields[0].value = item?.name
   ratingForm.value.fields[1].value = item?.rating
+  selectedRating.value = item?.rating
   ratingForm.value.fields[2].value = item.category
+  ratingForm.value.fields[3].value = item?.mandatoryForClass ?? []
   const dialogModal = {
-    title: 'Update rating',
+    title: 'Update parameter',
     content: '',
     confirmText: 'Save',
     formComponents: ratingForm.value,
@@ -223,7 +261,7 @@ const deleteRating = async () => {
       .delete(`${baseurl}/${store.rating_details?._id}`)
       .then(async (res) => {
         if (res?.status === 204) {
-          store.showSnackbar('Rating Deleted Successfully')
+          store.showSnackbar('Parameter deleted successfully')
           await loadItems({
             page: table_data.value.page,
             itemsPerPage: table_data.value.itemsPerPage,
@@ -238,7 +276,7 @@ const deleteRating = async () => {
 const onDelete = async (item) => {
   store.setRatingDetails(item)
   const dialogModal = {
-    title: 'Delete Rating',
+    title: 'Delete Parameter',
     content: 'Are you sure to delete? ',
     confirmText: 'Delete',
     formComponents: {},

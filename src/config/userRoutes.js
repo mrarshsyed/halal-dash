@@ -43,6 +43,7 @@ export const permissions = {
   cruiseUpdateHalalRatings: 'cruise-update_halal_ratings',
 
   // restaurant
+  restaurantAll: 'restaurant-all',
   restaurantHalalRating: 'restaurant-halal-rating',
   restaurantMasterData: 'restaurant-master_data',
   restaurantRestaurant: 'restaurant-restaurant',
@@ -206,6 +207,15 @@ export const routes = [
       {
         path: 'ratings',
         component: () => import('@/views/activity/Ratings.vue'),
+        meta: {
+          requiresAuth: true,
+          role: ['super-admin'],
+          permissions: []
+        }
+      },
+      {
+        path: 'ratings-main-category',
+        component: () => import('@/views/activity/RatingsMainCategory.vue'),
         meta: {
           requiresAuth: true,
           role: ['super-admin'],
@@ -902,8 +912,16 @@ export const navLinks = [
         permissions: [permissions.activityAll, permissions.activityAddToSystem]
       },
       {
+        icon: 'format-list-group',
+        title: 'Categories',
+        to: '/activity/ratings-main-category',
+        value: 'activity-ratings-main-category',
+        role: ['super-admin'],
+        permissions: [permissions.activityHalalRatingCategory]
+      },
+      {
         icon: 'list-box',
-        title: 'Ratings Category',
+        title: 'Subcategories',
         to: '/activity/ratings-category',
         value: 'activity-ratings-category',
         role: ['super-admin'],
@@ -911,11 +929,11 @@ export const navLinks = [
       },
       {
         icon: 'star-box',
-        title: 'Ratings',
+        title: 'Parameters',
         to: '/activity/ratings',
         value: 'activity-ratings',
         role: ['super-admin'],
-        permissions: [permissions.hotelHalalRating]
+        permissions: [permissions.activityHalalRating]
       },
       {
         icon: 'view-list',
@@ -949,7 +967,7 @@ export const navLinks = [
     children: [
       {
         icon: 'list-box',
-        title: 'Ratings Category',
+        title: 'Categories',
         to: '/cruise/ratings-category',
         value: 'cruise-ratings-category',
         role: ['super-admin'],
@@ -957,7 +975,7 @@ export const navLinks = [
       },
       {
         icon: 'star-box',
-        title: 'Ratings',
+        title: 'Parameters',
         to: '/cruise/ratings',
         value: 'cruise-ratings',
         role: ['super-admin'],
@@ -1033,7 +1051,7 @@ export const navLinks = [
     children: [
       {
         icon: 'list-box',
-        title: 'Ratings Category',
+        title: 'Categories',
         to: '/restaurant/ratings-category',
         value: 'restaurant-ratings-category',
         role: ['super-admin'],
@@ -1041,7 +1059,7 @@ export const navLinks = [
       },
       {
         icon: 'star-box',
-        title: 'Ratings',
+        title: 'Parameters',
         to: '/restaurant/ratings',
         value: 'restaurant-ratings',
         role: ['super-admin'],

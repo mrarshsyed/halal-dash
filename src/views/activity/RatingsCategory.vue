@@ -1,25 +1,15 @@
 <template>
   <div>
     <v-row class="mb-4">
-      <v-col
-        cols="12"
-        md="8"
-      >
+      <v-col cols="12" md="8">
         <v-text-field
           v-model="table_data.search"
           placeholder="Enter search here ..."
         />
       </v-col>
-      <v-col
-        cols="12"
-        md="4"
-      >
-        <v-btn
-          @click="showDialog"
-          block
-          color="primary"
-        >
-          + Add New Category
+      <v-col cols="12" md="4">
+        <v-btn @click="showDialog" block color="primary">
+          + Add New Subcategory
         </v-btn>
       </v-col>
     </v-row>
@@ -34,8 +24,8 @@
       :items-per-page-options="table_data.itemsPerPageOption"
       :page="table_data.page"
     >
-      <template #item.name="{ item }">
-        {{ item?.name }}
+      <template #item.mainCategory="{ item }">
+        {{ item?.mainCategory?.name }}
       </template>
       <template #item.action="{ item }">
         <div class="d-flex ga-3">
@@ -52,7 +42,6 @@
         </div>
       </template>
     </v-data-table>
-    <!-- @update:options="loadItems" -->
   </div>
 </template>
 
@@ -62,34 +51,39 @@ import { useAppStore } from '@/store/app'
 import axios from '@/plugins/axios'
 
 const baseUrl = 'admin/activity-halal-rating-categories'
+const store = useAppStore()
 const Form = ref({
   id: null,
-  fields: [{ type: 'text', label: 'Name', isRequired: true, value: null }]
-})
-const resetForm = async () => {
-  Form.value.id = null
-  Form.value.fields = Form.value.fields?.map((form) => {
-    return {
-      ...form,
-      value: null
+  fields: [
+    { key: 'name', type: 'text', label: 'Name', isRequired: true, value: null },
+    {
+      key: 'mainCategory',
+      type: 'select',
+      label: 'Category',
+      isRequired: true,
+      options: [],
+      value: null,
+      itemTitle: 'name',
+      itemValue: '_id',
+      multiple: false
     }
-  })
+  ]
+})
+const mainCategories = ref([])
+const loadMainCategories = async () => {
+  const res = await axios.get('admin/activity-halal-rating-main-categories')
+  mainCategories.value = (res?.data ?? []).filter((m) => m.allow_category)
 }
-const store = useAppStore()
-const loadItems = async ({ page, itemsPerPage, sortBy }) => {
-  await axios
-    .get(baseUrl, {
-      page: page,
-      itemsPerPage: itemsPerPage,
-      sortBy: sortBy
-    })
-    .then((res) => {
-      if (res?.data?.length) {
-        // store.setUserList(res?.data?.data)
-        table_data.value.serverItems = res?.data
-        table_data.value.totalItems = res?.data?.length
-      }
-    })
+const resetForm = () => {
+  Form.value.id = null
+  Form.value.fields = Form.value.fields.map((f) => ({ ...f, value: null }))
+  Form.value.fields[1].options = mainCategories.value
+}
+const loadItems = async () => {
+  await axios.get(baseUrl).then((res) => {
+    table_data.value.serverItems = res?.data ?? []
+    table_data.value.totalItems = res?.data?.length ?? 0
+  })
 }
 const table_data = ref({
   loading: true,
@@ -100,7 +94,7 @@ const table_data = ref({
   serverItems: [],
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
-    // { title: 'Rating', key: 'rating', align: 'start' },
+    { title: 'Category', key: 'mainCategory', align: 'start' },
     { title: 'Action', key: 'action', align: 'start' }
   ],
   itemsPerPageOption: [
@@ -109,85 +103,75 @@ const table_data = ref({
     { value: -1, title: 'All' }
   ]
 })
-const saveRating = async () => {
+const saveItem = async () => {
   const payload = {
-    name: store.dialog.formComponents?.fields[0]?.value
+    name: store.getFieldValue('name'),
+    mainCategory: store.getFieldValue('mainCategory')
   }
-  const response = !Form?.value?.id
-    ? await axios.post(baseUrl, payload)
-    : await axios.patch(`${baseUrl}/${Form?.value?.id}`, payload)
-  if (response?.status === 200) {
-    store.showSnackbar('Category saved successfully')
-    await loadItems({
-      page: table_data.value.page,
-      itemsPerPage: table_data.value.itemsPerPage,
-      sortBy: 'ascending'
-    })
-    store.closeDialog()
-    resetForm()
+  try {
+    const response = !Form.value.id
+      ? await axios.post(baseUrl, payload)
+      : await axios.patch(`${baseUrl}/${Form.value.id}`, payload)
+    if (response?.status === 200 || response?.status === 201) {
+      store.showSnackbar('Subcategory saved successfully')
+      await loadItems()
+      store.closeDialog()
+      resetForm()
+    }
+  } catch (e) {
+    // the axios interceptor already shows the API message; keep the form open
   }
 }
 const showDialog = () => {
   resetForm()
-  const dialogModal = {
-    title: 'Add New Category',
+  store.showDialog({
+    title: 'Add New Subcategory',
     content: '',
     confirmText: 'Save',
     formComponents: { ...Form.value },
-    confirmFunction: saveRating
-  }
-  store.showDialog(dialogModal)
+    confirmFunction: saveItem
+  })
 }
-const onEdit = async (item) => {
+const onEdit = (item) => {
   resetForm()
   store.setRatingDetails(item)
   Form.value.id = item?._id
   Form.value.fields[0].value = item?.name
-  const dialogModal = {
-    title: 'Update Category',
+  Form.value.fields[1].value = item?.mainCategory?._id
+  store.showDialog({
+    title: 'Update Subcategory',
     content: '',
     confirmText: 'Save',
     formComponents: Form.value,
-    confirmFunction: saveRating
-  }
-  store.showDialog(dialogModal)
+    confirmFunction: saveItem
+  })
 }
-const deleteRating = async () => {
-  if (store.rating_details?._id) {
-    await axios
-      .delete(`${baseUrl}/${store.rating_details?._id}`)
-      .then(async (res) => {
-        if (res?.status === 204) {
-          store.showSnackbar('Category Deleted Successfully')
-          await loadItems({
-            page: table_data.value.page,
-            itemsPerPage: table_data.value.itemsPerPage,
-            sortBy: 'ascending'
-          })
-          store.setRatingDetails({})
-          store.closeDialog()
-        }
-      })
+const deleteItem = async () => {
+  if (!store.rating_details?._id) return
+  try {
+    const res = await axios.delete(`${baseUrl}/${store.rating_details._id}`)
+    if (res?.status === 204) {
+      store.showSnackbar('Subcategory deleted successfully')
+      await loadItems()
+      store.setRatingDetails({})
+      store.closeDialog()
+    }
+  } catch (e) {
+    // error snackbar shown by interceptor; keep the row
   }
 }
-const onDelete = async (item) => {
+const onDelete = (item) => {
   store.setRatingDetails(item)
-  const dialogModal = {
-    title: 'Delete Category',
-    content: 'Are you sure to delete? All Ratings Will be deleted',
+  store.showDialog({
+    title: 'Delete Subcategory',
+    content: 'Are you sure to delete?',
     confirmText: 'Delete',
     formComponents: {},
-    confirmFunction: deleteRating
-  }
-  store.showDialog(dialogModal)
+    confirmFunction: deleteItem
+  })
 }
 onMounted(async () => {
-  await loadItems({
-    page: table_data.value.page,
-    itemsPerPage: table_data.value.itemsPerPage,
-    sortBy: 'ascending'
-  })
+  await loadMainCategories()
+  await loadItems()
 })
 </script>
-
-<style lang="scss" scoped></style>

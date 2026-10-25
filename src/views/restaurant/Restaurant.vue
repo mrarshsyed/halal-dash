@@ -25,6 +25,43 @@
         + Add New {{ moduleName }}
       </v-btn>
     </v-col>
+    <v-col cols="12" md="2">
+      <v-text-field
+        v-model="halalFilter.min"
+        type="number"
+        label="Halal rating min (%)"
+        min="0"
+        max="100"
+        hide-details
+        clearable
+      />
+    </v-col>
+    <v-col cols="12" md="2">
+      <v-text-field
+        v-model="halalFilter.max"
+        type="number"
+        label="Halal rating max (%)"
+        min="0"
+        max="100"
+        hide-details
+        clearable
+      />
+    </v-col>
+    <v-col cols="12" md="3">
+      <v-select
+        v-model="halalFilter.sort"
+        :items="halalSortOptions"
+        item-title="title"
+        item-value="value"
+        label="Sort by halal rating"
+        hide-details
+        clearable
+      />
+    </v-col>
+    <v-col cols="12" md="5" class="d-flex ga-2">
+      <v-btn color="primary" @click="applyHalalFilter">Apply</v-btn>
+      <v-btn variant="outlined" @click="resetHalalFilter">Reset</v-btn>
+    </v-col>
     <v-col cols="12">
       <v-data-table-server
         density="compact"
@@ -42,7 +79,10 @@
           {{ item?.name }}
         </template>
         <template #item.rating="{ item }">
-          {{ item?.halal_ratings_percentage }}
+          <div class="d-flex align-center ga-2">
+            <span>{{ item?.halal_ratings_percentage_v2 ?? 0 }}</span>
+            <HalalClassBadge :halal-class="item?.halal_class" />
+          </div>
         </template>
         <template #item.manager="{ item }">
           {{ item?.manager?.email }}
@@ -59,9 +99,7 @@
             <v-tooltip
               text="Ratings"
               location="top"
-              v-if="
-                store.hasPermission(permissions.restaurantUpdateHalalRatings)
-              "
+              v-if="canRate"
             >
               <template #activator="{ props }">
                 <v-icon
@@ -621,6 +659,13 @@
     <p class="mb-4">
       Rating : {{ detailsData?.rating }}
     </p>
+    <HalalRatingSummary
+      class="mb-4"
+      :percentage="detailsData?.halal_ratings_percentage_v2"
+      :total="detailsData?.halal_ratings_total_v2"
+      :halal-class="detailsData?.halal_class"
+      :ratings="detailsData?.halal_ratings_v2"
+    />
     <p class="mb-4">
       Start Price : {{ detailsData?.startPrice }}
     </p>
@@ -740,56 +785,13 @@
       </v-col>
     </v-row>
   </div>
-  <v-dialog v-model="assignRatingDialogShow">
-    <v-card>
-      <v-card-title>Select Rating</v-card-title>
-      <v-card-text>
-        <v-row no-gutters>
-          <v-col
-            cols="12"
-            v-for="(r, index) in ratings"
-            :key="index"
-          >
-            <v-checkbox
-              v-model="selectedRatings"
-              :value="r"
-            >
-              <template #label>
-                {{ r?.name }}
-                <v-chip class="ms-2">
-                  {{ r?.rating }}
-                </v-chip>
-              </template>
-            </v-checkbox>
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-card-actions class="ma-2">
-        <p>
-          Selected Ratings {{ sumOfSelectedRatings }} out of
-          {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
-        </p>
-        <v-spacer />
-        <v-btn
-          color="error"
-          @click="
-            () => {
-              selectedRatings = []
-              assignRatingDialogShow = false
-            }
-          "
-        >
-          Close
-        </v-btn>
-        <v-btn
-          color="primary"
-          @click="onAssignRating"
-        >
-          Save
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <HalalScoreRatingDialog
+    v-model="assignRatingDialogShow"
+    :ratings="ratings"
+    :selected="selectedHalalRatings"
+    :save-url="ratingSaveUrl"
+    @saved="onRatingSaved"
+  />
   <v-dialog v-model="assignManagerDialogShow">
     <v-card>
       <v-card-title>Assign Manager</v-card-title>
@@ -842,6 +844,9 @@ import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
+import HalalScoreRatingDialog from '@/components/HalalScoreRatingDialog.vue'
+import HalalClassBadge from '@/components/HalalClassBadge.vue'
+import HalalRatingSummary from '@/components/HalalRatingSummary.vue'
 import ImageUploader from './components/ImageUploader.vue'
 import { useAppStore } from '@/store/app'
 import { permissions } from '@/config/userRoutes'
@@ -995,7 +1000,17 @@ const form = ref()
 const formValue = ref(false)
 const showForm = ref(false)
 const ratings = ref([])
-const selectedRatings = ref([])
+const selectedHalalRatings = ref([])
+// The server also lets restaurant-all users save scores.
+const canRate = computed(
+  () =>
+    store.hasPermission(permissions.restaurantUpdateHalalRatings) ||
+    store.hasPermission(permissions.restaurantAll)
+)
+const ratingSaveUrl = computed(
+  () =>
+    `admin/restaurant/restaurants/${store.details?._id}/update-halal-ratings`
+)
 const assignRatingDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
 const managerSearch = ref('')
@@ -1012,9 +1027,7 @@ const categoriesList = [
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
-  if (item?.halal_ratings?.length) {
-    selectedRatings.value = item?.halal_ratings
-  }
+  selectedHalalRatings.value = item?.halal_ratings_v2 ?? []
   assignRatingDialogShow.value = true
 }
 const onEdit = (item) => {
@@ -1102,12 +1115,34 @@ const save = async () => {
 const onUploadsUpdate = (images, key) => {
   formData.value[key] = images
 }
+const halalFilter = ref({ min: null, max: null, sort: null })
+const halalSortOptions = [
+  { title: 'Highest first', value: -1 },
+  { title: 'Lowest first', value: 1 }
+]
+const applyHalalFilter = async () => {
+  table_data.value.page = 1
+  await loadItems()
+}
+const resetHalalFilter = async () => {
+  halalFilter.value = { min: null, max: null, sort: null }
+  table_data.value.page = 1
+  await loadItems()
+}
 const loadItems = async () => {
   const payload = {
     page: table_data.value.page,
     perPage: table_data.value.itemsPerPage,
     search: table_data.value.search
   }
+  const { min, max, sort } = halalFilter.value
+  const hasMin = min !== null && min !== ''
+  const hasMax = max !== null && max !== ''
+  // Both ends are inclusive on the server; a missing end defaults to 0 / 100.
+  if (hasMin || hasMax) {
+    payload.halalness = [hasMin ? Number(min) : 0, hasMax ? Number(max) : 100]
+  }
+  if (sort) payload.sort = { halalness: sort }
   await axios
     .post('admin/restaurant/restaurants-list', {
       ...payload
@@ -1143,33 +1178,9 @@ const onDelete = (item) => {
 const onImageUpdate = (data, key) => {
   formData.value[key] = [...data]
 }
-const sumOfSelectedRatings = computed(() => {
-  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
-})
-const sumOfTotalRating = computed(() => {
-  return ratings.value.reduce((total, r) => total + r.rating, 0)
-})
-const ratingPercentage = computed(() => {
-  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
-})
-const onAssignRating = async () => {
-  const ids = selectedRatings.value?.map((x) => {
-    return x._id
-  })
-  axios
-    .patch(
-      `admin/restaurant/restaurants/${store.details?._id}/update-halal-ratings`,
-      {
-        ratingIds: ids
-      }
-    )
-    .then(async (res) => {
-      store.showSnackbar('Ratings updated successfully')
-      store.setDetails({})
-      await loadItems()
-      assignRatingDialogShow.value = false
-      selectedRatings.value = []
-    })
+const onRatingSaved = async () => {
+  store.setDetails({})
+  await loadItems()
 }
 const onManagerSearch = (data) => {
   managerSearch.value = data
@@ -1284,7 +1295,7 @@ onBeforeMount(async () => {
       }
     })
   }
-  if (store.hasPermission(permissions.restaurantUpdateHalalRatings)) {
+  if (canRate.value) {
     await axios.get('admin/restaurant-halal-ratings').then((res) => {
       if (res?.data?.length) {
         ratings.value = res?.data

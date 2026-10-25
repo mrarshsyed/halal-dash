@@ -22,8 +22,14 @@
       <template #item.country="{ item }">
         {{ item?.countryName }}
       </template>
+      <template #item.category="{ item }">
+        {{ getActivityCategories(item) }}
+      </template>
       <template #item.rating="{ item }">
-        {{ item?.halal_ratings_percentage }}
+        {{ item?.halal_ratings_percentage_v2 }}
+      </template>
+      <template #item.points="{ item }">
+        {{ item?.halal_ratings_total_v2 ?? 0 }}
       </template>
       <template #item.manager="{ item }">
         {{ item?.manager?.email }}
@@ -82,7 +88,7 @@
           <v-tooltip
             text="Ratings"
             location="top"
-            v-if="store.hasPermission(permissions.activityUpdateHalalRatings)"
+            v-if="canRate"
           >
             <template #activator="{ props }">
               <v-icon
@@ -174,42 +180,88 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="assignRatingDialogShow">
+    <v-dialog v-model="assignRatingDialogShow" max-width="720" scrollable>
       <v-card>
         <v-card-title>Add Rating</v-card-title>
         <v-card-text>
-          <p>Select Rating</p>
+          <p class="font-weight-bold mb-2">Common Parameters</p>
+          <p v-if="!commonRatings.length" class="text-medium-emphasis">
+            No common parameters have been added yet.
+          </p>
           <v-row no-gutters>
-            <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-              <v-checkbox v-model="selectedRatings" :value="r">
+            <v-col cols="12" v-for="r in commonRatings" :key="r._id">
+              <v-checkbox
+                v-model="selectedIds"
+                :value="r._id"
+                density="compact"
+                hide-details
+              >
                 <template #label>
                   {{ r?.name }}
-                  <v-chip class="ms-2">
-                    {{ r?.rating }}
-                  </v-chip>
+                  <v-chip class="ms-2" size="small">{{ r?.rating }}</v-chip>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
+          <v-autocomplete
+            class="mt-6"
+            clearable
+            label="Subcategory"
+            :items="categories"
+            item-title="name"
+            item-value="_id"
+            v-model="selectedCategoryId"
+            @update:model-value="onCategoryChange"
+          />
+          <v-row no-gutters v-if="selectedCategoryId">
+            <v-col cols="12" v-for="r in categoryRatings" :key="r._id">
+              <v-checkbox
+                v-model="selectedIds"
+                :value="r._id"
+                density="compact"
+                hide-details
+              >
+                <template #label>
+                  {{ r?.name }}
+                  <v-chip class="ms-2" size="small">{{ r?.rating }}</v-chip>
+                </template>
+              </v-checkbox>
+            </v-col>
+          </v-row>
+          <v-alert
+            v-if="savedCategoryCount > 1"
+            type="warning"
+            class="mt-4"
+            density="compact"
+          >
+            This activity has parameters from more than one subcategory ({{
+              checkedCategoryNames.join(', ')
+            }}). Pick one subcategory to save; parameters from the others
+            will be cleared.
+          </v-alert>
+          <v-alert
+            v-if="ratingError"
+            type="error"
+            class="mt-4"
+            density="compact"
+          >
+            {{ ratingError }}
+          </v-alert>
         </v-card-text>
         <v-card-actions class="ma-2">
           <p>
-            Selected Ratings {{ sumOfSelectedRatings }} out of
+            Selected points {{ sumOfSelectedRatings }} out of
             {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
           </p>
           <v-spacer />
+          <v-btn color="error" @click="closeRatingDialog"> Close </v-btn>
           <v-btn
-            color="error"
-            @click="
-              () => {
-                selectedRatings = []
-                assignRatingDialogShow = false
-              }
-            "
+            color="primary"
+            :disabled="savedCategoryCount > 1"
+            @click="onAssignRating"
           >
-            Close
+            Save
           </v-btn>
-          <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -235,8 +287,11 @@ const managers = computed(() => {
   return store.managers
 })
 const ratings = ref([])
+const categories = ref([])
+const selectedIds = ref([])
+const selectedCategoryId = ref(null)
+const ratingError = ref('')
 const selectedManager = ref(null)
-const selectedRatings = ref([])
 const managerSearch = ref('')
 const managerForm = ref()
 const assignRatingDialogShow = ref(false)
@@ -252,7 +307,9 @@ const table_data = ref({
     { title: 'Activity', key: 'name', align: 'start' },
     { title: 'City', key: 'destinationName', align: 'start' },
     { title: 'Country', key: 'country', align: 'start' },
+    { title: 'Category', key: 'category', align: 'start' },
     { title: 'Rating(%)', key: 'rating', align: 'start' },
+    { title: 'Points', key: 'points', align: 'start' },
     { title: 'Manager Name', key: 'manager_name', align: 'start' },
     { title: 'Manager Email', key: 'manager', align: 'start' },
     { title: 'Action', key: 'action', align: 'center' }
@@ -385,15 +442,62 @@ const searchForm = ref({
   exportFunction: onExport
 })
 
-const sumOfSelectedRatings = computed(() => {
-  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
+// Activity category = the segments of the "Categories" group (e.g. Travel Services).
+const getActivityCategories = (item) =>
+  (item?.content?.segmentationGroups ?? [])
+    .find((g) => g?.name === 'Categories')
+    ?.segments?.map((s) => s?.name)
+    .filter(Boolean)
+    .join(', ') || '-'
+// The server also lets activity-all users save scores.
+const canRate = computed(
+  () =>
+    store.hasPermission(permissions.activityUpdateHalalRatings) ||
+    store.hasPermission(permissions.activityAll)
+)
+// Common parameters: attached directly to a main category (no subcategory).
+const commonRatings = computed(() =>
+  ratings.value.filter((r) => r?.mainCategory && !r?.category)
+)
+const categoryRatings = computed(() =>
+  ratings.value.filter(
+    (r) =>
+      selectedCategoryId.value && r?.category?._id === selectedCategoryId.value
+  )
+)
+// Subcategories among the checked parameters; more than one cannot be saved.
+const checkedCategories = computed(() => {
+  const map = new Map()
+  for (const r of ratings.value) {
+    if (r?.category && selectedIds.value.includes(r._id)) {
+      map.set(r.category._id, r.category.name)
+    }
+  }
+  return map
 })
-const sumOfTotalRating = computed(() => {
-  return ratings.value.reduce((total, r) => total + r.rating, 0)
-})
-const ratingPercentage = computed(() => {
-  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
-})
+const checkedCategoryNames = computed(() => [...checkedCategories.value.values()])
+const savedCategoryCount = computed(() => checkedCategoryNames.value.length)
+// Preview only; the saved score comes from the API response. Like the server,
+// old rows with several subcategories use every selected subcategory as the catalog.
+const visibleRatings = computed(() => [
+  ...commonRatings.value,
+  ...(savedCategoryCount.value > 1
+    ? ratings.value.filter((r) => checkedCategories.value.has(r?.category?._id))
+    : categoryRatings.value)
+])
+const sumOfSelectedRatings = computed(() =>
+  visibleRatings.value
+    .filter((r) => selectedIds.value.includes(r._id))
+    .reduce((total, r) => total + r.rating, 0)
+)
+const sumOfTotalRating = computed(() =>
+  visibleRatings.value.reduce((total, r) => total + r.rating, 0)
+)
+const ratingPercentage = computed(() =>
+  sumOfTotalRating.value
+    ? Math.round((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
+    : 0
+)
 
 const loadItems = async ({ page, itemsPerPage }) => {
   table_data.value.page = page
@@ -476,32 +580,65 @@ const onAssignManager = async () => {
       }
     })
 }
+const ratingErrorMessages = {
+  'Select ratings from a single category':
+    'Only one subcategory can be selected.',
+  'Each rating must belong to a main category or category':
+    'A checked parameter has no group. Reload the parameter list.',
+  'Ratings ids must be a array': 'No parameters were sent. Please try again.'
+}
+// Changing the subcategory drops checks from other subcategories; common checks stay.
+const onCategoryChange = () => {
+  const subIds = new Set(
+    ratings.value.filter((r) => r?.category).map((r) => r._id)
+  )
+  const keep = new Set(categoryRatings.value.map((r) => r._id))
+  selectedIds.value = selectedIds.value.filter(
+    (id) => !subIds.has(id) || keep.has(id)
+  )
+  ratingError.value = ''
+}
+const closeRatingDialog = () => {
+  selectedIds.value = []
+  selectedCategoryId.value = null
+  ratingError.value = ''
+  assignRatingDialogShow.value = false
+}
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
-  if (item?.halal_ratings?.length) {
-    selectedRatings.value = item?.halal_ratings
-  }
+  const saved = item?.halal_ratings_v2 ?? []
+  selectedIds.value = saved.map((x) => x._id)
+  selectedCategoryId.value =
+    saved.find((x) => x?.category)?.category?._id ?? null
+  ratingError.value = ''
   assignRatingDialogShow.value = true
 }
 const onAssignRating = async () => {
-  const ids = selectedRatings.value?.map((x) => {
-    return x._id
-  })
-  axios
-    .patch(`admin/activities/${store.details?._id}/update-halal-ratings`, {
-      ratingIds: ids
+  try {
+    const res = await axios.patch(
+      `admin/activities/${store.details?._id}/update-halal-ratings`,
+      { ratingIds: selectedIds.value }
+    )
+    store.showSnackbar(
+      `Ratings updated successfully (${res?.data?.halal_ratings_percentage_v2 ?? 0}%, ${res?.data?.halal_ratings_total_v2 ?? 0} points)`
+    )
+    store.setDetails({})
+    await loadItems({
+      page: table_data.value.page,
+      itemsPerPage: table_data.value.itemsPerPage,
+      sortBy: 'ascending'
     })
-    .then(async (res) => {
-      store.showSnackbar('Ratings updated successfully')
-      store.setDetails({})
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
-      assignRatingDialogShow.value = false
-      selectedRatings.value = []
-    })
+    closeRatingDialog()
+  } catch (e) {
+    const msg = e?.response?.data?.validationErrors?.ratingIds
+    if (msg) {
+      ratingError.value =
+        ratingErrorMessages[msg] ??
+        (msg.startsWith('Invalid halal rating ids')
+          ? 'A checked parameter no longer exists. Reload the parameter list.'
+          : msg)
+    }
+  }
 }
 const onNextPage = async () => {
   table_data.value.page = table_data.value.page + 1
@@ -556,10 +693,13 @@ onMounted(async () => {
     })
   }
   await axiosInstance.get('admin/activity-halal-ratings').then((res) => {
-    if (res?.data?.length) {
-      ratings.value = res?.data
-    }
+    ratings.value = res?.data ?? []
   })
+  await axiosInstance
+    .get('admin/activity-halal-rating-categories')
+    .then((res) => {
+      categories.value = res?.data ?? []
+    })
 })
 
 onBeforeUnmount(() => {

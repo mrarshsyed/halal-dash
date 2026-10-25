@@ -34,7 +34,10 @@
           {{ item?.name }}
         </template>
         <template #item.rating="{ item }">
-          {{ item?.halal_ratings_percentage }}
+          <div class="d-flex align-center ga-2">
+            <span>{{ item?.halal_ratings_percentage_v2 ?? 0 }}</span>
+            <HalalClassBadge :halal-class="item?.halal_class" />
+          </div>
         </template>
         <template #item.manager="{ item }">
           {{ item?.manager?.email }}
@@ -54,7 +57,7 @@
             <v-tooltip
               text="Ratings"
               location="top"
-              v-if="store.hasPermission(permissions.cruiseUpdateHalalRatings)"
+              v-if="canRate"
             >
               <template #activator="{ props }">
                 <v-icon
@@ -324,6 +327,13 @@
     />
     <p class="mb-4">Ship Name : {{ detailsData?.name }}</p>
     <p class="mb-4">Ship Line : {{ detailsData?.shipLine?.name }}</p>
+    <HalalRatingSummary
+      class="mb-4"
+      :percentage="detailsData?.halal_ratings_percentage_v2"
+      :total="detailsData?.halal_ratings_total_v2"
+      :halal-class="detailsData?.halal_class"
+      :ratings="detailsData?.halal_ratings_v2"
+    />
     <p class="mb-2">Description :</p>
     <div class="mb-4" v-html="detailsData?.description" />
     <p class="mb-2">Images :</p>
@@ -410,44 +420,13 @@
       </v-col>
     </v-row>
   </div>
-  <v-dialog v-model="assignRatingDialogShow">
-    <v-card>
-      <v-card-title>Select Rating</v-card-title>
-      <v-card-text>
-        <v-row no-gutters>
-          <v-col cols="12" v-for="(r, index) in ratings" :key="index">
-            <v-checkbox v-model="selectedRatings" :value="r">
-              <template #label>
-                {{ r?.name }}
-                <v-chip class="ms-2">
-                  {{ r?.rating }}
-                </v-chip>
-              </template>
-            </v-checkbox>
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-card-actions class="ma-2">
-        <p>
-          Selected Ratings {{ sumOfSelectedRatings }} out of
-          {{ sumOfTotalRating }} ({{ ratingPercentage }}%)
-        </p>
-        <v-spacer />
-        <v-btn
-          color="error"
-          @click="
-            () => {
-              selectedRatings = []
-              assignRatingDialogShow = false
-            }
-          "
-        >
-          Close
-        </v-btn>
-        <v-btn color="primary" @click="onAssignRating"> Save </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <HalalScoreRatingDialog
+    v-model="assignRatingDialogShow"
+    :ratings="ratings"
+    :selected="selectedHalalRatings"
+    :save-url="ratingSaveUrl"
+    @saved="onRatingSaved"
+  />
   <v-dialog v-model="assignManagerDialogShow">
     <v-card>
       <v-card-title>Assign Manager</v-card-title>
@@ -495,6 +474,9 @@ import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
+import HalalScoreRatingDialog from '@/components/HalalScoreRatingDialog.vue'
+import HalalClassBadge from '@/components/HalalClassBadge.vue'
+import HalalRatingSummary from '@/components/HalalRatingSummary.vue'
 import ImageUploader from './components/ImageUploader.vue'
 import { useAppStore } from '@/store/app'
 import { permissions } from '@/config/userRoutes'
@@ -614,7 +596,17 @@ const lines = ref([])
 const room_groups = ref([])
 const showForm = ref(false)
 const ratings = ref([])
-const selectedRatings = ref([])
+const selectedHalalRatings = ref([])
+// The server also lets cruise-all users save scores.
+const canRate = computed(
+  () =>
+    store.hasPermission(permissions.cruiseUpdateHalalRatings) ||
+    store.hasPermission(permissions.cruiseAll)
+)
+const ratingSaveUrl = computed(
+  () =>
+    `admin/cruise/ships/${store.details?._id}/update-halal-ratings`
+)
 const assignRatingDialogShow = ref(false)
 const assignManagerDialogShow = ref(false)
 const managerSearch = ref('')
@@ -623,9 +615,7 @@ const searchKeyword = ref('')
 
 const onRatingIconClick = async (item) => {
   store.setDetails(item)
-  if (item?.halal_ratings?.length) {
-    selectedRatings.value = item?.halal_ratings
-  }
+  selectedHalalRatings.value = item?.halal_ratings_v2 ?? []
   assignRatingDialogShow.value = true
 }
 
@@ -831,34 +821,13 @@ const onUpdateImageLink = (data) => {
 const onUpdateImageLinks = (key, index, data) => {
   formData.value[key][index].images = data
 }
-const sumOfSelectedRatings = computed(() => {
-  return selectedRatings.value.reduce((total, r) => total + r.rating, 0)
-})
-const sumOfTotalRating = computed(() => {
-  return ratings.value.reduce((total, r) => total + r.rating, 0)
-})
-const ratingPercentage = computed(() => {
-  return Math.ceil((sumOfSelectedRatings.value / sumOfTotalRating.value) * 100)
-})
-const onAssignRating = async () => {
-  const ids = selectedRatings.value?.map((x) => {
-    return x._id
+const onRatingSaved = async () => {
+  store.setDetails({})
+  await loadItems({
+    page: table_data.value.page,
+    itemsPerPage: table_data.value.itemsPerPage,
+    sortBy: 'ascending'
   })
-  axios
-    .patch(`admin/cruise/ships/${store.details?._id}/update-halal-ratings`, {
-      ratingIds: ids
-    })
-    .then(async (res) => {
-      store.showSnackbar('Ratings updated successfully')
-      store.setDetails({})
-      await loadItems({
-        page: table_data.value.page,
-        itemsPerPage: table_data.value.itemsPerPage,
-        sortBy: 'ascending'
-      })
-      assignRatingDialogShow.value = false
-      selectedRatings.value = []
-    })
 }
 const onManagerSearch = (data) => {
   managerSearch.value = data
@@ -956,25 +925,33 @@ const handelRemoveManagerIconClick = (item) => {
 }
 
 onBeforeMount(async () => {
+  const loaders = []
   if (store.hasPermission(permissions.userList)) {
-    await axios.get('admin/users').then((res) => {
-      if (res?.data?.length) {
-        const managerList = res?.data?.filter((x) => x?.role === 'manager')
-        store.setManager(managerList)
-      }
-    })
+    loaders.push(
+      axios.get('admin/users').then((res) => {
+        if (res?.data?.length) {
+          const managerList = res?.data?.filter((x) => x?.role === 'manager')
+          store.setManager(managerList)
+        }
+      })
+    )
   }
-  if (store.hasPermission(permissions.cruiseUpdateHalalRatings)) {
-    await axios.get('admin/cruise-halal-ratings').then((res) => {
-      if (res?.data?.length) {
-        ratings.value = res?.data
-      }
-    })
+  if (canRate.value) {
+    loaders.push(
+      axios.get('admin/cruise-halal-ratings').then((res) => {
+        if (res?.data?.length) {
+          ratings.value = res?.data
+        }
+      })
+    )
   }
-  await getLines()
-  await getRoomGroups()
-  if (id.value) {
-    const details = await axios.get(`admin/cruise/ships/${id.value}`)
+  loaders.push(getLines(), getRoomGroups())
+  const detailsRequest = id.value
+    ? axios.get(`admin/cruise/ships/${id.value}`)
+    : null
+  await Promise.all(loaders)
+  if (detailsRequest) {
+    const details = await detailsRequest
     if (details?.data?._id) {
       if (formMode.value) {
         formData.value = { ...details?.data }

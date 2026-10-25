@@ -44,6 +44,12 @@
         <template #item.ship="{ item }">
           {{ item?.ship?.name }}
         </template>
+        <template #item.halal="{ item }">
+          <div class="d-flex align-center ga-2">
+            <span>{{ item?.ship?.halal_ratings_percentage_v2 ?? 0 }}</span>
+            <HalalClassBadge :halal-class="item?.ship?.halal_class" />
+          </div>
+        </template>
         <template #item.duration="{ item }">
           {{ item?.duration }} Days
         </template>
@@ -556,6 +562,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from '@/plugins/axios'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import ImageUploader from './components/ImageUploader.vue'
+import HalalClassBadge from '@/components/HalalClassBadge.vue'
 import { useAppStore } from '@/store/app'
 
 const store = useAppStore()
@@ -582,6 +589,7 @@ const table_data = ref({
   headers: [
     { title: 'Name', key: 'name', align: 'start' },
     { title: 'Ship', key: 'ship', align: 'start' },
+    { title: 'Ship Halal Rating(%)', key: 'halal', align: 'start' },
     { title: 'Duration', key: 'duration', align: 'start' },
     { title: 'Start Price', key: 'startPrice', align: 'start' },
     { title: 'End Price', key: 'endPrice', align: 'start' },

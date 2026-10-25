@@ -13,6 +13,7 @@
               :cols="component?.cols ?? 12"
               :md="component?.md ?? 6"
               v-for="(component, index) in dialog.formComponents?.fields"
+              v-show="!component?.hidden"
               :key="index"
             >
               <v-text-field
@@ -101,6 +102,12 @@ const getValidationRules = (component) => {
   const commonRules = component?.isRequired
     ? [(v) => !!v || `${component?.label} is required`]
     : []
+  // `positive: true` on a number field: blank or 0 counts as missing.
+  if (component?.positive) {
+    commonRules.push(
+      (v) => Number(v) > 0 || `${component?.label} is required (above 0)`
+    )
+  }
 
   if (component?.type === 'email') {
     return [
